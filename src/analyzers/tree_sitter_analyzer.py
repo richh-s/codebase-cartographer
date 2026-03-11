@@ -3,7 +3,7 @@ import os
 from typing import Dict, List, Optional, Tuple, Any
 from tree_sitter import Language, Parser
 
-from codebase_cartographer.models.nodes import FunctionNode
+from models.nodes import FunctionNode, ClassNode
 
 class LanguageRouter:
     """Maps file extensions to the appropriate tree-sitter grammar."""
@@ -208,13 +208,16 @@ class TreeSitterAnalyzer:
         
         return max(1.0, complexity)  # Base complexity of 1.0
 
-    def _extract_classes(self, root_node, source: bytes) -> List[str]:
+    def _extract_classes(self, root_node, source: bytes, module_path: str) -> List[ClassNode]:
         classes = []
         def traverse(node):
             if node.type == "class_definition":
                 name_node = next((c for c in node.children if c.type == "identifier"), None)
                 if name_node:
-                    classes.append(name_node.text.decode('utf-8'))
+                    classes.append(ClassNode(
+                        name=name_node.text.decode('utf-8'),
+                        parent_module=module_path
+                    ))
             for child in node.children:
                 traverse(child)
         traverse(root_node)
@@ -266,7 +269,7 @@ class TreeSitterAnalyzer:
             if ext == ".py":
                 result["imports"].extend(self.analyze_python_imports(root, source_bytes))
                 result["functions"] = self.analyze_python_functions(root, source_bytes, module_path)
-                result["classes"] = self._extract_classes(root, source_bytes)
+                result["classes"] = self._extract_classes(root, source_bytes, module_path)
             elif ext == ".sql":
                 # Add SQL fallback complexity and symbol mapping (module itself is the symbol in dbt)
                 base = os.path.basename(filepath)

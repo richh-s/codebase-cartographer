@@ -27,6 +27,10 @@ dependencies = [
     "tree-sitter-sql",
     "sqlglot>=20.0.0",
     "scipy>=1.8.0",
+    "numpy>=1.21.0",
+    "google-generativeai>=0.3.0",
+    "openai>=1.0.0",
+    "python-dotenv>=1.0.0",
 ]
 
 [project.optional-dependencies]
@@ -37,7 +41,7 @@ dev = [
 ]
 
 [project.scripts]
-codebase-cartographer = "codebase_cartographer.cli:app"
+codebase-cartographer = "cli:app"
 
 [tool.setuptools.packages.find]
 where = ["src"]

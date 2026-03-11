@@ -3,7 +3,7 @@ import os
 import networkx as nx
 from typing import Dict, List, Any
 
-from codebase_cartographer.models.nodes import ModuleNode
+from models.nodes import ModuleNode
 
 class GraphBuilder:
     """Constructs and analyzes the codebase dependency graph using a NetworkX DiGraph."""
@@ -155,21 +155,27 @@ class GraphBuilder:
         )
         top_hubs = [n.identity for n in sorted_nodes[:10]]
         
-        # Format structured JSON edges
-        structured_edges = [
+        # Format structured JSON edges with sorting
+        structured_edges = sorted([
             {"source": u, "target": v, "type": d.get("type", "unknown")}
             for u, v, d in self.graph.edges(data=True)
-        ]
+        ], key=lambda x: (x["source"], x["target"]))
+        
+        # Format nodes sorted by identity
+        sorted_nodes_list = sorted(
+            [n.model_dump() for n in self.nodes.values()],
+            key=lambda x: x["identity"]
+        )
         
         output = {
-            "nodes": [n.model_dump() for n in self.nodes.values()],
+            "nodes": sorted_nodes_list,
             "edges": structured_edges,
             "top_hubs": top_hubs,
-            "scc_groups": self.scc_groups,
+            "scc_groups": sorted([sorted(g) for g in self.scc_groups]),
             "metadata": {
                 "total_files": len(self.nodes)
             }
         }
         
         with open(output_path, 'w', encoding='utf-8') as f:
-            json.dump(output, f, indent=2)
+            json.dump(output, f, indent=2, sort_keys=True)

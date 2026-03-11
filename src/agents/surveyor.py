@@ -2,10 +2,10 @@ import os
 import time
 from typing import List
 
-from codebase_cartographer.analyzers.tree_sitter_analyzer import TreeSitterAnalyzer
-from codebase_cartographer.utils.git_utils import GitUtils
-from codebase_cartographer.graph.graph_builder import GraphBuilder
-from codebase_cartographer.models.nodes import ModuleNode
+from analyzers.tree_sitter_analyzer import TreeSitterAnalyzer
+from utils.git_utils import GitUtils
+from graph.graph_builder import GraphBuilder
+from models.nodes import ModuleNode
 
 class SurveyorAgent:
     """Orchestrates Phase 1: Static structure and git metadata extraction."""
@@ -121,3 +121,4 @@ class SurveyorAgent:
         out_path = os.path.join(self.target_dir, output_json)
         self.graph_builder.export_json(out_path)
         print(f"Analysis complete. Results saved to {out_path}")
+        return self.graph_builder

@@ -6,7 +6,7 @@ from sqlglot import exp, parse_one
 from sqlglot.optimizer.qualify import qualify
 from sqlglot.optimizer.scope import build_scope
 from typing import List, Optional, Dict, Tuple, Any
-from codebase_cartographer.models.lineage import LineageEdge, ColumnRef
+from models.lineage import LineageEdge, ColumnRef
 
 class SQLLineageAnalyzer:
     """Uses sqlglot to extract lineage from SQL and dbt models with Phase 2.5 refinements."""

@@ -1,7 +1,7 @@
 import networkx as nx
 import math
 from typing import List, Dict, Any, Optional, Set
-from codebase_cartographer.models.lineage import DataNode, LineageEdge, DatasetRole, TransformationNode
+from models.lineage import DataNode, LineageEdge, TransformationNode, DatasetRole
 
 class LineageGraph:
     """Manages the directed graph of data entities and their code lineages with phase 2.6 topological intelligence."""

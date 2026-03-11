@@ -3,13 +3,13 @@ import json
 import subprocess
 from datetime import datetime
 from typing import List, Dict, Any, Tuple, Optional
-from codebase_cartographer.analyzers.python_dataflow_analyzer import PythonDataFlowAnalyzer
-from codebase_cartographer.analyzers.sql_lineage_analyzer import SQLLineageAnalyzer
-from codebase_cartographer.analyzers.dag_config_analyzer import DAGConfigAnalyzer
-from codebase_cartographer.analyzers.dag_parsers.plugins import AirflowDagParser, DbtConfigParser
-from codebase_cartographer.utils.identity_resolver import IdentityResolver
-from codebase_cartographer.graph.lineage_graph import LineageGraph
-from codebase_cartographer.models.lineage import DataNode, LineageEdge, TransformationNode, DatasetRole
+from analyzers.python_dataflow_analyzer import PythonDataFlowAnalyzer
+from analyzers.sql_lineage import SQLLineageAnalyzer
+from analyzers.dag_config_parser import DAGConfigAnalyzer
+from analyzers.dag_parsers.plugins import AirflowDagParser, DbtConfigParser
+from utils.identity_resolver import IdentityResolver
+from graph.knowledge_graph import LineageGraph
+from models.lineage import DataNode, LineageEdge, TransformationNode, DatasetRole
 
 class HydrologistAgent:
     """Coordinates Phase 2.6: Advanced multi-modal data lineage extraction."""
@@ -336,13 +336,13 @@ class HydrologistAgent:
         for node in self.lineage_graph.data_nodes.values():
             if node.role == "SOURCE":# and not node.columns: # Temporary: check all sources
                 if node.identity in self.inferred_schemas:
-                    from codebase_cartographer.models.lineage import ColumnRef
+                    from models.lineage import ColumnRef
                     node.columns = [ColumnRef(name=c, confidence=0.7) for c in sorted(list(self.inferred_schemas[node.identity]))]
                 else:
                     # Try a name-only match if FQDN didn't hit
                     raw_name = node.identity.split(":")[-1] if ":" in node.identity else node.identity
                     if raw_name in self.inferred_schemas:
-                        from codebase_cartographer.models.lineage import ColumnRef
+                        from models.lineage import ColumnRef
                         node.columns = [ColumnRef(name=c, confidence=0.6) for c in sorted(list(self.inferred_schemas[raw_name]))]
 
         # Cleanup debug logs and finalize
@@ -394,6 +394,6 @@ class HydrologistAgent:
                 "warnings": self.lineage_graph.validate_integrity(),
                 "mermaid": self.lineage_graph.to_mermaid()
             }
-            json.dump(data, f, indent=2, default=str)
+            json.dump(data, f, indent=2, sort_keys=True, default=str)
             
-        return out_path
+        return self.lineage_graph

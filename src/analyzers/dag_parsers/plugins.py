@@ -1,7 +1,7 @@
 import re
 import yaml
 from typing import List
-from codebase_cartographer.models.lineage import LineageEdge
+from models.lineage import LineageEdge
 
 class AirflowDagParser:
     """Parses Airflow DAGs (Python) for virtual task dependencies (>>)."""

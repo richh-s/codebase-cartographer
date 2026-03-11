@@ -1,26 +1,55 @@
 # Codebase Cartographer
 
-A CLI tool for mapping and analyzing codebases.
+A tool for autonomous code mapping and data lineage intelligence.
 
-## Features (Planned)
-- Codebase visualization and mapping
-- Dependency analysis
-- Structural reports
+## 🚀 Installation
 
-## Development Setup
+Install using `uv` or `pip`:
 
-1. Create a virtual environment:
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-   ```
+```bash
+uv pip install -e .
+```
 
-2. Install dependencies:
-   ```bash
-   pip install -e ".[dev]"
-   ```
+## 🛠 Usage
 
-3. Run the CLI:
-   ```bash
-   codebase-cartographer --help
-   ```
+To analyze a repository and generate mapping artifacts:
+
+```bash
+codebase-cartographer analyze /path/to/your/repo
+```
+
+This will generate a `.cartography/` directory in the target repository containing:
+- `module_graph.json`: Structural dependency graph, PageRank, and complexity metrics.
+- `lineage_graph.json`: Data lineage extraction from Python, SQL, and YAML.
+- `RECONNAISSANCE.md`: (Requires `--llm`) AI-generated business reconnaissance report summarizing system purpose and architectural health.
+
+## 🤖 Semantic Intelligence (Phase 3)
+
+To enable LLM-powered analysis, set your API keys in a `.env` file:
+```bash
+GOOGLE_API_KEY=your_key
+# OR
+OPENAI_API_KEY=your_key
+```
+
+Run full semantic analysis:
+```bash
+codebase-cartographer analyze /path/to/repo --llm --semantic-depth full
+```
+
+## 📂 Project Structure
+
+- `src/cli.py`: CLI entry point.
+- `src/orchestrator.py`: Coordinates agents.
+- `src/agents/`: Surveyor (Structure) and Hydrologist (Lineage) agents.
+- `src/analyzers/`: SQL, Python, and YAML parsers.
+- `src/graph/`: Knowledge and Lineage graph implementations.
+- `src/models/`: Pydantic schemas.
+
+## 🧪 Development
+
+Run tests with `pytest`:
+
+```bash
+pytest tests/
+```

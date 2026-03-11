@@ -3,8 +3,8 @@ import re
 import hashlib
 from typing import List, Optional, Dict, Tuple, Any
 from tree_sitter import Language, Parser
-from codebase_cartographer.analyzers.tree_sitter_analyzer import LanguageRouter
-from codebase_cartographer.models.lineage import DataNode, LineageEdge
+from analyzers.tree_sitter_analyzer import LanguageRouter
+from models.lineage import DataNode, LineageEdge
 
 class PythonDataFlowAnalyzer:
     """Uses tree-sitter to extract dataflow lineage from Python source code."""

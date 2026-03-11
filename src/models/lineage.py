@@ -48,6 +48,10 @@ class DataNode(BaseModel):
     
     is_dynamic_reference: bool = False
     
+    # Semantic Intelligence (Phase 3 Upgrade)
+    purpose_statement: Optional[str] = None
+    domain_cluster: Optional[str] = None
+    
     # Merged structural (from Phase 1) and lineage (from Phase 2) importance
     importance_score: int = 1
     

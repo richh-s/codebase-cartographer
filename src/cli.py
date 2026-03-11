@@ -1,27 +1,48 @@
 import os
 import typer
-from codebase_cartographer.agents.surveyor import SurveyorAgent
+from typing import Optional
+from dotenv import load_dotenv
+from orchestrator import analyze_repo
+
+load_dotenv()
 
 app = typer.Typer(name="codebase-cartographer", help="Codebase Cartographer CLI")
 
 @app.command()
-def survey(
-    target_dir: str = typer.Argument(".", help="Directory to analyze"),
-    output: str = typer.Option(".cartography/module_graph.json", "--output", "-o", help="Output JSON path")
+def analyze(
+    repo_path: str = typer.Argument(..., help="Path to the repository to analyze."),
+    output: Optional[str] = typer.Option(None, "--output", "-o", help="Custom output directory"),
+    llm: bool = typer.Option(False, "--llm", help="Enable LLM-powered semantic analysis."),
+    semantic_depth: str = typer.Option("light", "--semantic-depth", help="Depth of semantic analysis (light|full)."),
+    store_embeddings: bool = typer.Option(False, "--store-embeddings", help="Store vector embeddings in the output JSON.")
 ):
     """
-    Run Phase 1: The Surveyor Agent to extract the structural graph of the target directory.
+    Analyzes a codebase (local or GitHub) and generates structural/data lineage graphs with optional semantic intelligence.
     """
-    try:
-        agent = SurveyorAgent(target_dir)
-        # Ensure output directory exists before running
-        out_path = os.path.join(agent.target_dir, output)
-        os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    if repo_path.startswith("http"):
+        import tempfile
+        import subprocess
+        temp_dir = tempfile.mkdtemp(prefix="cartographer-")
+        typer.echo(f"Cloning repository to {temp_dir}...")
+        try:
+            subprocess.run(["git", "clone", "--depth", "1", repo_path, temp_dir], check=True, capture_output=True)
+            repo_path = temp_dir
+        except subprocess.CalledProcessError as e:
+            typer.secho(f"Error cloning repository: {e.stderr.decode()}", fg=typer.colors.RED)
+            raise typer.Exit(1)
         
-        agent.run(output_json=output)
-    except Exception as e:
-        typer.secho(f"Error executing Surveyor Agent: {e}", fg=typer.colors.RED)
-        raise typer.Exit(code=1)
+    if not os.path.exists(repo_path):
+        typer.echo(f"Error: Path {repo_path} does not exist.")
+        raise typer.Exit(1)
+        
+    typer.echo(f"Initializing analysis for {repo_path}...")
+    results = analyze_repo(
+        repo_path, 
+        llm_enabled=llm, 
+        semantic_depth=semantic_depth, 
+        store_embeddings=store_embeddings
+    )
+    typer.echo(f"Analysis successful!")
 
 @app.command()
 def hydrologist(

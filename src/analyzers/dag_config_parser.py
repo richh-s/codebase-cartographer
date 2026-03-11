@@ -1,5 +1,5 @@
 from typing import List, Protocol
-from codebase_cartographer.models.lineage import LineageEdge
+from models.lineage import LineageEdge
 
 class DAGParserPlugin(Protocol):
     def can_handle(self, filepath: str) -> bool: ...

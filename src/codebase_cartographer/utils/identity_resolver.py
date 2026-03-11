@@ -61,16 +61,46 @@ class IdentityResolver:
         
         return canon
 
+    def resolve_canonical(self, raw_name: str) -> str:
+        """Returns the canonical name without updating the registry."""
+        if raw_name in self.mappings:
+            return self.mappings[raw_name]
+        return self._normalize(raw_name)
+
     def _normalize(self, name: str) -> str:
-        """Basic normalization for fallback resolution."""
+        """Enhanced normalization across systems (S3, DB, Warehouse)."""
         name = name.lower().strip('"').strip("'").strip("`")
+        
+        # Strip dbt-specific markers
+        if name.startswith("__dbt_ref_"):
+            name = name[len("__dbt_ref_"):]
+            if name.endswith("__"): name = name[:-2]
+        elif name.startswith("__dbt_source_"):
+            name = name[len("__dbt_source_"):]
+            if name.endswith("__"): name = name[:-2]
+            # source_name.table_name or source_name_table_name
+            if "_" in name and "." not in name:
+                # Heuristic: last part is usually the table
+                name = name.split("_")[-1]
+        
+        # Strip protocols
         if "://" in name:
             name = name.split("://")[-1]
         
-        # Strip common extensions and paths
-        name = re.sub(r"\.(csv|parquet|sql|json|delta|avro|txt)$", "", name)
-        name = name.split("/")[-1]
+        # Strip bucket name if S3-like
+        if "/" in name:
+            parts = name.split("/")
+            # If it's a deep path, take the last significant part
+            # e.g. s3://bucket/warehouse/orders -> orders
+            name = parts[-1] if parts[-1] else parts[-2]
         
+        # Strip extensions
+        name = re.sub(r"\.(csv|parquet|sql|json|delta|avro|txt|db)$", "", name)
+        
+        # Handle database.schema.table -> table
+        if "." in name:
+            name = name.split(".")[-1]
+            
         return name
 
     def _parse_components(self, raw_name: str) -> Dict[str, Optional[str]]:

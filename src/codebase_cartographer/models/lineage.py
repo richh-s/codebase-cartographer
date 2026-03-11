@@ -40,6 +40,7 @@ class DataNode(BaseModel):
     database: Optional[str] = None
     schema_: Optional[str] = Field(default=None, alias="schema")
     table: Optional[str] = None
+    canonical_identity: Optional[str] = None
 
     # Richer schema awareness
     columns: List[ColumnRef] = Field(default_factory=list)

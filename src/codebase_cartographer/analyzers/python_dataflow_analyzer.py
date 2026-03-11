@@ -138,9 +138,14 @@ class PythonDataFlowAnalyzer:
                 func_text = func_node.text.decode('utf-8')
                 
                 # 1. Pandas Read/Write
-                if any(k in func_text for k in ["read_csv", "read_excel", "read_parquet", "read_sql", "to_csv", "to_parquet", "to_sql", "to_excel"]):
+                pandas_ios = [
+                    "read_csv", "read_excel", "read_parquet", "read_sql", "read_json",
+                    "to_csv", "to_parquet", "to_sql", "to_excel", "to_json"
+                ]
+                if any(k in func_text for k in pandas_ios):
                     args = node.child_by_field_name("arguments")
                     if args and len(args.children) > 1:
+                        # Usually first arg is path
                         path_node = args.children[1]
                         val, confidence = self._resolve_constant(path_node, source_bytes, merged_constants)
                         if val:
@@ -157,13 +162,13 @@ class PythonDataFlowAnalyzer:
                             ))
                             
                 # 2. PySpark Read/Write
-                elif ".read." in func_text or ".write." in func_text:
+                elif any(k in func_text for k in [".read.", ".write.", "read.csv", "read.parquet", "write.parquet", "write.save"]):
                     args = node.child_by_field_name("arguments")
                     if args and len(args.children) > 1:
                         path_node = args.children[1]
                         val, confidence = self._resolve_constant(path_node, source_bytes, merged_constants)
                         if val:
-                            etype = "PYTHON_READ" if ".read." in func_text else "PYTHON_WRITE"
+                            etype = "PYTHON_READ" if ".read" in func_text else "PYTHON_WRITE"
                             edges.append(LineageEdge(
                                 source=val if etype == "PYTHON_READ" else identity,
                                 target=identity if etype == "PYTHON_READ" else val,

@@ -29,6 +29,7 @@ class HydrologistAgent:
         self.discovered_schemas: Dict[str, List[Any]] = {}
         self.inferred_schemas: Dict[str, set] = {}
         self.dataset_to_system: Dict[str, str] = {}
+        self.shared_constants: Dict[str, str] = {}
         self.graph_version = self._get_git_version()
         
     def _get_git_version(self) -> str:
@@ -46,6 +47,7 @@ class HydrologistAgent:
 
     def _is_dataset(self, identity: str) -> bool:
         """Heuristic to distinguish datasets from code modules."""
+        if identity.startswith("cte:"): return False
         if ":" in identity: return True
         if self._is_module(identity): return False
         if "/" not in identity: return True 
@@ -141,7 +143,7 @@ class HydrologistAgent:
                     identity=identity, # Use file path as identity to avoid self-cycles
                     name=os.path.basename(file),
                     type="DBT_MODEL",
-                    logic_hash=edges[0].logic_hash if edges else "unknown",
+                    logic_hash=(edges[0].logic_hash if edges else None) or "unknown",
                     operations=metadata.get("operations", []),
                     column_lineage=metadata.get("column_lineage", []),
                     metadata={"file_path": rel_path}
@@ -160,6 +162,17 @@ class HydrologistAgent:
                 
                 if canon_identity in schemas:
                     self.discovered_schemas[canon_product] = schemas[canon_identity]
+                
+                # Phase 2.12: Internal SQL Scopes (CTEs)
+                for scope in metadata.get("scopes", []):
+                    scope_node = TransformationNode(
+                        identity=scope["identity"],
+                        name=scope["name"],
+                        type=scope["type"],
+                        logic_hash=scope.get("logic_hash") or "unknown",
+                        metadata={"parent_module": identity}
+                    )
+                    self.lineage_graph.add_transformation_node(scope_node)
                 
                 # Phase 2.8/2.9: Schema Inference for Sources
                 for target_table, cols in schemas.items():
@@ -196,7 +209,7 @@ class HydrologistAgent:
                     else: edge.target = canon
                     
                     if canon not in self.lineage_graph.data_nodes:
-                        # Phase 2.6/2.7/2.9/2.10: Enrich DataNode metadata
+                        # Phase 2.6/2.7/2.9/2.10/2.15: Enrich DataNode metadata
                         system = self.dataset_to_system.get(canon, ns)
                         if system == "unknown":
                             if "s3://" in raw: system = "s3"
@@ -208,74 +221,56 @@ class HydrologistAgent:
                             elif ".csv" in raw: system = "csv"
                             
                         # Phase 2.10 Refinement: Be careful with system "dbt"
-                        # Only tag as dbt if it's actually produced by a sql file in this repo
-                        if raw.endswith(".sql"):
-                            system = "dbt"
-                        elif canon in self.discovered_schemas:
-                            system = "dbt"
+                        if raw.endswith(".sql"): system = "dbt"
+                        elif canon in self.discovered_schemas: system = "dbt"
                             
                         # If it's a raw source, it shouldn't be "dbt" unless explicitly marked
                         if "raw_" in raw.lower() and canon not in self.discovered_schemas:
-                            system = "warehouse" # Fallback for jaffle shop / generic SQL warehouse
+                            system = "warehouse"
                             
-                        # Namespace mapping
-                        if ns != "unknown":
-                            system = ns
+                        if ns != "unknown": system = ns
                         
-                        env = "production" # Default
+                        env = "production"
                         raw_lower = raw.lower()
                         if "dev" in raw_lower: env = "development"
                         elif "qa" in raw_lower: env = "qa"
                         elif "staging" in raw_lower or "stg" in raw_lower: env = "staging"
                         
                         # Phase 2.7: Heuristic dataset typing
-                        dataset_type = "object_storage" if system in ["s3", "gcs"] else "database_table"
+                        dataset_type = "database_table"
+                        if system in ["s3", "gcs"]: dataset_type = "object_storage"
+                        elif system in ["csv", "parquet", "json", "delta"]: dataset_type = "file_dataset"
+                        
                         columns = self.discovered_schemas.get(canon, [])
                         confidence = 1.0 if columns else 0.5
+                        if canon in self.inferred_schemas: confidence = max(confidence, 0.7)
                         
-                        # Phase 2.8: Schema inference integration
-                        if not columns:
-                            # Try exact match or name-only match
-                            raw_name_key = self.identity_resolver.resolve(raw, "unknown")
-                            if raw_name_key in self.inferred_schemas:
-                                from codebase_cartographer.models.lineage import ColumnRef
-                                columns = [ColumnRef(name=c, confidence=0.7) for c in self.inferred_schemas[raw_name_key]]
-                                confidence = 0.7
-                            elif canon in self.inferred_schemas:
-                                from codebase_cartographer.models.lineage import ColumnRef
-                                columns = [ColumnRef(name=c, confidence=0.7) for c in self.inferred_schemas[canon]]
-                                confidence = 0.7
+                        # Phase 2.15: Dynamic references & stable placeholders
+                        is_dynamic = "{" in raw or "$" in raw or edge.confidence_score < 0.5
+                        if is_dynamic: confidence = 0.4
                         
-                        if "raw_" in raw_lower:
-                            dataset_type = "source_table"
-                            confidence = 0.9
-                        elif "stg_" in raw:
-                            dataset_type = "staging_table"
-                            confidence = 0.9
-                        elif "fct_" in raw:
-                            dataset_type = "fact_table"
-                            confidence = 0.9
-                        elif "dim_" in raw:
-                            dataset_type = "dimension_table"
-                            confidence = 0.9
-                        
-                        identity_info = self.identity_resolver.identities.get(canon)
-                        
+                        # Basename as table name for files
+                        table_name = raw
+                        if "/" in raw or "\\" in raw:
+                            table_name = os.path.splitext(os.path.basename(raw))[0]
+
                         self.lineage_graph.add_data_node(DataNode(
                             identity=canon,
                             name=raw,
                             canonical_name=canon,
+                            canonical_identity=self.identity_resolver.resolve_canonical(raw),
                             namespace=ns,
                             system=system,
                             environment=env,
                             type=dataset_type,
-                            database=identity_info.database if identity_info else None,
-                            schema_=identity_info.schema_ if identity_info else None,
-                            table=identity_info.table if identity_info else None,
+                            database=None, # Filled by identity_resolver parse if possible
+                            schema_=None,
+                            table=table_name,
                             columns=columns,
                             version=self.graph_version,
                             timestamp=datetime.now(),
-                            dataset_type_confidence=confidence
+                            dataset_type_confidence=confidence,
+                            is_dynamic_reference=is_dynamic
                         ))
             
             # 2. Inject Transformation Nodes for code-data boundaries

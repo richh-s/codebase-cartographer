@@ -1,0 +1,5 @@
+
+sources:
+  - name: internal_raw
+    tables:
+      - name: orders

@@ -36,6 +36,18 @@ class LineageGraph:
             
         self.graph.add_edge(edge.source, edge.target, **edge.model_dump())
 
+    def blast_radius(self, node_identity: str) -> List[str]:
+        """Returns all downstream dependents of a given node identity using BFS."""
+        if node_identity not in self.graph:
+            return []
+            
+        dependents = set()
+        # Use BFS to find all reachable nodes in the directed graph
+        for descendant in nx.descendants(self.graph, node_identity):
+            dependents.add(descendant)
+            
+        return sorted(list(dependents))
+
     def assign_roles(self):
         """Assigns semantic roles (SOURCE, INTERMEDIATE, TERMINAL) based on graph topology."""
         for node_id in self.data_nodes:

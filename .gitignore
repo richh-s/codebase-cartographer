@@ -36,3 +36,8 @@ env/
 # Project Specific
 .cartography/*
 !.cartography/.gitkeep
+
+# Secrets
+.env
+.env.*
+!.env.example

@@ -60,7 +60,7 @@ class HydrologistAgent:
         if "unknown" in edge.source or "unknown" in edge.target: completeness_factor *= 0.7
         return round(base_conf * completeness_factor, 2)
 
-    def run(self, output_json: str = ".cartography/lineage.json"):
+    def run(self, output_json: str = ".cartography/lineage_graph.json", sql_dialect: Optional[str] = None):
         """
         Traverses the codebase and extracts lineage edges with Phase 2.6 refinements.
         """
@@ -125,12 +125,12 @@ class HydrologistAgent:
                         sqlglot_schema[f"__dbt_ref_{canon_name}__"] = cols
                     # Also handle potential dbt source format (simplified)
                     sqlglot_schema[f"__dbt_source_{canon_name}__"] = cols
-
+ 
                 # Request 2.11: Use canonical identity for transformation as well if possible
                 canon_identity = self.identity_resolver.resolve(identity, "dbt", allow_fuzzy=False)
                 
                 edges, schemas, metadata = self.sql_analyzer.analyze(
-                    filepath, canon_identity, schema=sqlglot_schema
+                    filepath, canon_identity, schema=sqlglot_schema, dialect=sql_dialect
                 )
                 all_edges.extend(edges)
                 

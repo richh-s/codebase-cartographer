@@ -96,6 +96,51 @@ class LineageGraph:
             merged = base_importance + impact_sum
             node.importance_score = min(100, int(merged * 10))  # Scale for visibility
 
+    def save_json(self, path: str):
+        """Serializes the graph to a JSON file."""
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        data = {
+            "data_nodes": [n.model_dump() for n in self.data_nodes.values()],
+            "transformation_nodes": [n.model_dump() for n in self.transformation_nodes.values()],
+            "edges": [
+                {"source": u, "target": v, **d} 
+                for u, v, d in self.graph.edges(data=True)
+            ],
+            "health": self.get_health_report()
+        }
+        with open(path, "w") as f:
+            json.dump(data, f, indent=2, default=str)
+
+    def load_json(self, path: str):
+        """Deserializes the graph from a JSON file."""
+        with open(path, "r") as f:
+            data = json.load(f)
+        
+        self.graph.clear()
+        self.data_nodes.clear()
+        self.transformation_nodes.clear()
+        
+        for dn in data.get("data_nodes", []):
+            node = DataNode(**dn)
+            self.add_data_node(node)
+            
+        for tn in data.get("transformation_nodes", []):
+            node = TransformationNode(**tn)
+            self.add_transformation_node(node)
+            
+        for edge in data.get("edges", []):
+            source = edge.pop("source")
+            target = edge.pop("target")
+            self.graph.add_edge(source, target, **edge)
+
+    def find_sources(self) -> List[DataNode]:
+        """Returns all entry points (SOURCE nodes) in the data system."""
+        return [n for n in self.data_nodes.values() if n.role == DatasetRole.SOURCE]
+
+    def find_sinks(self) -> List[DataNode]:
+        """Returns all exit points (TERMINAL nodes) in the data system."""
+        return [n for n in self.data_nodes.values() if n.role == DatasetRole.TERMINAL]
+
     def validate_integrity(self, canonical_registry: Optional[Dict[str, Set[tuple]]] = None) -> List[Dict[str, Any]]:
         """Phase 2.6 expanded validation."""
         warnings = []

@@ -21,11 +21,11 @@ class SurveyorAgent:
         rel_path = os.path.relpath(filepath, self.target_dir)
         return rel_path
         
-    def run(self, output_json: str = ".cartography/module_graph.json"):
+    def run(self, output_json: str = ".cartography/module_graph.json", velocity_days: int = 30):
         """Executes the full Surveyor pipeline."""
         print(f"Starting SurveyorAgent on {self.target_dir}")
         print(f"Output will be saved to {output_json}")
-        git_data = self.git_utils.get_file_metadata(days=30)
+        git_data = self.git_utils.get_file_metadata(days=velocity_days)
         
         # 1. Walk directory and parse files
         for root, dirs, files in os.walk(self.target_dir):
@@ -100,6 +100,7 @@ class SurveyorAgent:
                     complexity_score=module_complexity,
                     is_high_complexity=is_high_complexity,
                     velocity_score=velocity_score,
+                    change_velocity_30d=velocity_score, # Populate rubric field
                     metadata={
                         **ast_data.get("metadata", {}),
                         "last_modified": g_meta.get("last_modified", ""),

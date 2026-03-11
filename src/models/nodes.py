@@ -11,12 +11,14 @@ class FunctionNode(BaseModel):
     
     # Track nested functions to avoid inflating parent complexity
     is_nested: bool = False
+    decorators: List[str] = Field(default_factory=list)
 
 class ClassNode(BaseModel):
     """Represents a class parsed from the AST."""
     name: str
     parent_module: str
     docstring_summary: Optional[str] = None
+    bases: List[str] = Field(default_factory=list)
     methods: List[FunctionNode] = Field(default_factory=list)
 
 class ModuleNode(BaseModel):
@@ -35,6 +37,7 @@ class ModuleNode(BaseModel):
     # Intelligence Flags
     complexity_score: float = 0.0
     velocity_score: float = 0.0
+    change_velocity_30d: float = 0.0 # Strict rubric requirement
     pagerank_score: float = 0.0
     importance_score: int = 1 # 1-100 normalized
     

@@ -12,24 +12,26 @@ app = typer.Typer(name="codebase-cartographer", help="Codebase Cartographer CLI"
 def analyze(
     repo_path: str = typer.Argument(..., help="Path to the repository to analyze."),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Custom output directory"),
-    llm: bool = typer.Option(False, "--llm", help="Enable LLM-powered semantic analysis."),
-    semantic_depth: str = typer.Option("light", "--semantic-depth", help="Depth of semantic analysis (light|full)."),
-    store_embeddings: bool = typer.Option(False, "--store-embeddings", help="Store vector embeddings in the output JSON.")
+    llm: bool = typer.Option(False, "--llm", help="Enable LLM-based semantic analysis"),
+    semantic_depth: str = typer.Option("light", "--semantic-depth", help="Depth of semantic analysis (light, deep)"),
+    store_embeddings: bool = typer.Option(False, "--store-embeddings", help="Store semantic embeddings in the graph"),
+    velocity_days: int = typer.Option(30, "--velocity-days", help="Number of days to look back for git velocity"),
+    sql_dialect: str = typer.Option("duckdb", "--sql-dialect", help="SQL dialect for AST parsing (duckdb, snowflake, postgres, etc.)")
 ):
     """
-    Analyzes a codebase (local or GitHub) and generates structural/data lineage graphs with optional semantic intelligence.
+    Analyzes a codebase and generates architectural & lineage maps.
     """
     if repo_path.startswith("http"):
+        print(f"Cloning remote repository: {repo_path}")
         import tempfile
         import subprocess
-        temp_dir = tempfile.mkdtemp(prefix="cartographer-")
-        typer.echo(f"Cloning repository to {temp_dir}...")
+        tmp_dir = tempfile.mkdtemp()
         try:
-            subprocess.run(["git", "clone", "--depth", "1", repo_path, temp_dir], check=True, capture_output=True)
-            repo_path = temp_dir
-        except subprocess.CalledProcessError as e:
-            typer.secho(f"Error cloning repository: {e.stderr.decode()}", fg=typer.colors.RED)
-            raise typer.Exit(1)
+            subprocess.run(["git", "clone", repo_path, tmp_dir], check=True)
+            repo_path = tmp_dir
+        except Exception as e:
+            print(f"Error cloning repository: {e}")
+            return
         
     if not os.path.exists(repo_path):
         typer.echo(f"Error: Path {repo_path} does not exist.")
@@ -47,7 +49,7 @@ def analyze(
 @app.command()
 def hydrologist(
     target_dir: str = typer.Argument(".", help="Directory to analyze"),
-    output: str = typer.Option(".cartography/lineage.json", "--output", "-o", help="Output JSON path")
+    output: str = typer.Option(".cartography/lineage_graph.json", "--output", "-o", help="Output JSON path")
 ):
     """
     Run Phase 2: The Hydrologist Agent to extract data lineage.
@@ -72,7 +74,7 @@ def lineage(
     Shows immediate upstream dependencies and downstream consumers.
     """
     import json
-    lineage_path = os.path.join(target_dir, ".cartography", "lineage.json")
+    lineage_path = os.path.join(target_dir, ".cartography", "lineage_graph.json")
     if not os.path.exists(lineage_path):
         typer.secho(f"Lineage file not found at {lineage_path}. Run hydrologist first.", fg=typer.colors.RED)
         raise typer.Exit(code=1)
@@ -113,7 +115,7 @@ def impact(
     import math
     from collections import deque
     
-    lineage_path = os.path.join(target_dir, ".cartography", "lineage.json")
+    lineage_path = os.path.join(target_dir, ".cartography", "lineage_graph.json")
     if not os.path.exists(lineage_path):
         typer.secho(f"Lineage file not found at {lineage_path}. Run hydrologist first.", fg=typer.colors.RED)
         raise typer.Exit(code=1)

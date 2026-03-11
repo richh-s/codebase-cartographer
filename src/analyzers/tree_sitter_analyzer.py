@@ -105,6 +105,15 @@ class TreeSitterAnalyzer:
 
                 name = name_node.text.decode('utf-8')
                 
+                # Extract Decorators
+                decorators = []
+                parent = node.parent
+                if parent and parent.type == "decorated_definition":
+                    for child in parent.children:
+                        if child.type == "decorator":
+                            dec_text = child.text.decode('utf-8').strip()
+                            decorators.append(dec_text)
+
                 # Exclude purely internal helpers from public API, but keep for complexity isolation
                 docstring = self._extract_docstring(node, source)
                 complexity = 1 + self._count_branches(node)
@@ -118,7 +127,8 @@ class TreeSitterAnalyzer:
                     parent_module=module_path,
                     docstring_summary=docstring,
                     complexity_score=complexity,
-                    is_nested=is_nested
+                    is_nested=is_nested,
+                    decorators=decorators
                 )
                 functions_found.append(func_node)
                 
@@ -214,9 +224,18 @@ class TreeSitterAnalyzer:
             if node.type == "class_definition":
                 name_node = next((c for c in node.children if c.type == "identifier"), None)
                 if name_node:
+                    # Extract Inheritance Bases
+                    bases = []
+                    args = next((c for c in node.children if c.type == "argument_list"), None)
+                    if args:
+                        for arg in args.children:
+                            if arg.type in ("identifier", "attribute"):
+                                bases.append(arg.text.decode('utf-8'))
+                    
                     classes.append(ClassNode(
                         name=name_node.text.decode('utf-8'),
-                        parent_module=module_path
+                        parent_module=module_path,
+                        bases=bases
                     ))
             for child in node.children:
                 traverse(child)

@@ -207,12 +207,16 @@ class SQLLineageAnalyzer:
         edges, table_schemas, metadata = [], {}, {"operations": [], "column_lineage": [], "scopes": []}
         lhash = self._generate_logic_hash(mocked_sql)
         
+        # Detect Write Operation (CREATE TABLE, INSERT INTO, UPDATE)
+        # In dbt, the file name IS the table name created.
+        is_write_op = bool(re.search(r"\b(CREATE|INSERT|UPDATE|MERGE|DELETE)\b", mocked_sql, re.IGNORECASE))
+        
         try:
             expression = parse_one(mocked_sql, read=dialect)
             qualified = qualify(expression, schema=schema, validate_qualify_columns=False)
             root_scope = build_scope(qualified)
             
-            # 1. CTE Scope Tracking (Phase 2.12)
+            # 1. CTE Scope Tracking
             for scope in root_scope.traverse():
                 if scope.is_cte:
                     cte_name = next((k for k, v in scope.parent.sources.items() if v == scope), "unknown_cte")
@@ -231,7 +235,7 @@ class SQLLineageAnalyzer:
                             if table_name.startswith("__dbt_ref_"): table_name = table_name[len("__dbt_ref_"):-2] if table_name.endswith("__") else table_name[len("__dbt_ref_"):]
                             edges.append(LineageEdge(source=table_name, target=cte_identity, type="SQL_INTERNAL", origin_analyzer="sql_lineage", confidence_score=1.0))
                     
-                    # CTE -> Parent/Next Scope (placeholder for now, usually consumed by parent query)
+                    # CTE -> Parent/Next Scope
                     edges.append(LineageEdge(source=cte_identity, target=identity, type="SQL_SCOPE_FLOW", origin_analyzer="sql_lineage", confidence_score=0.9))
 
             tables = self._extract_tables(qualified)
@@ -260,7 +264,7 @@ class SQLLineageAnalyzer:
             tables, confidence = list(found), 0.3
             
         for table in tables:
-            etype, final_name = "TRANSFORM", table
+            etype, final_name = "SQL_READ", table
             if table.lower().startswith("__dbt_ref_"): etype, final_name = "DBT_REF", table[len("__dbt_ref_"):-2] if table.endswith("__") else table[len("__dbt_ref_"):]
             elif table.lower().startswith("__dbt_source_"):
                 etype, final_name = "DBT_SOURCE", table[len("__dbt_source_"):]
@@ -268,4 +272,17 @@ class SQLLineageAnalyzer:
                 if "_" in final_name: final_name = final_name.split("_")[-1]
             edges.append(LineageEdge(source=final_name, target=identity, type=etype, origin_analyzer="sql_lineage", confidence_score=confidence, logic_hash=lhash, source_module=identity, line_number=1 if confidence == 1.0 else None))
             
+        # Add Product Edge (Write) if it's a model producing a table
+        if is_write_op or identity.endswith(".sql"):
+            # The 'identity' (module) produces a data entity of the same name (logical table)
+            table_identity = f"table:{os.path.splitext(os.path.basename(identity))[0]}"
+            edges.append(LineageEdge(
+                source=identity, 
+                target=table_identity, 
+                type="SQL_PRODUCT", 
+                origin_analyzer="sql_lineage", 
+                confidence_score=1.0,
+                logic_hash=lhash
+            ))
+
         return edges, table_schemas, metadata

@@ -21,17 +21,24 @@ class Orchestrator:
         self.hydrologist = HydrologistAgent(self.repo_path)
         self.semanticist = SemanticistAgent()
         
-    def run_analysis(self, llm_enabled: bool = False, semantic_depth: str = "light", store_embeddings: bool = False):
-        """Executes the full analysis suite."""
+    def run_analysis(self, llm_enabled: bool = False, semantic_depth: str = "light", 
+                     store_embeddings: bool = False, velocity_days: int = 30, sql_dialect: str = "duckdb"):
+        """Executes the full analysis suite with rubric-compliant configuration."""
         print(f"--- Starting Full Analysis on {self.repo_path} ---")
         
-        # 1. Run Surveyor for Structural Graph
-        print("[1/3] Running Surveyor Agent...")
-        module_graph_builder = self.surveyor.run(output_json=".cartography/module_graph.json")
+        # 1. Run Surveyor for Structural Graph (Configurable velocity window)
+        print(f"[1/3] Running Surveyor Agent (Velocity Window: {velocity_days} days)...")
+        module_graph_builder = self.surveyor.run(
+            output_json=".cartography/module_graph.json", 
+            velocity_days=velocity_days
+        )
         
-        # 2. Run Hydrologist for Data Lineage Graph
-        print("[2/3] Running Hydrologist Agent...")
-        lineage_graph = self.hydrologist.run(output_json=".cartography/lineage_graph.json")
+        # 2. Run Hydrologist for Data Lineage Graph (Configurable SQL dialect)
+        print(f"[2/3] Running Hydrologist Agent (SQL Dialect: {sql_dialect})...")
+        lineage_graph = self.hydrologist.run(
+            output_json=".cartography/lineage_graph.json",
+            sql_dialect=sql_dialect
+        )
         
         # 3. Run Semanticist Agent (if enabled)
         if llm_enabled:

@@ -1,0 +1,125 @@
+{
+  "nodes": [
+    {
+      "path": "process_orders.py",
+      "identity": "process_orders.py",
+      "language": "py",
+      "architecture_layer": "unknown",
+      "imports": [],
+      "functions": [],
+      "classes": [],
+      "complexity_score": 0.0,
+      "velocity_score": 0.0,
+      "pagerank_score": 0.3333333333333333,
+      "importance_score": 1,
+      "is_high_complexity": false,
+      "is_high_velocity": false,
+      "is_architectural_hub": false,
+      "is_dead_code_candidate": true,
+      "is_sink_node": false,
+      "is_informational": false,
+      "metadata": {
+        "last_modified": "",
+        "last_author": "",
+        "author_breadth": 1
+      }
+    },
+    {
+      "path": "dag.py",
+      "identity": "dag.py",
+      "language": "py",
+      "architecture_layer": "unknown",
+      "imports": [
+        {
+          "name": "airflow",
+          "type": "python_import"
+        }
+      ],
+      "functions": [],
+      "classes": [],
+      "complexity_score": 0.0,
+      "velocity_score": 0.0,
+      "pagerank_score": 0.3333333333333333,
+      "importance_score": 1,
+      "is_high_complexity": false,
+      "is_high_velocity": false,
+      "is_architectural_hub": false,
+      "is_dead_code_candidate": true,
+      "is_sink_node": false,
+      "is_informational": false,
+      "metadata": {
+        "last_modified": "",
+        "last_author": "",
+        "author_breadth": 1
+      }
+    },
+    {
+      "path": "models/schema.yml",
+      "identity": "models/schema.yml",
+      "language": "yml",
+      "architecture_layer": "meta",
+      "imports": [],
+      "functions": [],
+      "classes": [],
+      "complexity_score": 0.0,
+      "velocity_score": 0.0,
+      "pagerank_score": 0.0,
+      "importance_score": 1,
+      "is_high_complexity": false,
+      "is_high_velocity": false,
+      "is_architectural_hub": false,
+      "is_dead_code_candidate": false,
+      "is_sink_node": false,
+      "is_informational": true,
+      "metadata": {
+        "last_modified": "",
+        "last_author": "",
+        "author_breadth": 1
+      }
+    },
+    {
+      "path": "models/stg_orders.sql",
+      "identity": "models/stg_orders.sql",
+      "language": "sql",
+      "architecture_layer": "product",
+      "imports": [
+        {
+          "name": "internal_raw.orders",
+          "type": "dbt_source"
+        }
+      ],
+      "functions": [
+        {
+          "qualified_name": "stg_orders",
+          "signature": "SQL Model",
+          "parent_module": "models/stg_orders.sql",
+          "docstring_summary": null,
+          "complexity_score": 1,
+          "is_nested": false
+        }
+      ],
+      "classes": [],
+      "complexity_score": 1.0,
+      "velocity_score": 0.0,
+      "pagerank_score": 0.3333333333333333,
+      "importance_score": 1,
+      "is_high_complexity": false,
+      "is_high_velocity": false,
+      "is_architectural_hub": false,
+      "is_dead_code_candidate": false,
+      "is_sink_node": true,
+      "is_informational": false,
+      "metadata": {
+        "last_modified": "",
+        "last_author": "",
+        "author_breadth": 1
+      }
+    }
+  ],
+  "edges": [],
+  "top_hubs": [],
+  "scc_groups": [],
+  "metadata": {
+    "total_files": 4
+  }
+}

@@ -1,0 +1,293 @@
+{
+  "version": "git:fb082fd",
+  "timestamp": "2026-03-11T15:05:20.166534",
+  "nodes": {
+    "data": [
+      {
+        "identity": "orders",
+        "name": "__dbt_source_internal_raw_orders__",
+        "canonical_name": "orders",
+        "namespace": "unknown",
+        "type": "database_table",
+        "format": null,
+        "location": null,
+        "version": "git:fb082fd",
+        "partition": null,
+        "timestamp": "2026-03-11 15:05:20.165676",
+        "owner_team": null,
+        "system": "warehouse",
+        "environment": "production",
+        "dataset_type_confidence": 0.5,
+        "database": null,
+        "schema_": null,
+        "table": "__dbt_source_internal_raw_orders__",
+        "canonical_identity": "orders",
+        "columns": [],
+        "role": "SOURCE",
+        "is_dynamic_reference": false,
+        "importance_score": 24,
+        "metadata": {}
+      },
+      {
+        "identity": "process_orders",
+        "name": "process_orders",
+        "canonical_name": "process_orders",
+        "namespace": "unknown",
+        "type": "database_table",
+        "format": null,
+        "location": null,
+        "version": "git:fb082fd",
+        "partition": null,
+        "timestamp": "2026-03-11 15:05:20.165989",
+        "owner_team": null,
+        "system": "unknown",
+        "environment": "production",
+        "dataset_type_confidence": 0.5,
+        "database": null,
+        "schema_": null,
+        "table": "process_orders",
+        "canonical_identity": "process_orders",
+        "columns": [],
+        "role": "TERMINAL",
+        "is_dynamic_reference": false,
+        "importance_score": 10,
+        "metadata": {}
+      },
+      {
+        "identity": "processed_orders",
+        "name": "//bucket/processed_orders.parquet",
+        "canonical_name": "processed_orders",
+        "namespace": "s3",
+        "type": "object_storage",
+        "format": null,
+        "location": null,
+        "version": "git:fb082fd",
+        "partition": null,
+        "timestamp": "2026-03-11 15:05:20.165975",
+        "owner_team": null,
+        "system": "s3",
+        "environment": "production",
+        "dataset_type_confidence": 0.5,
+        "database": null,
+        "schema_": null,
+        "table": "processed_orders",
+        "canonical_identity": "processed_orders",
+        "columns": [],
+        "role": "TERMINAL",
+        "is_dynamic_reference": false,
+        "importance_score": 10,
+        "metadata": {}
+      },
+      {
+        "identity": "stg_orders",
+        "name": "stg_orders",
+        "canonical_name": "stg_orders",
+        "namespace": "unknown",
+        "type": "database_table",
+        "format": null,
+        "location": null,
+        "version": "git:fb082fd",
+        "partition": null,
+        "timestamp": "2026-03-11 15:05:20.165932",
+        "owner_team": null,
+        "system": "dbt",
+        "environment": "staging",
+        "dataset_type_confidence": 1.0,
+        "database": null,
+        "schema_": null,
+        "table": "stg_orders",
+        "canonical_identity": "stg_orders",
+        "columns": [
+          {
+            "name": "*",
+            "source_columns": [
+              "raw_data.*"
+            ],
+            "inferred_type": null,
+            "confidence": 1.0
+          }
+        ],
+        "role": "INTERMEDIATE",
+        "is_dynamic_reference": false,
+        "importance_score": 21,
+        "metadata": {}
+      }
+    ],
+    "transformations": [
+      {
+        "identity": "cte:raw_data",
+        "name": "raw_data",
+        "type": "SQL_SCOPE",
+        "logic_hash": "3efd8db630e079fc",
+        "owner_team": null,
+        "environment": null,
+        "operations": [],
+        "column_lineage": [],
+        "metadata": {
+          "parent_module": "models/stg_orders.sql"
+        }
+      },
+      {
+        "identity": "models/schema.yml",
+        "name": "schema.yml",
+        "type": "DBT_MODEL",
+        "logic_hash": "unknown",
+        "owner_team": null,
+        "environment": "production",
+        "operations": [],
+        "column_lineage": [],
+        "metadata": {}
+      },
+      {
+        "identity": "models/stg_orders.sql",
+        "name": "stg_orders.sql",
+        "type": "DBT_MODEL",
+        "logic_hash": "unknown",
+        "owner_team": null,
+        "environment": null,
+        "operations": [],
+        "column_lineage": [
+          {
+            "target": "*",
+            "sources": [
+              "raw_data.*"
+            ]
+          }
+        ],
+        "metadata": {
+          "file_path": "models/stg_orders.sql"
+        }
+      },
+      {
+        "identity": "process_orders.py",
+        "name": "process_orders.py",
+        "type": "PYTHON_SCRIPT",
+        "logic_hash": "ef2b105ea13f940f",
+        "owner_team": null,
+        "environment": "production",
+        "operations": [],
+        "column_lineage": [],
+        "metadata": {}
+      }
+    ]
+  },
+  "edges": [
+    {
+      "source": "cte:raw_data",
+      "target": "stg_orders",
+      "type": "SQL_SCOPE_FLOW",
+      "origin_analyzer": "sql_lineage",
+      "confidence_score": 0.72,
+      "logic_hash": null,
+      "source_module": null,
+      "line_number": null,
+      "metadata": {},
+      "is_heuristic": false
+    },
+    {
+      "source": "models/schema.yml",
+      "target": "orders",
+      "type": "DBT_SOURCE",
+      "origin_analyzer": "dag_config",
+      "confidence_score": 1.0,
+      "logic_hash": null,
+      "source_module": "models/schema.yml",
+      "line_number": null,
+      "metadata": {},
+      "is_heuristic": false
+    },
+    {
+      "source": "models/stg_orders.sql",
+      "target": "stg_orders",
+      "type": "SQL_PRODUCT",
+      "origin_analyzer": "hydrologist",
+      "confidence_score": 1.0,
+      "logic_hash": null,
+      "source_module": "models/stg_orders.sql",
+      "line_number": null,
+      "metadata": {},
+      "is_heuristic": false
+    },
+    {
+      "source": "orders",
+      "target": "cte:raw_data",
+      "type": "SQL_INTERNAL",
+      "origin_analyzer": "sql_lineage",
+      "confidence_score": 0.8,
+      "logic_hash": null,
+      "source_module": null,
+      "line_number": null,
+      "metadata": {},
+      "is_heuristic": false
+    },
+    {
+      "source": "orders",
+      "target": "stg_orders",
+      "type": "DBT_SOURCE",
+      "origin_analyzer": "sql_lineage",
+      "confidence_score": 1.0,
+      "logic_hash": "5972cb1123bf53cb",
+      "source_module": "stg_orders",
+      "line_number": 1,
+      "metadata": {},
+      "is_heuristic": false
+    },
+    {
+      "source": "process_orders.py",
+      "target": "processed_orders",
+      "type": "PYTHON_WRITE",
+      "origin_analyzer": "python_dataflow",
+      "confidence_score": 1.0,
+      "logic_hash": "c9da363c5b79cfaa",
+      "source_module": "process_orders.py",
+      "line_number": 4,
+      "metadata": {},
+      "is_heuristic": false
+    },
+    {
+      "source": "stg_orders",
+      "target": "process_orders",
+      "type": "CONFIG_DEPENDENCY",
+      "origin_analyzer": "dag_config",
+      "confidence_score": 0.8,
+      "logic_hash": null,
+      "source_module": "dag.py",
+      "line_number": null,
+      "metadata": {},
+      "is_heuristic": false
+    },
+    {
+      "source": "stg_orders",
+      "target": "process_orders.py",
+      "type": "PYTHON_READ",
+      "origin_analyzer": "python_dataflow",
+      "confidence_score": 1.0,
+      "logic_hash": "ef2b105ea13f940f",
+      "source_module": "process_orders.py",
+      "line_number": 3,
+      "metadata": {},
+      "is_heuristic": false
+    }
+  ],
+  "health": {
+    "health_score": 80,
+    "total_nodes": 8,
+    "total_edges": 8,
+    "data_nodes": 4,
+    "transformation_nodes": 4,
+    "heuristic_edges": 0,
+    "orphan_nodes": 0,
+    "dangling_sinks": 0,
+    "isolated_transformations": 0,
+    "unresolved_datasets": 0,
+    "warning_count": 1
+  },
+  "warnings": [
+    {
+      "type": "logic_error",
+      "message": "Source node 'orders' has incoming write edge (impossible)",
+      "severity": "high"
+    }
+  ],
+  "mermaid": "flowchart TD\n    classDef source fill:#dfd,stroke:#383,stroke-width:2px;\n    classDef terminal fill:#fdd,stroke:#833,stroke-width:2px;\n    classDef intermediate fill:#ddf,stroke:#338;\n    classDef trans fill:#f9f,stroke:#333;\n    classDef unknown stroke-dasharray: 5 5;\n    subgraph Sources\n        orders[(\"orders<br/>[SOURCE]\")]\n        class orders source\n    end\n    subgraph Staging\n        stg_orders[(\"stg_orders<br/>[INTERMEDIATE]\")]\n        class stg_orders intermediate\n    end\n    subgraph Transformations\n        models/stg_orders.sql[/ models/stg_orders.sql /]\n        class models/stg_orders.sql trans\n        cte:raw_data[/ cte:raw_data /]\n        class cte:raw_data trans\n        process_orders.py[/ process_orders.py /]\n        class process_orders.py trans\n        models/schema.yml[/ models/schema.yml /]\n        class models/schema.yml trans\n    end\n    subgraph Outputs\n        processed_orders[(\"processed_orders<br/>[TERMINAL]\")]\n        class processed_orders terminal\n        process_orders[(\"process_orders<br/>[TERMINAL]\")]\n        class process_orders terminal\n    end\n    models/stg_orders.sql -- SQL_PRODUCT --> stg_orders\n    cte:raw_data -- SQL_SCOPE_FLOW --> stg_orders\n    orders -- SQL_INTERNAL --> cte:raw_data\n    orders -- DBT_SOURCE --> stg_orders\n    stg_orders -- PYTHON_READ --> process_orders.py\n    stg_orders -- CONFIG_DEPENDENCY --> process_orders\n    process_orders.py -- PYTHON_WRITE --> processed_orders\n    models/schema.yml -- DBT_SOURCE --> orders"
+}

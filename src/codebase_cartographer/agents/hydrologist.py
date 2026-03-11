@@ -124,43 +124,46 @@ class HydrologistAgent:
                     # Also handle potential dbt source format (simplified)
                     sqlglot_schema[f"__dbt_source_{canon_name}__"] = cols
 
+                # Request 2.11: Use canonical identity for transformation as well if possible
+                canon_identity = self.identity_resolver.resolve(identity, "dbt", allow_fuzzy=False)
+                
                 edges, schemas, metadata = self.sql_analyzer.analyze(
-                    filepath, identity, schema=sqlglot_schema
+                    filepath, canon_identity, schema=sqlglot_schema
                 )
                 all_edges.extend(edges)
                 
-                # Create a TransformationNode for the SQL model
+                # Create a TransformationNode linked to the canonical product
+                product_raw = os.path.splitext(os.path.basename(file))[0]
+                canon_product = self.identity_resolver.resolve(product_raw, "dbt", allow_fuzzy=False)
+                self.dataset_to_system[canon_product] = "dbt"
+
                 trans_node = TransformationNode(
-                    identity=identity,
+                    identity=identity, # Use file path as identity to avoid self-cycles
                     name=os.path.basename(file),
                     type="DBT_MODEL",
                     logic_hash=edges[0].logic_hash if edges else "unknown",
                     operations=metadata.get("operations", []),
-                    column_lineage=metadata.get("column_lineage", [])
+                    column_lineage=metadata.get("column_lineage", []),
+                    metadata={"file_path": rel_path}
                 )
                 self.lineage_graph.add_transformation_node(trans_node)
                 
-                # Link module to product
-                product_raw = os.path.splitext(os.path.basename(file))[0]
-                canon_product = self.identity_resolver.resolve(product_raw, "dbt")
-                self.dataset_to_system[canon_product] = "dbt"
-                
                 # Phase 2.10 Restore: Explicit product edge
                 all_edges.append(LineageEdge(
-                    source=identity,
-                    target=product_raw,
+                    source=identity, # Source is the transformation (file path)
+                    target=canon_product, # Target is the canonical dataset
                     type="SQL_PRODUCT",
                     origin_analyzer="hydrologist",
                     confidence_score=1.0,
                     source_module=identity
                 ))
                 
-                if identity in schemas:
-                    self.discovered_schemas[canon_product] = schemas[identity]
-                    print(f"DISCOVERED SCHEMA for {canon_product}: {[c.name for c in schemas[identity]]}")
+                if canon_identity in schemas:
+                    self.discovered_schemas[canon_product] = schemas[canon_identity]
                 
                 # Phase 2.8/2.9: Schema Inference for Sources
                 for target_table, cols in schemas.items():
+                    # target_table is now canon_identity
                     for col in cols:
                         for sc in col.source_columns:
                             parts = sc.split(".")
@@ -178,7 +181,7 @@ class HydrologistAgent:
             # Phase 2.9: Seed Detection
             elif "/seeds/" in filepath and file.endswith(".csv"):
                 name_raw = os.path.splitext(file)[0]
-                canon_seed = self.identity_resolver.resolve(name_raw, "dbt")
+                canon_seed = self.identity_resolver.resolve(name_raw, "dbt", allow_fuzzy=False)
                 self.dataset_to_system[canon_seed] = "dbt"
 
         # Pass 2: Identity Resolution & Topology Refinement
@@ -306,11 +309,20 @@ class HydrologistAgent:
         self.lineage_graph.assign_roles()
         
         # Phase 2.6: Override roles based on intent heuristics
-        for node in self.lineage_graph.data_nodes.values():
-            if "raw" in node.name.lower() or "source" in node.name.lower():
+        for identity, node in self.lineage_graph.data_nodes.items():
+            raw_name_lower = node.name.lower()
+            # Heuristic override
+            if "raw" in raw_name_lower or "source" in raw_name_lower:
                 node.role = DatasetRole.SOURCE
-            elif "report" in node.name.lower() or "dashboard" in node.name.lower() or "export" in node.name.lower():
+            elif any(p in raw_name_lower for p in ["report", "dashboard", "export"]):
                 node.role = DatasetRole.TERMINAL
+            elif any(p in raw_name_lower for p in ["customers", "orders"]) and not ("stg_" in raw_name_lower or "staging_" in raw_name_lower):
+                # Only mark orders/customers as terminal if they are NOT staging models
+                node.role = DatasetRole.TERMINAL
+            
+            # Topological safety check: if out-degree > 0, it CANNOT be terminal
+            if self.lineage_graph.graph.out_degree(identity) > 0 and node.role == DatasetRole.TERMINAL:
+                node.role = DatasetRole.INTERMEDIATE
 
         self.lineage_graph.compute_importance({}) 
 
@@ -318,20 +330,16 @@ class HydrologistAgent:
         out_path = os.path.join(self.target_dir, output_json)
         os.makedirs(os.path.dirname(out_path), exist_ok=True)
         
-        with open(out_path, "w") as f:
-            data = {
-                "version": self.graph_version,
-                "timestamp": datetime.now().isoformat(),
-                "nodes": {
-                    "data": [n.model_dump() for n in self.lineage_graph.data_nodes.values()],
-                    "transformations": [n.model_dump() for n in self.lineage_graph.transformation_nodes.values()]
-                },
-                "edges": [self.lineage_graph.graph.edges[u, v] for u, v in self.lineage_graph.graph.edges()],
-                "health": self.lineage_graph.get_health_report(),
-                "warnings": self.lineage_graph.validate_integrity(),
         # Pass 3: Schema Completion for Sources
+        
+        # Phase 2.8/2.11: Back-propagate inferred columns through SELECT * chains
+        # We do this after Pass 2 (Identity Resolution) so edges match canonical schemas
+        # Direction: Terminal Data -> Transformation -> Intermediate Data -> Transformation -> Source Data
+        # Phase 2.14: Removed dangerous iterative propagation. 
+        # Lineage-based propagation already happens in the per-module loop (lines 165-175).
+
         for node in self.lineage_graph.data_nodes.values():
-            if node.role == "SOURCE" and not node.columns:
+            if node.role == "SOURCE":# and not node.columns: # Temporary: check all sources
                 if node.identity in self.inferred_schemas:
                     from codebase_cartographer.models.lineage import ColumnRef
                     node.columns = [ColumnRef(name=c, confidence=0.7) for c in sorted(list(self.inferred_schemas[node.identity]))]
@@ -342,8 +350,53 @@ class HydrologistAgent:
                         from codebase_cartographer.models.lineage import ColumnRef
                         node.columns = [ColumnRef(name=c, confidence=0.6) for c in sorted(list(self.inferred_schemas[raw_name]))]
 
+        # Cleanup debug logs and finalize
+
         # Finalize and Save
-        summary = self.lineage_graph.get_summary()
+
+        # Final safety deduplication and bit-for-bit deterministic sorting
+        data_nodes = sorted(
+            [n.model_dump() for n in self.lineage_graph.data_nodes.values()],
+            key=lambda x: x["canonical_name"]
+        )
+        
+        transformation_nodes = []
+        for n in self.lineage_graph.transformation_nodes.values():
+            dump = n.model_dump()
+            # Safety deduplication of column lineage
+            seen_lineage = {}
+            for cl in dump.get("column_lineage", []):
+                target = cl["target"]
+                sources = sorted(list(set(cl["sources"])))
+                if target not in seen_lineage:
+                    seen_lineage[target] = sources
+                else:
+                    seen_lineage[target] = sorted(list(set(seen_lineage[target] + sources)))
+            
+            dump["column_lineage"] = sorted(
+                [{"target": k, "sources": v} for k, v in seen_lineage.items()],
+                key=lambda x: x["target"]
+            )
+            transformation_nodes.append(dump)
+            
+        transformation_nodes.sort(key=lambda x: x["identity"])
+        
+        edges = sorted(
+            [self.lineage_graph.graph.edges[u, v] for u, v in self.lineage_graph.graph.edges()],
+            key=lambda x: (x.get("source", ""), x.get("target", ""))
+        )
+
+        with open(out_path, "w") as f:
+            data = {
+                "version": self.graph_version,
+                "timestamp": datetime.now().isoformat(),
+                "nodes": {
+                    "data": data_nodes,
+                    "transformations": transformation_nodes
+                },
+                "edges": edges,
+                "health": self.lineage_graph.get_health_report(),
+                "warnings": self.lineage_graph.validate_integrity(),
                 "mermaid": self.lineage_graph.to_mermaid()
             }
             json.dump(data, f, indent=2, default=str)

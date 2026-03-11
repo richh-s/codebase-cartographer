@@ -1,4 +1,5 @@
 import re
+import os
 from typing import List, Dict, Optional, Set, Any
 from pydantic import BaseModel, Field
 
@@ -20,17 +21,13 @@ class IdentityResolver:
     
     def __init__(self, custom_mappings: Optional[Dict[str, str]] = None):
         # Maps alias/raw_name -> canonical_name
-        self.mappings: Dict[str, str] = {
-            "raw_orders.csv": "orders",
-            "s3://bucket/raw/orders.csv": "orders",
-            "db.raw_orders": "orders"
-        }
+        self.mappings: Dict[str, str] = {}
         if custom_mappings:
             self.mappings.update(custom_mappings)
             
         self.identities: Dict[str, DatasetIdentity] = {}
 
-    def resolve(self, raw_name: str, namespace: str) -> str:
+    def resolve(self, raw_name: str, namespace: str, allow_fuzzy: bool = True) -> str:
         """
         Resolves a raw name and namespace to a canonical identity.
         If a mapping exists, returns the mapped canonical name.
@@ -43,7 +40,13 @@ class IdentityResolver:
             # 2. Heuristic normalization
             canon = self._normalize(raw_name)
             
-        # 3. Registry tracking
+        # 3. Fuzzy matching for dbt sources (orders -> raw_orders)
+        if allow_fuzzy and canon not in self.identities and namespace in ["unknown", "dbt"]:
+            potential_raw = f"raw_{canon}"
+            if potential_raw in self.identities:
+                return potential_raw
+
+        # 4. Registry tracking
         if canon not in self.identities:
             components = self._parse_components(raw_name)
             self.identities[canon] = DatasetIdentity(
@@ -75,7 +78,10 @@ class IdentityResolver:
         clean = raw_name.lower().strip('"').strip("'").strip("`")
         if "://" in clean:
             clean = clean.split("://")[-1]
-        clean = clean.split("/")[-1]
+        
+        # If it's a file path, take the basename without extension
+        if "/" in clean or "\\" in clean:
+            clean = os.path.splitext(os.path.basename(clean))[0]
         
         parts = clean.split(".")
         if len(parts) >= 3:
@@ -83,7 +89,8 @@ class IdentityResolver:
         elif len(parts) == 2:
             return {"database": None, "schema_": parts[0], "table": parts[1]}
         else:
-            return {"database": None, "schema_": None, "table": parts[-1] if parts else raw_name}
+            # For dbt models like stg_orders, the table is the whole name
+            return {"database": None, "schema_": None, "table": clean}
 
     def get_identities(self) -> List[DatasetIdentity]:
         """Returns all discovered logical identities."""

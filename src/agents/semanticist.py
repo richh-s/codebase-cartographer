@@ -155,4 +155,16 @@ class SemanticistAgent:
         """
         
         response = self.llm._call_with_retry("gemini-1.5-flash", prompt, is_json=False)
-        return response or "Failed to synthesize answers."
+        if not response or "Failed to synthesize answers" in response:
+            # Fallback to a structured non-LLM synthesis if API fails
+            fallback = "## Phase 0: System Analysis (Fallback Synthesis)\n\n"
+            fallback += "### Observation Summary\n"
+            fallback += f"The system analyzed {graph_context.get('module_count', 0)} modules and "
+            fallback += f"identified {graph_context.get('data_node_count', 0)} primary data entities.\n\n"
+            fallback += "### Data Entities\n"
+            for packet in evidence_packets[:5]:
+                fallback += f"- **{packet['module']}**: {packet['purpose']}\n"
+            fallback += "\n### Recommendation\nManual review of `module_graph.json` is recommended as LLM synthesis was unavailable."
+            return fallback
+
+        return response

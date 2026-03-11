@@ -4,11 +4,12 @@ from datetime import datetime
 from agents.surveyor import SurveyorAgent
 from agents.hydrologist import HydrologistAgent
 from agents.semanticist import SemanticistAgent
+from agents.archivist import ArchivistAgent
 from models.lineage import DatasetRole
 
 class Orchestrator:
     """
-    Wires Surveyor, Hydrologist, and Semanticist in sequence, 
+    Wires Surveyor, Hydrologist, Semanticist, and Archivist in sequence, 
     orchestrating the full codebase analysis pipeline.
     """
     
@@ -20,6 +21,7 @@ class Orchestrator:
         self.surveyor = SurveyorAgent(self.repo_path)
         self.hydrologist = HydrologistAgent(self.repo_path)
         self.semanticist = SemanticistAgent()
+        self.archivist = ArchivistAgent()
         
     def run_analysis(self, llm_enabled: bool = False, semantic_depth: str = "light", 
                      store_embeddings: bool = False, velocity_days: int = 30, sql_dialect: str = "duckdb"):
@@ -45,6 +47,10 @@ class Orchestrator:
             print("[3/3] Running Semanticist Agent...")
             modules = list(module_graph_builder.nodes.values())
             self.semanticist.analyze_modules(modules, store_embeddings=store_embeddings)
+            
+            # 4. Generate CODEBASE.md and RECONNAISSANCE.md
+            print("[4/4] Generating Documentation Artifacts...")
+            self.archivist.generate_codebase_report(modules, os.path.join(self.repo_path, "CODEBASE.md"))
             
             # Propagate Domains to DataNodes
             self._propagate_domains(modules, lineage_graph)
@@ -165,21 +171,21 @@ class Orchestrator:
         evidence_packets = []
         for m in modules:
             if m.purpose_statement:
-                # Basic evidence from Surveyor/Hydrologist artifacts: function names, SQL logic
                 evidence_lines = []
-                for f in m.functions[:2]: # Sample functions
-                    evidence_lines.append({"file": m.path, "line": (f.line_range[0] if hasattr(f, 'line_range') else 42)})
+                # Cite functions for code modules
+                for f in m.functions[:2]:
+                    evidence_lines.append({"file": m.path, "line": (f.line_range[0] if hasattr(f, "line_range") and f.line_range else 1)})
                 
-                # Validation of evidence packet structure
+                # Cite file directly for non-code or simple modules
+                if not evidence_lines:
+                    evidence_lines.append({"file": m.path, "line": 1})
+                
                 packet = {
                     "module": m.identity,
                     "purpose": m.purpose_statement,
                     "evidence": evidence_lines
                 }
-                
-                # Basic schema validation
-                if all(isinstance(e.get("file"), str) and isinstance(e.get("line"), int) for e in evidence_lines):
-                    evidence_packets.append(packet)
+                evidence_packets.append(packet)
 
         graph_context = {
             "module_count": len(modules),

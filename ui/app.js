@@ -41,7 +41,10 @@ function shortenPath(path) {
 // ── API fetch ─────────────────────────────────────────────────────────────
 async function apiFetch(endpoint, options = {}) {
     const sep = endpoint.includes('?') ? '&' : '?';
-    const url = REPO_PATH ? `${API}${endpoint}${sep}repo_path=${encodeURIComponent(REPO_PATH)}` : `${API}${endpoint}`;
+    const t = Date.now();
+    const url = REPO_PATH
+        ? `${API}${endpoint}${sep}repo_path=${encodeURIComponent(REPO_PATH)}&_t=${t}`
+        : `${API}${endpoint}${sep}_t=${t}`;
     try {
         const r = await fetch(url, options);
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -65,9 +68,11 @@ function switchTab(tab) {
         'trace': 'Trace Log',
     }[tab] || tab;
 
-    // Lazy-load tab data
-    if (tab === 'module-graph' && !state.moduleGraph) loadModuleGraph();
-    if (tab === 'lineage-graph' && !state.lineageGraph) loadLineageGraph();
+    // Lazy-load or re-render tab data (delay slightly so container dimensions are ready)
+    setTimeout(() => {
+        if (tab === 'module-graph') loadModuleGraph();
+        if (tab === 'lineage-graph') loadLineageGraph();
+    }, 50);
     if (tab === 'artifacts') loadArtifact($('.artifact-tab.active')?.dataset.artifact || 'codebase');
     if (tab === 'trace') loadTrace();
 }
@@ -268,8 +273,23 @@ function createForceGraph(svgId, containerId, nodes, links, nodeColor, nodeRadiu
     const svg = d3.select(`#${svgId}`);
     svg.selectAll('*').remove();
 
-    const W = container.clientWidth;
-    const H = container.clientHeight;
+    let W = container.clientWidth;
+    let H = container.clientHeight;
+
+    // Fallback if container is hidden/collapsed
+    if (W === 0 || H === 0) {
+        const main = document.querySelector('.main-content');
+        if (main) {
+            W = main.clientWidth - 48; // accounting for padding
+            H = main.clientHeight - 120; // accounting for header/toolbar
+        }
+    }
+
+    // Hard fallback
+    if (W <= 0) W = window.innerWidth - 300;
+    if (H <= 0) H = window.innerHeight - 200;
+
+    console.log(`[Graph] Drawing ${svgId} in ${containerId}: ${W}x${H}, ${nodes.length} nodes, ${links.length} links`);
     svg.attr('viewBox', `0 0 ${W} ${H}`);
 
     const g = svg.append('g');
@@ -414,7 +434,10 @@ async function loadModuleGraph() {
         state.moduleGraph = await apiFetch('/api/module-graph');
         setLoading(false);
     }
-    if (!state.moduleGraph) return;
+    if (!state.moduleGraph) {
+        console.warn("[ModuleGraph] No data in state, skipping render");
+        return;
+    }
     renderModuleGraph(state.moduleGraph);
 }
 
@@ -514,37 +537,67 @@ document.getElementById('filterHideInfo').addEventListener('change', () => {
 
 // ── Lineage Graph ─────────────────────────────────────────────────────────
 async function loadLineageGraph() {
-    if (!state.lineageGraph) {
-        setLoading(true);
-        state.lineageGraph = await apiFetch('/api/lineage-graph');
+    console.log("[LineageGraph] Attempting to load...");
+    try {
+        if (!state.lineageGraph) {
+            setLoading(true);
+            state.lineageGraph = await apiFetch('/api/lineage-graph');
+            setLoading(false);
+        }
+        if (!state.lineageGraph) {
+            console.warn("[LineageGraph] No data received from server");
+            $('#lineageNodeCount').textContent = "No data found. Run analysis first.";
+            return;
+        }
+        renderLineageGraph(state.lineageGraph);
+    } catch (e) {
         setLoading(false);
+        console.error("[LineageGraph] Load error:", e);
+        $('#lineageNodeCount').textContent = "Error loading graph data.";
     }
-    if (!state.lineageGraph) return;
-    renderLineageGraph(state.lineageGraph);
 }
 
 function renderLineageGraph(graph) {
     const search = document.getElementById('lineageSearch').value.toLowerCase();
     const typeFilter = document.getElementById('lineageLayerFilter').value;
 
-    // Normalize nodes — data + transformations
-    let rawNodes = graph.nodes;
+    // Normalize nodes — handle multiple schema versions (Phase 1, 2, 3)
     let nodeList = [];
-    if (Array.isArray(rawNodes)) {
-        nodeList = rawNodes;
-    } else if (rawNodes && typeof rawNodes === 'object') {
-        nodeList = [...(rawNodes.data || []), ...(rawNodes.transformations || [])];
+
+    // 1. Try top-level data_nodes/transformation_nodes (LineageGraph schema)
+    if (graph.data_nodes || graph.transformation_nodes) {
+        nodeList = [...(graph.data_nodes || []), ...(graph.transformation_nodes || [])];
     }
+    // 2. Try nested nodes.data/nodes.transformations
+    else if (graph.nodes && typeof graph.nodes === 'object' && !Array.isArray(graph.nodes)) {
+        nodeList = [...(graph.nodes.data || []), ...(graph.nodes.transformations || [])];
+    }
+    // 3. Try top-level nodes array (ModuleGraph schema)
+    else if (Array.isArray(graph.nodes)) {
+        nodeList = graph.nodes;
+    }
+
+    console.log(`[LineageGraph] Resolved ${nodeList.length} nodes from keys:`, Object.keys(graph));
+
 
     let nodes = nodeList.map(n => ({ ...n, id: n.identity || n.name }));
     let edges = (graph.edges || []).map(e => ({ source: e.source, target: e.target, type: e.type }));
 
-    if (search) nodes = nodes.filter(n => (n.id || '').toLowerCase().includes(search) || (n.name || '').includes(search));
-    if (typeFilter) nodes = nodes.filter(n => (n.type || '').includes(typeFilter));
+    console.log(`[LineageGraph] Loaded: ${nodes.length} nodes, ${edges.length} edges`);
+    if (search) nodes = nodes.filter(n => (n.id || '').toLowerCase().includes(search) || (n.name || '').toLowerCase().includes(search));
+
+    if (typeFilter) {
+        if (typeFilter === 'file') {
+            nodes = nodes.filter(n => ['python_script', 'dbt_model', 'file_dataset'].includes((n.type || '').toLowerCase()));
+        } else {
+            nodes = nodes.filter(n => (n.type || '').toLowerCase().includes(typeFilter.toLowerCase()));
+        }
+    }
 
     const nodeIds = new Set(nodes.map(n => n.id));
     edges = edges.filter(e => nodeIds.has(e.source) && nodeIds.has(e.target));
 
+    console.log(`[LineageGraph] Filtered: ${nodes.length} nodes, ${edges.length} edges (Search: "${search}", Filter: "${typeFilter}")`);
     document.getElementById('lineageNodeCount').textContent = `${nodes.length} nodes, ${edges.length} edges`;
 
     const nodeColor = d => {

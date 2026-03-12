@@ -250,6 +250,8 @@ def stats(repo_path: Optional[str] = None):
         raw_nodes = lg.get("nodes", {})
         if isinstance(raw_nodes, dict):
             result["data_nodes"] = len(raw_nodes.get("data", [])) + len(raw_nodes.get("transformations", []))
+        elif isinstance(raw_nodes, list):
+            result["data_nodes"] = len(raw_nodes)
         result["lineage_edges"] = len(lg.get("edges", []))
 
     return result

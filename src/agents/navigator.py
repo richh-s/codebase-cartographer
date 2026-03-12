@@ -84,11 +84,21 @@ class NavigatorTools:
         with open(path) as f:
             self._lineage_graph = json.load(f)
         # Build identity index from lineage nodes
-        for section in ["data", "transformations"]:
-            for node in self._lineage_graph.get("nodes", {}).get(section, []):
-                self._nodes_by_identity[node.get("identity", "")] = node
-                self._nodes_by_identity[node.get("canonical_name", "")] = node
+        # Support both current top-level keys and legacy nested nodes object
+        sections = []
+        if "data_nodes" in self._lineage_graph:
+            sections.extend(self._lineage_graph.get("data_nodes", []))
+            sections.extend(self._lineage_graph.get("transformation_nodes", []))
+        elif "nodes" in self._lineage_graph and isinstance(self._lineage_graph["nodes"], dict):
+            nodes_obj = self._lineage_graph["nodes"]
+            sections.extend(nodes_obj.get("data", []))
+            sections.extend(nodes_obj.get("transformations", []))
+            
+        for node in sections:
+            self._nodes_by_identity[node.get("identity", "")] = node
+            self._nodes_by_identity[node.get("canonical_name", "")] = node
         return self._lineage_graph
+
 
     # ------------------------------------------------------------------
     # Tool 1: find_implementation — Semantic Search

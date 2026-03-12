@@ -40,12 +40,25 @@ class AnalyzeRequest(BaseModel):
     llm_enabled: bool = False
     semantic_depth: str = "light"
 
+class CloneRequest(BaseModel):
+    url: str  # GitHub / HTTPS / SSH git URL
+
 class QueryRequest(BaseModel):
     question: str
     repo_path: Optional[str] = None
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
+
+def _is_remote_url(s: str) -> bool:
+    """Returns True if s looks like a remote git URL."""
+    s = s.strip()
+    return (
+        s.startswith("http://")
+        or s.startswith("https://")
+        or s.startswith("git@")
+        or s.startswith("git://")
+    )
 
 def _get_repo(repo_path: Optional[str] = None) -> str:
     return os.path.abspath(repo_path or REPO_PATH)
@@ -93,6 +106,38 @@ def status(repo_path: Optional[str] = None):
             _resolve_artifact(repo, "lineage_graph", "lineage_graph.json")
         ),
     }
+
+
+@app.post("/api/clone")
+def clone_repo(req: CloneRequest):
+    """
+    Clones a remote git repository into a temp directory and returns the local path.
+    Supports HTTPS (github.com, gitlab.com, etc.) and git@ SSH URLs.
+    """
+    import tempfile, subprocess, re
+    url = req.url.strip()
+    if not _is_remote_url(url):
+        raise HTTPException(400, f"'{url}' does not look like a remote git URL.")
+
+    # Derive a friendly folder name from the URL
+    repo_name = re.sub(r'\.git$', '', url.rstrip('/').split('/')[-1])
+    clone_dir = os.path.join(tempfile.gettempdir(), f"cartographer_{repo_name}")
+
+    # Reuse clone if already exists (avoids re-cloning on refresh)
+    if os.path.exists(os.path.join(clone_dir, ".git")):
+        # Pull latest
+        subprocess.run(["git", "-C", clone_dir, "pull", "--ff-only"], capture_output=True)
+        return {"path": clone_dir, "cached": True, "repo_name": repo_name}
+
+    os.makedirs(clone_dir, exist_ok=True)
+    result = subprocess.run(
+        ["git", "clone", "--depth", "1", url, clone_dir],
+        capture_output=True, text=True, timeout=120
+    )
+    if result.returncode != 0:
+        raise HTTPException(500, f"git clone failed: {result.stderr.strip()[:400]}")
+
+    return {"path": clone_dir, "cached": False, "repo_name": repo_name}
 
 
 @app.get("/api/module-graph")

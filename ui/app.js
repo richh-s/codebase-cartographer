@@ -74,15 +74,67 @@ function switchTab(tab) {
 
 $$('.nav-item').forEach(el => el.addEventListener('click', () => switchTab(el.dataset.tab)));
 
-// ── Repo selector ──────────────────────────────────────────────────────────
-document.getElementById('setRepoBtn').addEventListener('click', () => {
-    REPO_PATH = document.getElementById('repoPathInput').value.trim();
+// ── Repo selector (supports local paths AND remote git URLs) ───────────────
+function isRemoteUrl(s) {
+    s = s.trim();
+    return s.startsWith('http://') || s.startsWith('https://') ||
+        s.startsWith('git@') || s.startsWith('git://');
+}
+
+function setCloneStatus(msg, type = '') {
+    const el = document.getElementById('cloneStatus');
+    if (!el) return;
+    el.textContent = msg;
+    el.className = `clone-status ${type}`;
+    el.classList.toggle('hidden', !msg);
+}
+
+async function handleSetRepo() {
+    const raw = document.getElementById('repoPathInput').value.trim();
+    if (!raw) return;
+
+    const btn = document.getElementById('setRepoBtn');
+    btn.disabled = true;
+
+    if (isRemoteUrl(raw)) {
+        // ── Remote URL: clone first ────────────────────────────────
+        const repoName = raw.replace(/\.git$/, '').split('/').pop();
+        setCloneStatus(`⏳ Cloning ${repoName}…`, 'cloning');
+
+        const res = await fetch(`${API}/api/clone`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: raw }),
+        }).then(r => r.json()).catch(e => ({ detail: String(e) }));
+
+        if (res.detail) {
+            setCloneStatus(`❌ ${res.detail}`, 'error');
+            btn.disabled = false;
+            return;
+        }
+
+        const cached = res.cached ? ' (cached)' : '';
+        setCloneStatus(`✅ Cloned → ${res.repo_name}${cached}`, 'cloned');
+        // Show local path in the input so user knows what was set
+        document.getElementById('repoPathInput').value = res.path;
+        // Auto-dismiss after 4 s
+        setTimeout(() => setCloneStatus('', ''), 4000);
+        REPO_PATH = res.path;
+    } else {
+        // ── Local path ─────────────────────────────────────────────
+        REPO_PATH = raw;
+        setCloneStatus('', '');
+    }
+
     state.moduleGraph = null;
     state.lineageGraph = null;
+    btn.disabled = false;
     initDashboard();
-});
+}
+
+document.getElementById('setRepoBtn').addEventListener('click', handleSetRepo);
 document.getElementById('repoPathInput').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') document.getElementById('setRepoBtn').click();
+    if (e.key === 'Enter') handleSetRepo();
 });
 
 // ── Dashboard ─────────────────────────────────────────────────────────────
@@ -223,36 +275,57 @@ function createForceGraph(svgId, containerId, nodes, links, nodeColor, nodeRadiu
     const g = svg.append('g');
 
     // Zoom + pan
-    svg.call(d3.zoom().scaleExtent([0.1, 5]).on('zoom', e => g.attr('transform', e.transform)));
+    svg.call(d3.zoom().scaleExtent([0.1, 8]).on('zoom', e => g.attr('transform', e.transform)));
 
     // Tooltip div
     const tooltip = document.getElementById(`${svgId.replace('Svg', 'Tooltip')}`);
 
-    // Arrow marker for directed edges
-    svg.append('defs').append('marker')
-        .attr('id', 'arrow')
+    // Defs: arrow + glow filter
+    const defs = svg.append('defs');
+    defs.append('marker')
+        .attr('id', `arrow-${svgId}`)
         .attr('viewBox', '0 -5 10 10')
-        .attr('refX', 18).attr('refY', 0)
-        .attr('markerWidth', 6).attr('markerHeight', 6)
+        .attr('refX', 20).attr('refY', 0)
+        .attr('markerWidth', 5).attr('markerHeight', 5)
         .attr('orient', 'auto')
         .append('path')
         .attr('d', 'M0,-5L10,0L0,5')
-        .attr('fill', '#2a3c60');
+        .attr('fill', '#4a6090');
+
+    const glow = defs.append('filter').attr('id', `glow-${svgId}`);
+    glow.append('feGaussianBlur').attr('stdDeviation', '3').attr('result', 'coloredBlur');
+    const merge = glow.append('feMerge');
+    merge.append('feMergeNode').attr('in', 'coloredBlur');
+    merge.append('feMergeNode').attr('in', 'SourceGraphic');
 
     const sim = d3.forceSimulation(nodes)
-        .force('link', d3.forceLink(links).id(d => d.id).distance(80).strength(0.3))
-        .force('charge', d3.forceManyBody().strength(-200))
+        .force('link', d3.forceLink(links).id(d => d.id).distance(100).strength(0.4))
+        .force('charge', d3.forceManyBody().strength(-280))
         .force('center', d3.forceCenter(W / 2, H / 2))
-        .force('collision', d3.forceCollide().radius(d => nodeRadius(d) + 4));
+        .force('collision', d3.forceCollide().radius(d => nodeRadius(d) + 12));
 
+    // ── Edges ──────────────────────────────────────────────────────────
     const link = g.append('g')
         .selectAll('line')
         .data(links)
         .join('line')
-        .attr('stroke-width', 1)
-        .attr('stroke', '#2a3c60')
-        .attr('stroke-opacity', 0.6)
-        .attr('marker-end', 'url(#arrow)');
+        .attr('stroke-width', 1.5)
+        .attr('stroke', '#3d5a8a')
+        .attr('stroke-opacity', 0.75)
+        .attr('marker-end', `url(#arrow-${svgId})`);
+
+    // ── Nodes ──────────────────────────────────────────────────────────
+    // Outer glow ring
+    const ring = g.append('g')
+        .selectAll('circle')
+        .data(nodes)
+        .join('circle')
+        .attr('r', d => nodeRadius(d) + 4)
+        .attr('fill', 'none')
+        .attr('stroke', d => nodeColor(d))
+        .attr('stroke-width', 1.5)
+        .attr('stroke-opacity', 0.25)
+        .attr('pointer-events', 'none');
 
     const node = g.append('g')
         .selectAll('circle')
@@ -260,9 +333,10 @@ function createForceGraph(svgId, containerId, nodes, links, nodeColor, nodeRadiu
         .join('circle')
         .attr('r', d => nodeRadius(d))
         .attr('fill', d => nodeColor(d))
-        .attr('fill-opacity', 0.85)
-        .attr('stroke', '#0a0e17')
-        .attr('stroke-width', 1.5)
+        .attr('fill-opacity', 0.92)
+        .attr('stroke', d => nodeColor(d))
+        .attr('stroke-width', 2)
+        .attr('stroke-opacity', 0.6)
         .style('cursor', 'pointer')
         .call(d3.drag()
             .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
@@ -270,6 +344,10 @@ function createForceGraph(svgId, containerId, nodes, links, nodeColor, nodeRadiu
             .on('end', (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })
         )
         .on('mouseover', (e, d) => {
+            d3.select(e.currentTarget)
+                .attr('filter', `url(#glow-${svgId})`)
+                .attr('stroke-opacity', 1)
+                .attr('r', nodeRadius(d) + 2);
             tooltip.innerHTML = tooltipFn(d);
             tooltip.classList.remove('hidden');
         })
@@ -277,29 +355,56 @@ function createForceGraph(svgId, containerId, nodes, links, nodeColor, nodeRadiu
             tooltip.style.left = (e.offsetX + 14) + 'px';
             tooltip.style.top = (e.offsetY - 10) + 'px';
         })
-        .on('mouseout', () => tooltip.classList.add('hidden'))
+        .on('mouseout', (e, d) => {
+            d3.select(e.currentTarget)
+                .attr('filter', null)
+                .attr('stroke-opacity', 0.6)
+                .attr('r', nodeRadius(d));
+            tooltip.classList.add('hidden');
+        })
         .on('click', (e, d) => { e.stopPropagation(); if (clickFn) clickFn(d); });
 
-    const label = g.append('g')
-        .selectAll('text')
-        .data(nodes)
-        .join('text')
+    // ── Labels with pill background ────────────────────────────────────
+    const labelG = g.append('g').selectAll('g').data(nodes).join('g').attr('pointer-events', 'none');
+
+    // Background pill rect (sized dynamically after text render)
+    const labelBg = labelG.append('rect')
+        .attr('rx', 3).attr('ry', 3)
+        .attr('fill', 'rgba(8,14,28,0.78)')
+        .attr('stroke', 'rgba(100,140,200,0.18)')
+        .attr('stroke-width', 0.5);
+
+    const labelText = labelG.append('text')
         .text(d => labelFn(d))
-        .attr('font-size', 9)
-        .attr('fill', '#7b93c2')
-        .attr('pointer-events', 'none')
-        .attr('dy', 4)
-        .attr('text-anchor', 'middle');
+        .attr('font-size', 11)
+        .attr('font-family', 'Inter, system-ui, sans-serif')
+        .attr('fill', '#d0ddf5')
+        .attr('text-anchor', 'middle')
+        .attr('dominant-baseline', 'middle');
 
     sim.on('tick', () => {
         link
             .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
             .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
         node.attr('cx', d => d.x).attr('cy', d => d.y);
-        label.attr('x', d => d.x).attr('y', d => d.y + nodeRadius(d) + 10);
+        ring.attr('cx', d => d.x).attr('cy', d => d.y);
+        labelG.attr('transform', d => `translate(${d.x},${d.y + nodeRadius(d) + 13})`);
+
+        // Size the background pill after text is placed
+        labelText.each(function () {
+            try {
+                const bb = this.getBBox();
+                const pad = 3;
+                d3.select(this.previousElementSibling)
+                    .attr('x', bb.x - pad)
+                    .attr('y', bb.y - pad)
+                    .attr('width', bb.width + pad * 2)
+                    .attr('height', bb.height + pad * 2);
+            } catch (_) { }
+        });
     });
 
-    return { sim, node, link, label, g };
+    return { sim, node, link, labelText, labelBg, g };
 }
 
 // ── Module Graph ──────────────────────────────────────────────────────────
@@ -328,30 +433,42 @@ function renderModuleGraph(graph) {
     const nodeIds = new Set(nodes.map(n => n.id));
     edges = edges.filter(e => nodeIds.has(e.source) && nodeIds.has(e.target));
 
-    document.getElementById('graphNodeCount').textContent = `${nodes.length} nodes`;
+    document.getElementById('graphNodeCount').textContent = `${nodes.length} nodes, ${edges.length} edges`;
 
+    // ── Vivid, high-contrast colour palette ──────────────────────────
     const nodeColor = d => {
-        if (d.is_architectural_hub) return '#a855f7';
-        if (d.is_dead_code_candidate) return '#f43f5e';
-        if (d.is_informational) return '#465a80';
-        return '#00e5ff';
+        if (d.is_architectural_hub) return '#c084fc'; // vivid purple
+        if (d.is_dead_code_candidate) return '#f87171'; // vivid red
+        if (d.is_high_velocity) return '#fb923c'; // orange
+        if (d.is_informational) return '#4b6fa8'; // muted blue-slate
+        // colour by language
+        const lang = (d.language || '').toLowerCase();
+        if (lang === 'python') return '#34d399'; // green
+        if (lang === 'sql') return '#38bdf8'; // sky blue
+        if (lang === 'yaml' || lang === 'json') return '#a78bfa'; // lavender
+        return '#60a5fa'; // default blue
     };
+
+    // ── Bigger nodes — min 8px so they're always clickable ───────────
     const nodeRadius = d => {
-        if (d.is_architectural_hub) return 9;
-        if (d.is_high_velocity) return 7;
-        return 5;
+        if (d.is_architectural_hub) return 14;
+        if (d.is_high_velocity) return 11;
+        return 8;
     };
+
+    // ── Short filename label ─────────────────────────────────────────
     const labelFn = d => {
-        const parts = (d.path || '').split('/');
+        const parts = (d.path || d.identity || '').split('/');
         return parts[parts.length - 1] || d.identity;
     };
+
     const tooltipFn = d => `
-    <strong>${d.identity}</strong><br/>
-    <span style="color:#7b93c2">${d.path}</span><br/>
-    Layer: ${d.architecture_layer}<br/>
-    Complexity: ${(d.complexity_score || 0).toFixed(1)} | PageRank: ${(d.pagerank_score || 0).toFixed(3)}
-    ${d.purpose_statement ? `<br/><em style="color:#7b93c2;font-size:11px">${d.purpose_statement.substring(0, 80)}…</em>` : ''}
-  `;
+        <strong>${d.identity}</strong><br/>
+        <span style="color:#94afd4">${d.path}</span><br/>
+        Language: <b>${d.language || '?'}</b> | Layer: ${d.architecture_layer || '—'}<br/>
+        Complexity: ${(d.complexity_score || 0).toFixed(1)} &nbsp;|&nbsp; PageRank: ${(d.pagerank_score || 0).toFixed(3)}
+        ${d.purpose_statement ? `<br/><em style="color:#94afd4;font-size:11px">${d.purpose_statement.substring(0, 90)}…</em>` : ''}
+    `;
     const clickFn = d => showModuleDetail(d);
 
     createForceGraph('moduleGraphSvg', 'moduleGraphContainer', nodes, edges, nodeColor, nodeRadius, labelFn, tooltipFn, clickFn);

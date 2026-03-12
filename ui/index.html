@@ -1,220 +1,243 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Codebase Cartographer</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Codebase Cartographer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
-  <!-- Sidebar navigation -->
-  <nav class="sidebar">
-    <div class="sidebar-logo">
-      <span class="logo-icon">🗺️</span>
-      <div class="logo-text">
-        <span class="logo-title">Cartographer</span>
-        <span class="logo-sub">Codebase Intelligence</span>
-      </div>
-    </div>
-
-    <div class="repo-selector">
-      <label>Repository</label>
-      <div class="repo-input-row">
-        <input id="repoPathInput" type="text" placeholder="/path/to/repo" />
-        <button id="setRepoBtn" class="btn-icon" title="Set Repo">→</button>
-      </div>
-    </div>
-
-    <ul class="nav-list">
-      <li class="nav-item active" data-tab="dashboard">
-        <span class="nav-icon">📊</span> Dashboard
-      </li>
-      <li class="nav-item" data-tab="module-graph">
-        <span class="nav-icon">🕸️</span> Module Graph
-      </li>
-      <li class="nav-item" data-tab="lineage-graph">
-        <span class="nav-icon">🌊</span> Lineage Graph
-      </li>
-      <li class="nav-item" data-tab="navigator">
-        <span class="nav-icon">🧭</span> Navigator
-      </li>
-      <li class="nav-item" data-tab="artifacts">
-        <span class="nav-icon">📄</span> Artifacts
-      </li>
-      <li class="nav-item" data-tab="trace">
-        <span class="nav-icon">📡</span> Trace Log
-      </li>
-    </ul>
-
-    <div class="sidebar-footer">
-      <button id="analyzeBtn" class="btn-analyze">
-        <span class="btn-icon-inner">⚡</span> Run Analysis
-      </button>
-      <div id="analyzeStatus" class="analyze-status hidden"></div>
-    </div>
-  </nav>
-
-  <!-- Main content -->
-  <main class="main-content">
-    <!-- Header bar -->
-    <header class="topbar">
-      <h1 id="pageTitle" class="page-title">Dashboard</h1>
-      <div class="topbar-meta">
-        <span id="commitBadge" class="badge badge-commit hidden"></span>
-        <span id="timestampBadge" class="badge badge-time hidden"></span>
-        <div id="statusDot" class="status-dot dot-idle" title="No analysis loaded"></div>
-      </div>
-    </header>
-
-    <!-- ────── Dashboard tab ────── -->
-    <section id="tab-dashboard" class="tab active">
-      <div class="stats-grid">
-        <div class="stat-card" id="stat-modules">
-          <div class="stat-icon">📦</div>
-          <div class="stat-value" id="statsModules">—</div>
-          <div class="stat-label">Modules</div>
-        </div>
-        <div class="stat-card" id="stat-edges">
-          <div class="stat-icon">🔗</div>
-          <div class="stat-value" id="statsEdges">—</div>
-          <div class="stat-label">Import Edges</div>
-        </div>
-        <div class="stat-card accent-purple" id="stat-hubs">
-          <div class="stat-icon">⭐</div>
-          <div class="stat-value" id="statsHubs">—</div>
-          <div class="stat-label">Arch Hubs</div>
-        </div>
-        <div class="stat-card accent-red" id="stat-dead">
-          <div class="stat-icon">☠️</div>
-          <div class="stat-value" id="statsDead">—</div>
-          <div class="stat-label">Dead Code</div>
-        </div>
-        <div class="stat-card accent-cyan" id="stat-data">
-          <div class="stat-icon">🗄️</div>
-          <div class="stat-value" id="statsData">—</div>
-          <div class="stat-label">Data Nodes</div>
-        </div>
-        <div class="stat-card accent-green" id="stat-lineage">
-          <div class="stat-icon">↕️</div>
-          <div class="stat-value" id="statsLineage">—</div>
-          <div class="stat-label">Lineage Edges</div>
-        </div>
-      </div>
-
-      <div class="dashboard-panels">
-        <div class="panel" id="panel-hubs">
-          <div class="panel-header">⭐ Architectural Hubs</div>
-          <div id="hubsList" class="module-list"></div>
-        </div>
-        <div class="panel" id="panel-velocity">
-          <div class="panel-header">🔥 High Velocity Files</div>
-          <div id="velocityList" class="module-list"></div>
-        </div>
-        <div class="panel" id="panel-domains">
-          <div class="panel-header">🗂️ Domain Clusters</div>
-          <div id="domainsList" class="domain-chips"></div>
-        </div>
-        <div class="panel" id="panel-debt">
-          <div class="panel-header">🚩 Tech Debt Summary</div>
-          <div id="debtList" class="module-list"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ────── Module Graph tab ────── -->
-    <section id="tab-module-graph" class="tab">
-      <div class="graph-toolbar">
-        <input id="graphSearch" class="graph-search" type="text" placeholder="Search modules…" />
-        <label class="filter-label">
-          <input type="checkbox" id="filterHubsOnly" /> Hubs only
-        </label>
-        <label class="filter-label">
-          <input type="checkbox" id="filterHideInfo" checked /> Hide informational
-        </label>
-        <span id="graphNodeCount" class="graph-count"></span>
-      </div>
-      <div id="moduleGraphContainer" class="graph-container">
-        <svg id="moduleGraphSvg" width="100%" height="100%"></svg>
-        <div id="moduleGraphTooltip" class="graph-tooltip hidden"></div>
-      </div>
-      <div id="moduleNodeDetail" class="node-detail-panel hidden">
-        <button class="close-btn" id="closeModuleDetail">✕</button>
-        <div id="moduleNodeDetailContent"></div>
-      </div>
-    </section>
-
-    <!-- ────── Lineage Graph tab ────── -->
-    <section id="tab-lineage-graph" class="tab">
-      <div class="graph-toolbar">
-        <input id="lineageSearch" class="graph-search" type="text" placeholder="Search datasets…" />
-        <select id="lineageLayerFilter" class="graph-select">
-          <option value="">All types</option>
-          <option value="table">table</option>
-          <option value="file">file</option>
-          <option value="api">api</option>
-        </select>
-        <span id="lineageNodeCount" class="graph-count"></span>
-      </div>
-      <div id="lineageGraphContainer" class="graph-container">
-        <svg id="lineageGraphSvg" width="100%" height="100%"></svg>
-        <div id="lineageGraphTooltip" class="graph-tooltip hidden"></div>
-      </div>
-      <div id="lineageNodeDetail" class="node-detail-panel hidden">
-        <button class="close-btn" id="closeLineageDetail">✕</button>
-        <div id="lineageNodeDetailContent"></div>
-      </div>
-    </section>
-
-    <!-- ────── Navigator tab ────── -->
-    <section id="tab-navigator" class="tab">
-      <div class="navigator-shell">
-        <div class="navigator-intro">
-          <h2>🧭 Navigator Agent</h2>
-          <p>Ask questions about the codebase. Every answer includes file citations and the analysis method used.</p>
-          <div class="example-queries">
-            <button class="example-chip" data-q="Where is the revenue calculation logic?">Revenue logic</button>
-            <button class="example-chip" data-q="What upstream sources feed the customers table?">Upstream of customers</button>
-            <button class="example-chip" data-q="What breaks if I change the orders model?">Blast radius of orders</button>
-            <button class="example-chip" data-q="Explain the purpose of the staging layer">Staging layer</button>
-          </div>
+    <!-- Sidebar navigation -->
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">🗺️</span>
+            <div class="logo-text">
+                <span class="logo-title">Cartographer</span>
+                <span class="logo-sub">Codebase Intelligence</span>
+            </div>
         </div>
 
-        <div id="navMessages" class="nav-messages"></div>
-
-        <div class="nav-input-row">
-          <input id="navInput" type="text" class="nav-input" placeholder="Ask a question about the codebase…" />
-          <button id="navSend" class="btn-send">
-            <span>Ask</span> <span class="send-arrow">→</span>
-          </button>
+        <div class="repo-selector">
+            <label>Repository <span class="label-hint">path or GitHub URL</span></label>
+            <div class="repo-input-row">
+                <input id="repoPathInput" type="text" placeholder="https://github.com/user/repo  or  /local/path" />
+                <button id="setRepoBtn" class="btn-icon" title="Set Repo (clones if URL)">→</button>
+            </div>
+            <div id="cloneStatus" class="clone-status hidden"></div>
         </div>
-      </div>
-    </section>
 
-    <!-- ────── Artifacts tab ────── -->
-    <section id="tab-artifacts" class="tab">
-      <div class="artifact-tabs">
-        <button class="artifact-tab active" data-artifact="codebase">CODEBASE.md</button>
-        <button class="artifact-tab" data-artifact="onboarding">onboarding_brief.md</button>
-      </div>
-      <div id="artifactContent" class="artifact-viewer markdown-body">
-        <p class="placeholder-text">Select an artifact above to view it.</p>
-      </div>
-    </section>
+        <ul class="nav-list">
+            <li class="nav-item active" data-tab="dashboard">
+                <span class="nav-icon">📊</span> Dashboard
+            </li>
+            <li class="nav-item" data-tab="module-graph">
+                <span class="nav-icon">🕸️</span> Module Graph
+            </li>
+            <li class="nav-item" data-tab="lineage-graph">
+                <span class="nav-icon">🌊</span> Lineage Graph
+            </li>
+            <li class="nav-item" data-tab="navigator">
+                <span class="nav-icon">🧭</span> Navigator
+            </li>
+            <li class="nav-item" data-tab="artifacts">
+                <span class="nav-icon">📄</span> Artifacts
+            </li>
+            <li class="nav-item" data-tab="trace">
+                <span class="nav-icon">📡</span> Trace Log
+            </li>
+        </ul>
 
-    <!-- ────── Trace Log tab ────── -->
-    <section id="tab-trace" class="tab">
-      <div class="trace-toolbar">
-        <input id="traceSearch" class="graph-search" type="text" placeholder="Filter events (agent, type…)" />
-        <button id="traceRefresh" class="btn-sm">↻ Refresh</button>
-      </div>
-      <div id="traceLog" class="trace-log"></div>
-    </section>
-  </main>
+        <div class="sidebar-footer">
+            <button id="analyzeBtn" class="btn-analyze">
+                <span class="btn-icon-inner">⚡</span> Run Analysis
+            </button>
+            <div id="analyzeStatus" class="analyze-status hidden"></div>
+        </div>
+    </nav>
 
-  <script src="app.js"></script>
+    <!-- Main content -->
+    <main class="main-content">
+        <!-- Header bar -->
+        <header class="topbar">
+            <h1 id="pageTitle" class="page-title">Dashboard</h1>
+            <div class="topbar-meta">
+                <span id="commitBadge" class="badge badge-commit hidden"></span>
+                <span id="timestampBadge" class="badge badge-time hidden"></span>
+                <div id="statusDot" class="status-dot dot-idle" title="No analysis loaded"></div>
+            </div>
+        </header>
+
+        <!-- ────── Dashboard tab ────── -->
+        <section id="tab-dashboard" class="tab active">
+            <div class="stats-grid">
+                <div class="stat-card" id="stat-modules">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-value" id="statsModules">—</div>
+                    <div class="stat-label">Modules</div>
+                </div>
+                <div class="stat-card" id="stat-edges">
+                    <div class="stat-icon">🔗</div>
+                    <div class="stat-value" id="statsEdges">—</div>
+                    <div class="stat-label">Import Edges</div>
+                </div>
+                <div class="stat-card accent-purple" id="stat-hubs">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-value" id="statsHubs">—</div>
+                    <div class="stat-label">Arch Hubs</div>
+                </div>
+                <div class="stat-card accent-red" id="stat-dead">
+                    <div class="stat-icon">☠️</div>
+                    <div class="stat-value" id="statsDead">—</div>
+                    <div class="stat-label">Dead Code</div>
+                </div>
+                <div class="stat-card accent-cyan" id="stat-data">
+                    <div class="stat-icon">🗄️</div>
+                    <div class="stat-value" id="statsData">—</div>
+                    <div class="stat-label">Data Nodes</div>
+                </div>
+                <div class="stat-card accent-green" id="stat-lineage">
+                    <div class="stat-icon">↕️</div>
+                    <div class="stat-value" id="statsLineage">—</div>
+                    <div class="stat-label">Lineage Edges</div>
+                </div>
+            </div>
+
+            <div class="dashboard-panels">
+                <div class="panel" id="panel-hubs">
+                    <div class="panel-header">⭐ Architectural Hubs</div>
+                    <div id="hubsList" class="module-list"></div>
+                </div>
+                <div class="panel" id="panel-velocity">
+                    <div class="panel-header">🔥 High Velocity Files</div>
+                    <div id="velocityList" class="module-list"></div>
+                </div>
+                <div class="panel" id="panel-domains">
+                    <div class="panel-header">🗂️ Domain Clusters</div>
+                    <div id="domainsList" class="domain-chips"></div>
+                </div>
+                <div class="panel" id="panel-debt">
+                    <div class="panel-header">🚩 Tech Debt Summary</div>
+                    <div id="debtList" class="module-list"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ────── Module Graph tab ────── -->
+        <section id="tab-module-graph" class="tab">
+            <div class="graph-toolbar">
+                <input id="graphSearch" class="graph-search" type="text" placeholder="Search modules…" />
+                <label class="filter-label">
+                    <input type="checkbox" id="filterHubsOnly" /> Hubs only
+                </label>
+                <label class="filter-label">
+                    <input type="checkbox" id="filterHideInfo" checked /> Hide informational
+                </label>
+                <span id="graphNodeCount" class="graph-count"></span>
+            </div>
+            <div class="graph-legend">
+                <span class="legend-item"><span class="legend-dot" style="background:#c084fc"></span>Hub</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#34d399"></span>Python</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#38bdf8"></span>SQL</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#a78bfa"></span>YAML/JSON</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#fb923c"></span>High
+                    Velocity</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#f87171"></span>Dead Code</span>
+                <span class="legend-item"><span class="legend-dot"
+                        style="background:#4b6fa8"></span>Informational</span>
+            </div>
+            <div id="moduleGraphContainer" class="graph-container">
+                <svg id="moduleGraphSvg" width="100%" height="100%"></svg>
+                <div id="moduleGraphTooltip" class="graph-tooltip hidden"></div>
+            </div>
+            <div id="moduleNodeDetail" class="node-detail-panel hidden">
+                <button class="close-btn" id="closeModuleDetail">✕</button>
+                <div id="moduleNodeDetailContent"></div>
+            </div>
+        </section>
+
+        <!-- ────── Lineage Graph tab ────── -->
+        <section id="tab-lineage-graph" class="tab">
+            <div class="graph-toolbar">
+                <input id="lineageSearch" class="graph-search" type="text" placeholder="Search datasets…" />
+                <select id="lineageLayerFilter" class="graph-select">
+                    <option value="">All types</option>
+                    <option value="table">table</option>
+                    <option value="file">file</option>
+                    <option value="api">api</option>
+                </select>
+                <span id="lineageNodeCount" class="graph-count"></span>
+            </div>
+            <div id="lineageGraphContainer" class="graph-container">
+                <svg id="lineageGraphSvg" width="100%" height="100%"></svg>
+                <div id="lineageGraphTooltip" class="graph-tooltip hidden"></div>
+            </div>
+            <div id="lineageNodeDetail" class="node-detail-panel hidden">
+                <button class="close-btn" id="closeLineageDetail">✕</button>
+                <div id="lineageNodeDetailContent"></div>
+            </div>
+        </section>
+
+        <!-- ────── Navigator tab ────── -->
+        <section id="tab-navigator" class="tab">
+            <div class="navigator-shell">
+                <div class="navigator-intro">
+                    <h2>🧭 Navigator Agent</h2>
+                    <p>Ask questions about the codebase. Every answer includes file citations and the analysis method
+                        used.</p>
+                    <div class="example-queries">
+                        <button class="example-chip" data-q="Where is the revenue calculation logic?">Revenue
+                            logic</button>
+                        <button class="example-chip" data-q="What upstream sources feed the customers table?">Upstream
+                            of customers</button>
+                        <button class="example-chip" data-q="What breaks if I change the orders model?">Blast radius of
+                            orders</button>
+                        <button class="example-chip" data-q="Explain the purpose of the staging layer">Staging
+                            layer</button>
+                    </div>
+                </div>
+
+                <div id="navMessages" class="nav-messages"></div>
+
+                <div class="nav-input-row">
+                    <input id="navInput" type="text" class="nav-input"
+                        placeholder="Ask a question about the codebase…" />
+                    <button id="navSend" class="btn-send">
+                        <span>Ask</span> <span class="send-arrow">→</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ────── Artifacts tab ────── -->
+        <section id="tab-artifacts" class="tab">
+            <div class="artifact-tabs">
+                <button class="artifact-tab active" data-artifact="codebase">CODEBASE.md</button>
+                <button class="artifact-tab" data-artifact="onboarding">onboarding_brief.md</button>
+            </div>
+            <div id="artifactContent" class="artifact-viewer markdown-body">
+                <p class="placeholder-text">Select an artifact above to view it.</p>
+            </div>
+        </section>
+
+        <!-- ────── Trace Log tab ────── -->
+        <section id="tab-trace" class="tab">
+            <div class="trace-toolbar">
+                <input id="traceSearch" class="graph-search" type="text" placeholder="Filter events (agent, type…)" />
+                <button id="traceRefresh" class="btn-sm">↻ Refresh</button>
+            </div>
+            <div id="traceLog" class="trace-log"></div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
 </body>
+
 </html>

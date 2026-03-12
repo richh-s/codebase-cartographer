@@ -37,7 +37,9 @@ class ModuleNode(BaseModel):
     # Intelligence Flags
     complexity_score: float = 0.0
     velocity_score: float = 0.0
-    change_velocity_30d: float = 0.0 # Strict rubric requirement
+    change_velocity_30d: float = 0.0
+    commit_count_30d: int = 0
+    unique_authors_30d: int = 0
     pagerank_score: float = 0.0
     importance_score: int = 1 # 1-100 normalized
     

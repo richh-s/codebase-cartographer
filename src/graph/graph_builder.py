@@ -142,10 +142,8 @@ class GraphBuilder:
             # Update the graph data dict to reflect changes made to the Pydantic model
             self.graph.nodes[identity].update(node.model_dump())
 
-    def export_json(self, output_path: str):
-        """Serializes the graph to the required JSON schema."""
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
-        
+    def export_dict(self) -> Dict[str, Any]:
+        """Returns a dictionary representation of the graph for exporting."""
         # Top hubs: sort by pagerank descending (only include those that pass the threshold)
         hub_candidates = [n for n in self.nodes.values() if n.is_architectural_hub]
         sorted_nodes = sorted(
@@ -167,15 +165,19 @@ class GraphBuilder:
             key=lambda x: x["identity"]
         )
         
-        output = {
+        return {
             "nodes": sorted_nodes_list,
             "edges": structured_edges,
             "top_hubs": top_hubs,
-            "scc_groups": sorted([sorted(g) for g in self.scc_groups]),
+            "scc_groups": sorted([sorted(g) for g in getattr(self, "scc_groups", [])]),
             "metadata": {
                 "total_files": len(self.nodes)
             }
         }
-        
+
+    def export_json(self, output_path: str):
+        """Serializes the graph to the required JSON schema."""
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        output = self.export_dict()
         with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(output, f, indent=2, sort_keys=True)

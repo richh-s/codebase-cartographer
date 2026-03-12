@@ -32,6 +32,7 @@ class SurveyorAgent:
             if '.git' in dirs: dirs.remove('.git')
             if '.venv' in dirs: dirs.remove('.venv')
             if '.cartography' in dirs: dirs.remove('.cartography')
+            if 'artifacts' in dirs: dirs.remove('artifacts')
             if '__pycache__' in dirs: dirs.remove('__pycache__')
             
             for file in files:

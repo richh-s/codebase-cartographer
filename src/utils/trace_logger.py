@@ -1,7 +1,7 @@
 import json
 import os
-import time
-from datetime import datetime
+import threading
+from datetime import datetime, timezone
 from typing import Dict, Any, Optional, List
 
 class TraceLogger:
@@ -51,7 +51,7 @@ class TraceLogger:
 
         event = {
             "schema_version": self.schema_version,
-            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "agent": agent,
             "event_type": event_type,
             "target_file": target_file,

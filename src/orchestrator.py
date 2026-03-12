@@ -2,7 +2,7 @@ import os
 import json
 import ast
 import hashlib
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional, Set
 from agents.surveyor import SurveyorAgent
 from agents.hydrologist import HydrologistAgent
@@ -30,7 +30,7 @@ class Orchestrator:
         self.surveyor = SurveyorAgent(self.repo_path)
         self.hydrologist = HydrologistAgent(self.repo_path)
         self.semanticist = SemanticistAgent()
-        self.archivist = ArchivistAgent(self.repo_path)
+        self.archivist = ArchivistAgent(self.repo_path, logger=self.logger)
         
         self.cache_path = os.path.join(self.output_dir, "cache.json")
         self.cache = self._load_cache()
@@ -69,7 +69,50 @@ class Orchestrator:
                     return hashlib.sha256(f.read()).hexdigest()
             except:
                 return None
-        
+
+    def _compute_signature_hash(self, file_path: str) -> Optional[str]:
+        """
+        Computes a hash of only the public signatures (function/class names + params).
+        Fills Phase 4.5 requirement for Bazel-style optimization.
+        """
+        abs_path = file_path if os.path.isabs(file_path) else os.path.join(self.repo_path, file_path)
+        if not os.path.exists(abs_path) or not abs_path.endswith(".py"):
+            return None
+            
+        try:
+            with open(abs_path, "r") as f:
+                source = f.read()
+            tree = ast.parse(source)
+            signatures = []
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef):
+                    # Canonical signature: name(args, defaults)
+                    args = [a.arg for a in node.args.args]
+                    signatures.append(f"func:{node.name}({','.join(args)})")
+                elif isinstance(node, ast.ClassDef):
+                    signatures.append(f"class:{node.name}")
+            
+            sig_str = "|".join(sorted(signatures))
+            return hashlib.sha256(sig_str.encode("utf-8")).hexdigest()
+        except:
+            return None
+
+    def _update_catalog(self, git_sha: str, module_graph: str, lineage_graph: str, codebase_report: str):
+        """Generates catalog.json to point Phase 5 Navigator to latest artifacts."""
+        catalog = {
+            "latest_analysis": {
+                "git_commit": git_sha,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "module_graph": os.path.relpath(module_graph, self.repo_path),
+                "lineage_graph": os.path.relpath(lineage_graph, self.repo_path),
+                "codebase_report": os.path.relpath(codebase_report, self.repo_path)
+            }
+        }
+        catalog_path = os.path.join(self.output_dir, "catalog.json")
+        with open(catalog_path, "w") as f:
+            json.dump(catalog, f, indent=2)
+        print(f"[Info] Orchestrator: Catalog updated at {catalog_path}")
+
     def run_analysis(self, llm_enabled: bool = False, semantic_depth: str = "light", 
                      store_embeddings: bool = False, velocity_days: int = 30, sql_dialect: str = "duckdb"):
         """Executes the suite with incremental intelligence and Agent 4 excellence."""
@@ -99,6 +142,8 @@ class Orchestrator:
         
         # 3. Handle Incremental Logic (Depth 1)
         changed_modules = []
+        signature_drifted = set()
+        
         for m in modules:
             new_hash = self._compute_ast_hash(m.path)
             old_hash = self.cache["files"].get(m.path)
@@ -107,18 +152,31 @@ class Orchestrator:
                 changed_modules.append(m)
                 self.cache["files"][m.path] = new_hash
                 
+                # Check for signature drift
+                new_sig = self._compute_signature_hash(m.path)
+                old_sig = self.cache.get("signatures", {}).get(m.path)
+                if new_sig != old_sig:
+                    signature_drifted.add(m.identity)
+                    if "signatures" not in self.cache: self.cache["signatures"] = {}
+                    self.cache["signatures"][m.path] = new_sig
+                
         # Flag Dep-1 neighbors for re-analysis
-        if llm_enabled and changed_modules:
+        if llm_enabled and (changed_modules or signature_drifted):
             blast_radius = set()
             for cm in changed_modules:
                 blast_radius.add(cm.identity)
-                # Find direct importers (Depth 1)
-                for u, v in module_graph_builder.graph.in_edges(cm.identity):
+                
+            # Only trigger neighbor re-analysis if signatures changed (Bazel-style)
+            for sid in signature_drifted:
+                for u, v in module_graph_builder.graph.in_edges(sid):
                     blast_radius.add(u)
             
             re_analyze_targets = [m for m in modules if m.identity in blast_radius]
-            print(f"[Info] Incremental: Re-analyzing {len(re_analyze_targets)} modules (Blast Radius D1)")
-            self.semanticist.analyze_modules(re_analyze_targets, store_embeddings=store_embeddings)
+            if re_analyze_targets:
+                print(f"[Info] Incremental: Re-analyzing {len(re_analyze_targets)} modules (Blast Radius D1)")
+                self.semanticist.analyze_modules(re_analyze_targets, store_embeddings=store_embeddings)
+            else:
+                print("[Info] Incremental: No modules required re-analysis.")
         elif llm_enabled:
             print("[Info] Incremental: No AST changes detected. Skipping LLM re-analysis.")
         
@@ -149,12 +207,16 @@ class Orchestrator:
         # Final Stable Exports
         m_graph_path = os.path.join(self.artifacts_dir, f"module_graph_git_{git_sha[:8]}.json")
         l_graph_path = os.path.join(self.artifacts_dir, f"lineage_graph_git_{git_sha[:8]}.json")
+        cb_report_path = os.path.join(self.artifacts_dir, "CODEBASE.md")
         
         self.archivist.export_graph_json(module_graph_builder.export_dict(), git_sha, m_graph_path)
         
         # Validate and export lineage
         lineage_graph.validate_or_raise()
         self.archivist.export_graph_json(lineage_graph.serialize_stable(), git_sha, l_graph_path)
+        
+        # Update Catalog for Phase 5 Navigator
+        self._update_catalog(git_sha, m_graph_path, l_graph_path, cb_report_path)
         
         self._save_cache()
         print(f"--- Analysis Complete! Artifacts in {self.artifacts_dir} ---")

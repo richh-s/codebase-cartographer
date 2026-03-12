@@ -1,6 +1,7 @@
 import os
 import json
-from datetime import datetime
+import json
+from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 from models.nodes import ModuleNode
 
@@ -10,16 +11,17 @@ class ArchivistAgent:
     Fulfills Phase 4 requirements for determinism, portability, and overrides.
     """
     
-    def __init__(self, repo_path: str, st_threshold: int = 5):
+    def __init__(self, repo_path: str, st_threshold: int = 5, logger: Optional[Any] = None):
         self.repo_path = os.path.abspath(repo_path)
         self.st_threshold = st_threshold
+        self.logger = logger
         self.schema_version = "1.0"
         self.analysis_version = "cartographer_phase4"
 
     def apply_overrides(self, modules: List[ModuleNode], overrides_path: str):
         """
         Applies manual overrides from overrides.json.
-        Validation: Errors out if the target module doesn't exist.
+        Validation: Errors out if the target module doesn't exist (Ghost Prevention).
         """
         if not os.path.exists(overrides_path):
             return
@@ -29,12 +31,24 @@ class ArchivistAgent:
                 overrides = json.load(f)
             
             module_map = {m.path: m for m in modules}
+            used_overrides = set()
+            
             for entry in overrides:
                 target = entry.get("module")
                 if target not in module_map:
-                    print(f"[Warning] Archivist: Override target '{target}' not found in graph.")
+                    # High-visibility warning for ghost overrides
+                    msg = f"Stale override detected! Module '{target}' no longer exists."
+                    print(f"[ERROR] Archivist: {msg}")
+                    if self.logger:
+                        self.logger.log_event(
+                            agent="Archivist",
+                            event_type="ERROR",
+                            target_file="overrides.json",
+                            metadata={"error": msg, "target_module": target}
+                        )
                     continue
                 
+                used_overrides.add(target)
                 m = module_map[target]
                 if "purpose" in entry:
                     m.purpose_statement = entry["purpose"]
@@ -44,6 +58,8 @@ class ArchivistAgent:
                     m.domain_cluster = entry["domain"]
                 
                 print(f"[Info] Archivist: Applied override to {target}")
+            
+            # Optional: Log which ones were not used if we had a registry
         except Exception as e:
             print(f"[Error] Archivist: Failed to apply overrides: {e}")
 
@@ -84,6 +100,23 @@ class ArchivistAgent:
             
             lines.append(f"| `{rel_path}` | {domain} | {layer} | {status} | {purpose} |")
             
+        # Add Categorized Debt Section
+        lines.extend([
+            "",
+            "## 🚩 Technical Debt & Risks",
+            "| Area | Debt Type | Severity | Description |",
+            "| :--- | :--- | :--- | :--- |"
+        ])
+        
+        # Simple heuristic debt for now (placeholder for more complex logic)
+        for m in modules:
+            if m.is_high_complexity:
+                lines.append(f"| `{m.identity}` | Complexity | Medium | Module contains functions with high cyclomatic complexity. |")
+            if m.is_dead_code_candidate:
+                lines.append(f"| `{m.identity}` | Logic | Low | Potential dead code (produced but never consumed). |")
+            if m.is_architectural_hub:
+                lines.append(f"| `{m.identity}` | Coupling | Low | Significant architectural hub; changes may have high blast radius. |")
+
         with open(output_path, "w") as f:
             f.write("\n".join(lines))
         print(f"[Info] Archivist: Codebase report saved to {output_path}")
@@ -96,7 +129,7 @@ class ArchivistAgent:
             "schema_version": self.schema_version,
             "analysis_version": self.analysis_version,
             "git_commit": git_sha,
-            "timestamp": datetime.utcnow().isoformat() + "Z"
+            "timestamp": datetime.now(timezone.utc).isoformat()
         }
         
         # Merge header with data

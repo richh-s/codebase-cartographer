@@ -106,14 +106,18 @@ async function handleSetRepo() {
         const repoName = raw.replace(/\.git$/, '').split('/').pop();
         setCloneStatus(`⏳ Cloning ${repoName}…`, 'cloning');
 
-        const res = await fetch(`${API}/api/clone`, {
+        const response = await fetch(`${API}/api/clone`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ url: raw }),
-        }).then(r => r.json()).catch(e => ({ detail: String(e) }));
+        });
 
-        if (res.detail) {
-            setCloneStatus(`❌ ${res.detail}`, 'error');
+        const res = await response.json().catch(() => ({ detail: 'Failed to parse server response' }));
+
+        if (!response.ok) {
+            const errorMsg = res.detail || 'Unknown cloning error';
+            setCloneStatus(`❌ ${errorMsg}`, 'error');
+            console.error("[Clone] Error:", res);
             btn.disabled = false;
             return;
         }

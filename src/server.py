@@ -42,6 +42,7 @@ class AnalyzeRequest(BaseModel):
 
 class CloneRequest(BaseModel):
     url: str  # GitHub / HTTPS / SSH git URL
+    force_refresh: bool = False
 
 class QueryRequest(BaseModel):
     question: str
@@ -112,30 +113,44 @@ def status(repo_path: Optional[str] = None):
 def clone_repo(req: CloneRequest):
     """
     Clones a remote git repository into a temp directory and returns the local path.
-    Supports HTTPS (github.com, gitlab.com, etc.) and git@ SSH URLs.
     """
-    import tempfile, subprocess, re
+    import tempfile, subprocess, re, hashlib
     url = req.url.strip()
     if not _is_remote_url(url):
         raise HTTPException(400, f"'{url}' does not look like a remote git URL.")
 
-    # Derive a friendly folder name from the URL
+    # Derive a unique folder name to prevent collisions (e.g. same repo name from different users)
+    url_hash = hashlib.md5(url.encode()).hexdigest()[:8]
     repo_name = re.sub(r'\.git$', '', url.rstrip('/').split('/')[-1])
-    clone_dir = os.path.join(tempfile.gettempdir(), f"cartographer_{repo_name}")
+    clone_dir = os.path.join(tempfile.gettempdir(), f"cartographer_{repo_name}_{url_hash}")
 
-    # Reuse clone if already exists (avoids re-cloning on refresh)
+    # Force re-clone if requested
+    if req.force_refresh and os.path.exists(clone_dir):
+        import shutil
+        print(f"[Info] Force refresh requested for {url}. Removing {clone_dir}")
+        shutil.rmtree(clone_dir)
+
+    # Reuse clone if already exists
     if os.path.exists(os.path.join(clone_dir, ".git")):
-        # Pull latest
-        subprocess.run(["git", "-C", clone_dir, "pull", "--ff-only"], capture_output=True)
-        return {"path": clone_dir, "cached": True, "repo_name": repo_name}
+        print(f"[Info] Attempting to update existing repo at {clone_dir}")
+        pull_result = subprocess.run(["git", "-C", clone_dir, "pull", "--ff-only"], capture_output=True, text=True)
+        if pull_result.returncode == 0:
+            return {"path": clone_dir, "cached": True, "repo_name": repo_name}
+        else:
+            print(f"[Warning] git pull failed at {clone_dir}: {pull_result.stderr.strip()}")
+            # If pull fails (e.g. divergent branches or corrupted), we attempt one more fresh clone
+            import shutil
+            shutil.rmtree(clone_dir)
 
     os.makedirs(clone_dir, exist_ok=True)
+    print(f"[Info] Cloning {url} to {clone_dir}")
     result = subprocess.run(
         ["git", "clone", "--depth", "1", url, clone_dir],
-        capture_output=True, text=True, timeout=120
+        capture_output=True, text=True, timeout=180 # Increased timeout for slow connections
     )
     if result.returncode != 0:
-        raise HTTPException(500, f"git clone failed: {result.stderr.strip()[:400]}")
+        error_msg = result.stderr.strip() or result.stdout.strip()
+        raise HTTPException(500, f"git clone failed: {error_msg[:500]}")
 
     return {"path": clone_dir, "cached": False, "repo_name": repo_name}
 

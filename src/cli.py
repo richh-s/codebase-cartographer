@@ -188,6 +188,35 @@ def query(
 
 
 @app.command()
+def serve(
+    repo_path: str = typer.Argument(".", help="Path to the analyzed repository."),
+    port: int = typer.Option(8370, "--port", "-p", help="Port to run the UI server on."),
+    host: str = typer.Option("0.0.0.0", "--host", help="Host to bind to."),
+):
+    """
+    Start the Codebase Cartographer Web UI.
+    Opens a browser-based interface for exploring module graphs, lineage, and the Navigator.
+    """
+    import sys, os
+    # Add src to path so server.py can import agents
+    src_dir = os.path.dirname(os.path.abspath(__file__))
+    sys.path.insert(0, src_dir)
+
+    import server as srv
+    srv.REPO_PATH = os.path.abspath(repo_path)
+
+    try:
+        import uvicorn
+    except ImportError:
+        typer.secho("❌  uvicorn not installed. Run: pip install uvicorn", fg=typer.colors.RED)
+        raise typer.Exit(1)
+
+    typer.secho(f"🗺️  Codebase Cartographer UI → http://localhost:{port}/", fg=typer.colors.CYAN)
+    typer.echo(f"   Repo: {srv.REPO_PATH}")
+    uvicorn.run(srv.app, host=host, port=port, log_level="warning")
+
+
+@app.command()
 def version():
     """Print the version of Codebase Cartographer."""
     typer.echo("0.2.0")

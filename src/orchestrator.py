@@ -10,6 +10,7 @@ from agents.semanticist import SemanticistAgent
 from agents.archivist import ArchivistAgent
 from utils.git_provider import GitProvider
 from utils.trace_logger import TraceLogger, TraceEvents, Agents
+from utils.semantic_index import SemanticIndex
 from models.lineage import DatasetRole
 
 class Orchestrator:
@@ -31,6 +32,7 @@ class Orchestrator:
         self.hydrologist = HydrologistAgent(self.repo_path)
         self.semanticist = SemanticistAgent()
         self.archivist = ArchivistAgent(self.repo_path, logger=self.logger)
+        self.semantic_index = SemanticIndex(self.repo_path)
         
         self.cache_path = os.path.join(self.output_dir, "cache.json")
         self.cache = self._load_cache()
@@ -217,6 +219,15 @@ class Orchestrator:
         
         # Update Catalog for Phase 5 Navigator
         self._update_catalog(git_sha, m_graph_path, l_graph_path, cb_report_path)
+        
+        # Build / update semantic index for Navigator queries
+        graph_dict = module_graph_builder.export_dict()
+        indexed = self.semantic_index.build_from_graph(
+            graph_dict,
+            llm_client=self.semanticist.llm if llm_enabled else None
+        )
+        if indexed > 0:
+            print(f"[Info] Orchestrator: Semantic index updated ({indexed} entries) at semantic_index/")
         
         self._save_cache()
         print(f"--- Analysis Complete! Artifacts in {self.artifacts_dir} ---")

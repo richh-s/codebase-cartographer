@@ -101,7 +101,8 @@ class SurveyorAgent:
                     complexity_score=module_complexity,
                     is_high_complexity=is_high_complexity,
                     velocity_score=velocity_score,
-                    change_velocity_30d=velocity_score, # Populate rubric field
+                    change_velocity_30d=velocity_score,
+                    last_modified=g_meta.get("last_modified", ""),  # Rubric field
                     metadata={
                         **ast_data.get("metadata", {}),
                         "last_modified": g_meta.get("last_modified", ""),

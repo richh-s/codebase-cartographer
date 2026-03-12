@@ -9,6 +9,10 @@ class FunctionNode(BaseModel):
     docstring_summary: Optional[str] = None
     complexity_score: int = 1
     
+    # Rubric: call_count_within_repo and is_public_api
+    call_count_within_repo: int = 0
+    is_public_api: bool = True  # False for _private functions
+    
     # Track nested functions to avoid inflating parent complexity
     is_nested: bool = False
     decorators: List[str] = Field(default_factory=list)
@@ -27,6 +31,9 @@ class ModuleNode(BaseModel):
     identity: str  # E.g., module name like 'codebase_cartographer.cli'
     language: str
     architecture_layer: str = "unknown"
+    
+    # Rubric: last_modified as top-level field
+    last_modified: Optional[str] = None
     
     # Imports now track {"name": "target_name", "type": "dbt_ref|import"}
     imports: List[Dict[str, str]] = Field(default_factory=list)
@@ -58,3 +65,16 @@ class ModuleNode(BaseModel):
     semantic_embedding: Optional[List[float]] = None # Only if --store-embeddings is enabled
     
     metadata: Dict[str, Any] = Field(default_factory=dict)
+
+
+class DatasetNode(BaseModel):
+    """
+    Rubric-compliant DatasetNode schema (alias for DataNode with explicit spec fields).
+    Used for type-safe access to dataset metadata from the lineage graph.
+    """
+    name: str
+    storage_type: str = "table"  # 'table' | 'file' | 'stream' | 'api'
+    schema_snapshot: Optional[List[str]] = None  # list of column names
+    freshness_sla: Optional[str] = None  # e.g. "24h", "1h"
+    owner: Optional[str] = None
+    is_source_of_truth: bool = False

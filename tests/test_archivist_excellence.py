@@ -81,10 +81,13 @@ def test_deterministic_export(repo_path):
         # Remove timestamp for comparison
         data_1.pop("timestamp")
         
-    # Clear cache and artifacts and run again
+    # Clear cache, artifacts, and semantic_index and run again
     shutil.rmtree(os.path.join(repo_path, ".cartography"))
     shutil.rmtree(os.path.join(repo_path, "artifacts"))
-    orchestrator = Orchestrator(repo_path) 
+    si_dir = os.path.join(repo_path, "semantic_index")
+    if os.path.exists(si_dir):
+        shutil.rmtree(si_dir)
+    orchestrator = Orchestrator(repo_path)
     orchestrator.run_analysis(llm_enabled=False)
     
     m_graph_file_2 = [f for f in os.listdir(artifacts_dir) if f.startswith("module_graph_git_")][0]

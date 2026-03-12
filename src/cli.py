@@ -157,9 +157,40 @@ def impact(
     typer.echo(f"\nTotal Weighted Impact: {total_impact:.1f}")
 
 @app.command()
+def query(
+    repo_path: str = typer.Argument(".", help="Path to the analyzed repository."),
+    question: Optional[str] = typer.Option(None, "--question", "-q", help="Single query to run (non-interactive)."),
+):
+    """
+    Query the codebase knowledge graph using natural language.
+    Launches the Navigator Agent in interactive mode if no --question is provided.
+    """
+    if not os.path.exists(repo_path):
+        typer.echo(f"Error: Path {repo_path} does not exist.")
+        raise typer.Exit(1)
+
+    catalog_path = os.path.join(repo_path, ".cartography", "catalog.json")
+    if not os.path.exists(catalog_path):
+        typer.secho(
+            "No analysis found. Run 'codebase-cartographer analyze <repo_path>' first.",
+            fg=typer.colors.RED
+        )
+        raise typer.Exit(1)
+
+    from agents.navigator import NavigatorAgent
+    navigator = NavigatorAgent(repo_path)
+
+    if question:
+        answer = navigator.query(question)
+        typer.echo(answer)
+    else:
+        navigator.interactive()
+
+
+@app.command()
 def version():
     """Print the version of Codebase Cartographer."""
-    typer.echo("0.1.0")
+    typer.echo("0.2.0")
 
 if __name__ == "__main__":
     app()

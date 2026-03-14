@@ -16,7 +16,7 @@ class SemanticistAgent:
         self.budget = self.llm.budget
         self.logger = logger
 
-    def analyze_modules(self, modules: List[ModuleNode], store_embeddings: bool = False) -> List[ModuleNode]:
+    def analyze_modules(self, modules: List[ModuleNode], store_embeddings: bool = False, n_clusters: Optional[int] = None) -> List[ModuleNode]:
         """
         Runs the full semantic analysis pipeline for a list of modules.
         """
@@ -66,8 +66,8 @@ class SemanticistAgent:
                 for m, emb in zip(eligible_for_clustering, embeddings):
                     m.semantic_embedding = emb
             
-            # Perform Clustering
-            labels = cluster_into_domains(embeddings, len(modules))
+            # Perform Clustering with optional n_clusters override
+            labels = cluster_into_domains(embeddings, len(modules), n_clusters=n_clusters)
             
             for m, label in zip(eligible_for_clustering, labels):
                 # Placeholder for label_domain_clusters logic
@@ -108,9 +108,23 @@ class SemanticistAgent:
                     module.documentation_drift = data.get("is_drift", False)
                     # We can store extra metadata in the object if models allow, 
                     # for now we ensure the boolean is set and can log the contradiction.
-                    if module.documentation_drift:
-                        module.metadata["drift_severity"] = data.get("severity")
-                        module.metadata["drift_contradiction"] = data.get("contradiction")
+                    module.metadata["drift_severity"] = data.get("severity")
+                    module.metadata["drift_contradiction"] = data.get("contradiction")
+                    
+                    if self.logger:
+                        self.logger.log_event(
+                            "Semanticist", 
+                            "SEMANTIC_ENRICHMENT", 
+                            module.path, 
+                            "llm_inference", 
+                            1.0, 
+                            metadata={
+                                "feature": "drift_detection",
+                                "is_drift": module.documentation_drift,
+                                "severity": data.get("severity"),
+                                "contradiction": data.get("contradiction")
+                            }
+                        )
                 except Exception:
                     # Fallback to simple embedding similarity if LLM synthesis fails
                     embeddings = self.llm.embed_texts([docstring, module.purpose_statement], task_type="retrieval_document")
@@ -174,7 +188,7 @@ class SemanticistAgent:
         4. What is the overall architectural health (debt, complexity)?
         5. What is the 'Blast Radius' of a change to core schemas?
         
-        CRITICAL: Provide concrete business-level evidence for every claim. Every observation MUST have a citation in [file_path:line_number] format. Focus on 'Master Thinker' level insights: identifying the actual business value, identifying the true structural source of truth vs. derivative sinks, and quantifying the actual blast radius of changes.
+        CRITICAL: Provide concrete business-level evidence for every claim. Every observation MUST have a citation in [file_path:line_number] format. Focus on 'Master Thinker' level insights: identifying the actual business value, identifying the true structural source of truth vs. derivative sinks, and quantifying the actual blast radius of changes. Responses failing to cite multiple lines for major logic centers will be rejected.
         
         Evidence:
         {json.dumps(evidence_packets, indent=2)}

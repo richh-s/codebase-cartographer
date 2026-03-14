@@ -90,8 +90,8 @@ class GraphBuilder:
         # 3. Apply metrics and classify nodes
         # Baseline threshold scales with 1/N. Anything significantly above 1/N is acting as a hub or sink.
         pr_baseline = 1.0 / N if N > 0 else 0.0
-        # Increased multiplier from 1.5 to 2.5 to be more restrictive of what gets called a 'hub'
-        pr_threshold = max(pagerank_threshold, pr_baseline * 2.5)
+        # Adaptive threshold: Lower the hardcoded floor and use a slightly higher multiplier for precision.
+        pr_threshold = max(0.05, pr_baseline * 3.5)
         
         # Calculate min/max PageRank for normalization
         pr_values = [v for v in pagerank.values() if v > 0]

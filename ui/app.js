@@ -171,6 +171,13 @@ async function initDashboard() {
             tb.textContent = formatTime(statusData.timestamp);
             tb.classList.remove('hidden');
         }
+
+        // Update repo indicator
+        const ri = $('#currentRepoIndicator');
+        if (ri) {
+            ri.textContent = statusData.repo_path || REPO_PATH || 'Local Server Root';
+            ri.title = statusData.repo_path || REPO_PATH || '';
+        }
     }
 
     if (statsData) {
@@ -243,6 +250,9 @@ function renderDebt(nodes) {
 document.getElementById('analyzeBtn').addEventListener('click', async () => {
     const btn = document.getElementById('analyzeBtn');
     const status = document.getElementById('analyzeStatus');
+    const llmEnabled = document.getElementById('llmEnabledCheckbox').checked;
+    const semanticDepth = document.getElementById('semanticDepthSelect').value;
+
     btn.disabled = true;
     status.textContent = '⚡ Analysis running…';
     status.classList.remove('hidden');
@@ -250,7 +260,11 @@ document.getElementById('analyzeBtn').addEventListener('click', async () => {
     const result = await fetch(`${API}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ repo_path: REPO_PATH || '.', llm_enabled: false }),
+        body: JSON.stringify({
+            repo_path: REPO_PATH || '.',
+            llm_enabled: llmEnabled,
+            semantic_depth: semanticDepth
+        }),
     }).then(r => r.json()).catch(() => null);
 
     if (result?.status === 'started') {

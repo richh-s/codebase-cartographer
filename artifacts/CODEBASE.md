@@ -1,7 +1,7 @@
 # 🗺️ Codebase Technical Overview
-**Commit SHA:** `4ba5b3bac750a889b19c5d56b46569d41f8935f4`
-**Generated:** 2026-03-12T17:07:51.604888
-**Total Modules:** 64
+**Commit SHA:** `de811aded186e04e56e9d55553a675842db6a8ac`
+**Generated:** 2026-03-14T11:46:22.297096
+**Total Modules:** 71
 
 ## 📂 Module Inventory
 | Module | Domain | Layer | Status | Purpose |
@@ -23,6 +23,7 @@
 | `mock_project/models/stg_orders.sql` | General | unknown | ✅ Stable | No purpose statement generated. |
 | `mock_project/process_orders.py` | General | unknown | ✅ Stable | No purpose statement generated. |
 | `pyproject.toml` | General | unknown | ✅ Stable | No purpose statement generated. |
+| `semantic_index/index.json` | General | meta | ✅ Stable | No purpose statement generated. |
 | `src/agents/__init__.py` | General | unknown | ✅ Stable | No purpose statement generated. |
 | `src/agents/archivist.py` | General | unknown | ✅ Stable | No purpose statement generated. |
 | `src/agents/hydrologist.py` | General | unknown | ✅ Stable | No purpose statement generated. |
@@ -37,6 +38,12 @@
 | `src/analyzers/sql_lineage.py` | General | unknown | ✅ Stable | No purpose statement generated. |
 | `src/analyzers/tree_sitter_analyzer.py` | General | unknown | ✅ Stable | No purpose statement generated. |
 | `src/cli.py` | General | unknown | ✅ Stable | No purpose statement generated. |
+| `src/codebase_cartographer.egg-info/PKG-INFO` | General | unknown | ✅ Stable | No purpose statement generated. |
+| `src/codebase_cartographer.egg-info/SOURCES.txt` | General | meta | ✅ Stable | No purpose statement generated. |
+| `src/codebase_cartographer.egg-info/dependency_links.txt` | General | meta | ✅ Stable | No purpose statement generated. |
+| `src/codebase_cartographer.egg-info/entry_points.txt` | General | meta | ✅ Stable | No purpose statement generated. |
+| `src/codebase_cartographer.egg-info/requires.txt` | General | meta | ✅ Stable | No purpose statement generated. |
+| `src/codebase_cartographer.egg-info/top_level.txt` | General | meta | ✅ Stable | No purpose statement generated. |
 | `src/graph/__init__.py` | General | unknown | ✅ Stable | No purpose statement generated. |
 | `src/graph/graph_builder.py` | General | unknown | ✅ Stable | No purpose statement generated. |
 | `src/graph/knowledge_graph.py` | General | unknown | ✅ Stable | No purpose statement generated. |
@@ -84,6 +91,7 @@
 | `mock_project/process_orders.py` | Logic | Low | Potential dead code (produced but never consumed). |
 | `pyproject.toml` | Logic | Low | Potential dead code (produced but never consumed). |
 | `src/agents/__init__.py` | Logic | Low | Potential dead code (produced but never consumed). |
+| `src/agents/archivist.py` | Complexity | Medium | Module contains functions with high cyclomatic complexity. |
 | `src/agents/hydrologist.py` | Complexity | Medium | Module contains functions with high cyclomatic complexity. |
 | `src/agents/navigator.py` | Complexity | Medium | Module contains functions with high cyclomatic complexity. |
 | `src/agents/semanticist.py` | Complexity | Medium | Module contains functions with high cyclomatic complexity. |
@@ -93,6 +101,7 @@
 | `src/analyzers/python_dataflow_analyzer.py` | Complexity | Medium | Module contains functions with high cyclomatic complexity. |
 | `src/analyzers/sql_lineage.py` | Complexity | Medium | Module contains functions with high cyclomatic complexity. |
 | `src/cli.py` | Logic | Low | Potential dead code (produced but never consumed). |
+| `src/codebase_cartographer.egg-info/PKG-INFO` | Logic | Low | Potential dead code (produced but never consumed). |
 | `src/graph/__init__.py` | Logic | Low | Potential dead code (produced but never consumed). |
 | `src/graph/graph_builder.py` | Complexity | Medium | Module contains functions with high cyclomatic complexity. |
 | `src/graph/knowledge_graph.py` | Complexity | Medium | Module contains functions with high cyclomatic complexity. |

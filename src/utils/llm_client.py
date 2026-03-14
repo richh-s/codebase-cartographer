@@ -10,6 +10,11 @@ try:
 except ImportError:
     openai = None
 
+try:
+    import ollama
+except ImportError:
+    ollama = None
+
 class ContextWindowBudget:
     """Tracks LLM spending and enforces token/batch limits."""
     def __init__(self, max_cost: float = 1.0, max_tokens_per_module: int = 2000, max_batch_size: int = 10):
@@ -39,13 +44,25 @@ class LLMClient:
         self.google_api_key = api_key or os.getenv("GOOGLE_API_KEY")
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
         
-        self.provider = None
-        if self.openai_api_key and openai:
-            self.client = OpenAI(api_key=self.openai_api_key)
-            self.provider = "openai"
-        elif self.google_api_key:
+        self.provider = "heuristics"
+        
+        # 1. Check Ollama (Primary)
+        if ollama:
+            try:
+                ollama.list()
+                self.provider = "ollama"
+            except Exception:
+                pass
+        
+        # 2. Check Gemini (Fallback 1)
+        if self.provider == "heuristics" and self.google_api_key:
             genai.configure(api_key=self.google_api_key)
             self.provider = "google"
+            
+        # 3. Check OpenAI (Fallback 2)
+        if self.provider == "heuristics" and self.openai_api_key and openai:
+            self.client = OpenAI(api_key=self.openai_api_key)
+            self.provider = "openai"
         
         self.budget = budget or ContextWindowBudget()
         self.max_retries = 2
@@ -57,98 +74,198 @@ class LLMClient:
         }
 
     def _call_with_retry(self, model_name: str, prompt: str, is_json: bool = False) -> Optional[str]:
-        """Handles transient API retries for both providers."""
-        if not self.provider:
-            print("[DEBUG] LLMClient: _call_with_retry failed - No provider.")
+        """Handles transient API retries and provider fallback."""
+        providers_to_try = []
+        if ollama: providers_to_try.append("ollama")
+        if self.google_api_key: providers_to_try.append("google")
+        if self.openai_api_key and openai: providers_to_try.append("openai")
+
+        if not providers_to_try:
             return None
 
-        for attempt in range(self.max_retries + 1):
-            try:
-                if self.provider == "google":
-                    model = genai.GenerativeModel(model_name)
-                    config = {**self.generation_config}
-                    if is_json:
-                        config["response_mime_type"] = "application/json"
-                    
-                    response = model.generate_content(
-                        prompt,
-                        generation_config=config,
-                        request_options={"timeout": 30}
-                    )
-                    if response and response.text:
-                        tokens = getattr(response, 'usage_metadata', None)
-                        if tokens:
-                            cost = (tokens.total_token_count / 1_000_000) * 0.10
-                            self.budget.record_usage(tokens.total_token_count, cost)
-                        return response.text
-                
-                elif self.provider == "openai":
-                    # Map to specific OpenAI models if needed
-                    actual_model = "gpt-4o-mini" if "flash" in model_name.lower() or "mini" in model_name.lower() else model_name
-                    
-                    kwargs = {
-                        "model": actual_model,
-                        "messages": [{"role": "user", "content": prompt}],
-                        "temperature": self.generation_config["temperature"],
-                        "top_p": self.generation_config["top_p"],
-                        "timeout": 30
-                    }
-                    if is_json:
-                        kwargs["response_format"] = {"type": "json_object"}
-                    
-                    response = self.client.chat.completions.create(**kwargs)
-                    if response.choices[0].message.content:
-                        usage = response.usage
-                        cost = (usage.total_tokens / 1_000_000) * 0.15 # GPT-4o-mini price approx
-                        self.budget.record_usage(usage.total_tokens, cost)
-                        return response.choices[0].message.content
+        for current_provider in providers_to_try:
+            for attempt in range(self.max_retries + 1):
+                try:
+                    if current_provider == "ollama":
+                        # Detect available model
+                        try:
+                            models_data = ollama.list()
+                            # Ollama returns a list of Model objects with 'model' attribute (containing 'name')
+                            models = getattr(models_data, 'models', [])
+                            names = [getattr(m, 'model', '') for m in models]
+                            
+                            # Clean potential tags if strictly qwen2.5:3b is missing
+                            local_model = "qwen2.5:3b" if "qwen2.5:3b" in names else (names[0] if names else None)
+                            
+                            if not local_model:
+                                print(f"[DEBUG] LLMClient: Ollama - No local models found in {names}.")
+                                break # Skip to next provider
 
-            except Exception as e:
-                error_str = str(e).lower()
-                is_transient = any(msg in error_str for msg in ["429", "rate limit", "503", "service unavailable", "deadline exceeded", "timeout"])
-                
-                if is_transient and attempt < self.max_retries:
-                    time.sleep(2 ** attempt)
-                    continue
-                else:
-                    return None
+                            response = ollama.generate(
+                                model=local_model,
+                                prompt=prompt,
+                                format='json' if is_json else '',
+                                options={
+                                    "temperature": self.generation_config["temperature"],
+                                    "top_p": self.generation_config["top_p"]
+                                }
+                            )
+                            if response and response.get('response'):
+                                self.budget.record_usage(len(response['response']) // 4, 0.0)
+                                return response['response']
+                            else:
+                                print(f"[DEBUG] LLMClient: Ollama generation returned empty response. Response: {response}")
+                                break
+                        except Exception as oe:
+                            print(f"[DEBUG] LLMClient: Ollama generation failed with error: {oe}")
+                            break # Skip to next provider
+                    
+                    elif current_provider == "google":
+                        # Ensure we use the model name passed or a default
+                        actual_model = "gemini-2.0-flash-lite"
+                        model = genai.GenerativeModel(actual_model)
+                        config = {**self.generation_config}
+                        if is_json:
+                            config["response_mime_type"] = "application/json"
+                        
+                        response = model.generate_content(
+                            prompt,
+                            generation_config=config,
+                            request_options={"timeout": 30}
+                        )
+                        if response and response.text:
+                            tokens = getattr(response, 'usage_metadata', None)
+                            if tokens:
+                                cost = (tokens.total_token_count / 1_000_000) * 0.10
+                                self.budget.record_usage(tokens.total_token_count, cost)
+                            return response.text
+                    
+                    elif current_provider == "openai":
+                        if not hasattr(self, 'client'):
+                            self.client = OpenAI(api_key=self.openai_api_key)
+                        
+                        actual_model = "gpt-4o-mini"
+                        kwargs = {
+                            "model": actual_model,
+                            "messages": [{"role": "user", "content": prompt}],
+                            "temperature": self.generation_config["temperature"],
+                            "top_p": self.generation_config["top_p"],
+                            "timeout": 30
+                        }
+                        if is_json:
+                            kwargs["response_format"] = {"type": "json_object"}
+                        
+                        response = self.client.chat.completions.create(**kwargs)
+                        if response.choices[0].message.content:
+                            usage = response.usage
+                            cost = (usage.total_tokens / 1_000_000) * 0.15
+                            self.budget.record_usage(usage.total_tokens, cost)
+                            return response.choices[0].message.content
+
+                except Exception as e:
+                    print(f"[DEBUG] LLMClient Provider {current_provider} Error: {e}")
+                    error_str = str(e).lower()
+                    is_transient = any(msg in error_str for msg in ["429", "rate limit", "503", "service unavailable", "deadline exceeded", "timeout"])
+                    
+                    if is_transient and attempt < self.max_retries:
+                        time.sleep(2 ** attempt)
+                        continue
+                    else:
+                        break # Break out of attempts for this provider, try next provider
         return None
 
     def embed_texts(self, texts: List[str], task_type: str = "clustering") -> List[List[float]]:
         """
-        Generates embeddings for a list of strings using the active provider.
+        Generates embeddings for a list of strings using the best available provider.
+        Prioritizes Ollama (if local) -> Gemini -> OpenAI.
         """
-        if not self.provider or not texts:
-            return [[0.0] * 768] * len(texts)
+        if not texts:
+            return []
 
-        try:
-            if self.provider == "google":
-                result = genai.embed_content(
-                    model="models/embedding-001",
-                    content=texts,
-                    task_type=task_type
-                )
-                total_chars = sum(len(t) for t in texts)
-                self.budget.record_usage(total_chars // 4, 0.0)
-                return result['embedding']
-            
-            elif self.provider == "openai":
-                response = self.client.embeddings.create(
-                    input=texts,
-                    model="text-embedding-3-small"
-                )
-                # Cost is negligible for small batches
-                self.budget.record_usage(response.usage.total_tokens, 0.0)
-                return [data.embedding for data in response.data]
+        # Define providers to try for embeddings
+        providers_to_try = []
+        if ollama: providers_to_try.append("ollama")
+        if self.google_api_key: providers_to_try.append("google")
+        if self.openai_api_key and openai: providers_to_try.append("openai")
+
+        for current_provider in providers_to_try:
+            try:
+                if current_provider == "ollama":
+                    # Detect model
+                    models_data = ollama.list()
+                    models = getattr(models_data, 'models', [])
+                    names = [getattr(m, 'model', '') for m in models]
+                    local_model = "qwen2.5:3b" if "qwen2.5:3b" in names else (names[0] if names else None)
+                    
+                    if not local_model:
+                        continue
+                    
+                    # Newer Ollama library uses .embed(model=..., input=...)
+                    response = ollama.embed(model=local_model, input=texts)
+                    if response and response.get('embeddings'):
+                        total_chars = sum(len(t) for t in texts)
+                        self.budget.record_usage(total_chars // 4, 0.0)
+                        return response['embeddings']
+                    continue
+
+                elif current_provider == "google":
+                    result = genai.embed_content(
+                        model="models/embedding-001",
+                        content=texts,
+                        task_type=task_type
+                    )
+                    total_chars = sum(len(t) for t in texts)
+                    self.budget.record_usage(total_chars // 4, 0.0)
+                    return result['embedding']
                 
-        except Exception:
-            # Fallback to zero vectors on failure
-            return [[0.0] * 768] * len(texts)
+                elif current_provider == "openai":
+                    response = self.client.embeddings.create(
+                        input=texts,
+                        model="text-embedding-3-small"
+                    )
+                    self.budget.record_usage(response.usage.total_tokens, 0.0)
+                    return [data.embedding for data in response.data]
+                    
+            except Exception as e:
+                print(f"[DEBUG] LLMClient Embedding Error ({current_provider}): {e}")
+                continue
+
+        # Final fallback to zero vectors
+        return [[0.0] * 768] * len(texts)
+
+    def _call_heuristic_fallback(self, batched_summaries: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Non-LLM fallback that extracts purpose from docstrings and metadata.
+        Ensures the pipeline continues even if all LLM services are down.
+        """
+        results = []
+        for summary in batched_summaries:
+            mpath = summary.get("module_path", "unknown")
+            doc = summary.get("docstring")
+            imports = summary.get("imports", [])
+            funcs = summary.get("functions", [])
+            
+            if doc:
+                purpose = f"Estimated purpose: {doc}"
+                confidence = 0.4
+            elif funcs or imports:
+                purpose = f"Inferred purpose: This module manages {len(funcs)} functions and imports {len(imports)} dependencies. Key features likely include {', '.join(funcs[:2]) if funcs else 'system coordination'}."
+                confidence = 0.2
+            else:
+                purpose = "Unknown purpose (Fallback enabled)"
+                confidence = 0.1
+                
+            results.append({
+                "module_path": mpath,
+                "purpose_statement": purpose,
+                "purpose_confidence": confidence
+            })
+        return results
 
     def get_purpose_statements(self, batched_summaries: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
         Processes a batch of module summaries to get business-level purpose statements.
-        Returns validated results or default fallbacks.
+        Cascades through: Cloud (OpenAI/Google) -> Local (Ollama) -> Heuristic.
         """
         if not batched_summaries:
             return []
@@ -156,23 +273,13 @@ class LLMClient:
         total_input_chars = sum(len(str(s)) for s in batched_summaries)
         estimated_input_tokens = total_input_chars // 4
         
+        # Budget Check
         if not self.budget.can_afford_batch(estimated_input_tokens):
-            return []
+             return self._call_heuristic_fallback(batched_summaries)
 
         prompt = f"""
         You are analyzing software modules.
-        Your task is to explain the BUSINESS PURPOSE of each module, not implementation details.
-
-        Focus on:
-        • what business capability the module provides
-        • what data it operates on
-        • how it fits into the system
-
-        Avoid:
-        • variable names
-        • programming language details
-        • algorithm explanations
-
+        Explain the BUSINESS PURPOSE of each module, not implementation details.
         Return 2-3 sentences per module.
         
         Modules to analyze:
@@ -190,10 +297,9 @@ class LLMClient:
         }}
         """
 
-        model_name = "gemini-1.5-flash" if self.provider == "google" else "gpt-4o-mini"
+        model_name = "gemini-2.0-flash-lite" # Default used in fallback check
         response_text = self._call_with_retry(model_name, prompt, is_json=True)
         
-        results = []
         if response_text:
             try:
                 if "```json" in response_text:
@@ -205,32 +311,22 @@ class LLMClient:
                 if not isinstance(raw_results, list):
                     raw_results = []
 
-                for i, summary in enumerate(batched_summaries):
+                results = []
+                for summary in batched_summaries:
                     mpath = summary.get("module_path")
                     found = next((r for r in raw_results if r.get("module_path") == mpath), None)
                     
-                    if found and "purpose_statement" in found and "purpose_confidence" in found:
+                    if found and found.get("purpose_statement") and found.get("purpose_confidence") is not None:
                         results.append(found)
                     else:
-                        results.append({
-                            "module_path": mpath,
-                            "purpose_statement": "Unknown purpose",
-                            "purpose_confidence": 0.0
-                        })
-            except (json.JSONDecodeError, KeyError):
-                for summary in batched_summaries:
-                    results.append({
-                        "module_path": summary.get("module_path"),
-                        "purpose_statement": "Unknown purpose",
-                        "purpose_confidence": 0.0
-                    })
-        else:
-            for summary in batched_summaries:
-                results.append({
-                    "module_path": summary.get("module_path"),
-                    "purpose_statement": "Unknown purpose",
-                    "purpose_confidence": 0.0
-                })
+                        # Fallback for individual module failure in block
+                        results.extend(self._call_heuristic_fallback([summary]))
+                
+                self.budget.modules_processed += len(results)
+                return results
 
-        self.budget.modules_processed += len(results)
-        return results
+            except (json.JSONDecodeError, KeyError):
+                pass
+        
+        # Final cascading fallback to heuristic
+        return self._call_heuristic_fallback(batched_summaries)

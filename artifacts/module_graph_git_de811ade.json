@@ -272,9 +272,9 @@
       "type": "python_import"
     }
   ],
-  "git_commit": "4ba5b3bac750a889b19c5d56b46569d41f8935f4",
+  "git_commit": "de811aded186e04e56e9d55553a675842db6a8ac",
   "metadata": {
-    "total_files": 64
+    "total_files": 71
   },
   "nodes": [
     {
@@ -302,7 +302,7 @@
         "last_author": "",
         "last_modified": ""
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": ".env",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -335,7 +335,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-12T00:43:35+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": ".env.example",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -434,7 +434,7 @@
         "last_author": "",
         "last_modified": ""
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": ".pytest_cache/CACHEDIR.TAG",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -500,7 +500,7 @@
         "last_author": "",
         "last_modified": ""
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": ".pytest_cache/v/cache/lastfailed",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -533,7 +533,7 @@
         "last_author": "",
         "last_modified": ""
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": ".pytest_cache/v/cache/nodeids",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -670,7 +670,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-10T20:06:21+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "fix_pagerank.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -708,7 +708,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-11T18:25:59+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "mock_project/dag.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -791,7 +791,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-11T18:25:59+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "mock_project/models/stg_orders.sql",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -824,7 +824,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-11T18:25:59+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "mock_project/process_orders.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -836,7 +836,7 @@
       "architecture_layer": "unknown",
       "change_velocity_30d": 3.0,
       "classes": [],
-      "commit_count_30d": 3,
+      "commit_count_30d": 4,
       "complexity_score": 0.0,
       "documentation_drift": null,
       "domain_cluster": null,
@@ -857,13 +857,46 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-12T00:43:35+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "pyproject.toml",
       "purpose_confidence": null,
       "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 1,
       "velocity_score": 3.0
+    },
+    {
+      "architecture_layer": "meta",
+      "change_velocity_30d": 2.0,
+      "classes": [],
+      "commit_count_30d": 2,
+      "complexity_score": 0.0,
+      "documentation_drift": null,
+      "domain_cluster": null,
+      "functions": [],
+      "identity": "semantic_index/index.json",
+      "importance_score": 1,
+      "imports": [],
+      "is_architectural_hub": false,
+      "is_dead_code_candidate": false,
+      "is_high_complexity": false,
+      "is_high_velocity": false,
+      "is_informational": true,
+      "is_sink_node": false,
+      "language": "json",
+      "last_modified": "2026-03-14T09:19:45+03:00",
+      "metadata": {
+        "author_breadth": 1,
+        "last_author": "richh-s",
+        "last_modified": "2026-03-14T09:19:45+03:00"
+      },
+      "pagerank_score": 0.0,
+      "path": "semantic_index/index.json",
+      "purpose_confidence": null,
+      "purpose_statement": null,
+      "semantic_embedding": null,
+      "unique_authors_30d": 1,
+      "velocity_score": 2.0
     },
     {
       "architecture_layer": "unknown",
@@ -890,7 +923,7 @@
         "last_author": "",
         "last_modified": ""
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "src/agents/__init__.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -900,7 +933,7 @@
     },
     {
       "architecture_layer": "unknown",
-      "change_velocity_30d": 3.0,
+      "change_velocity_30d": 4.0,
       "classes": [
         {
           "bases": [],
@@ -910,8 +943,8 @@
           "parent_module": "src/agents/archivist.py"
         }
       ],
-      "commit_count_30d": 3,
-      "complexity_score": 17.0,
+      "commit_count_30d": 5,
+      "complexity_score": 21.0,
       "documentation_drift": null,
       "domain_cluster": null,
       "functions": [
@@ -939,14 +972,14 @@
         },
         {
           "call_count_within_repo": 0,
-          "complexity_score": 7,
+          "complexity_score": 11,
           "decorators": [],
           "docstring_summary": "Generates a deterministic CODEBASE.md summarizing the repository context.\n        Includes freshness indicators and categorized debt.",
           "is_nested": false,
           "is_public_api": true,
           "parent_module": "src/agents/archivist.py",
           "qualified_name": "generate_codebase_report",
-          "signature": "def generate_codebase_report(self, modules: List[ModuleNode], git_sha: str, output_path: str)"
+          "signature": "def generate_codebase_report(self, modules: List[ModuleNode], git_sha: str, output_path: str, scc_groups: Optional[List[List[str]]] = None)"
         },
         {
           "call_count_within_repo": 0,
@@ -990,28 +1023,28 @@
       ],
       "is_architectural_hub": false,
       "is_dead_code_candidate": false,
-      "is_high_complexity": false,
+      "is_high_complexity": true,
       "is_high_velocity": false,
       "is_informational": false,
       "is_sink_node": false,
       "language": "py",
-      "last_modified": "2026-03-12T15:57:23+03:00",
+      "last_modified": "2026-03-14T09:19:45+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-12T15:57:23+03:00"
+        "last_modified": "2026-03-14T09:19:45+03:00"
       },
-      "pagerank_score": 0.01161986967962433,
+      "pagerank_score": 0.011499085578523813,
       "path": "src/agents/archivist.py",
       "purpose_confidence": null,
       "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 3.0
+      "velocity_score": 4.0
     },
     {
       "architecture_layer": "unknown",
-      "change_velocity_30d": 1.0,
+      "change_velocity_30d": 2.0,
       "classes": [
         {
           "bases": [],
@@ -1021,8 +1054,8 @@
           "parent_module": "src/agents/hydrologist.py"
         }
       ],
-      "commit_count_30d": 2,
-      "complexity_score": 74.0,
+      "commit_count_30d": 3,
+      "complexity_score": 69.0,
       "documentation_drift": null,
       "domain_cluster": null,
       "functions": [
@@ -1083,7 +1116,7 @@
         },
         {
           "call_count_within_repo": 0,
-          "complexity_score": 63,
+          "complexity_score": 58,
           "decorators": [],
           "docstring_summary": "Traverses the codebase and extracts lineage edges with Phase 2.6 refinements.",
           "is_nested": false,
@@ -1160,29 +1193,38 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "py",
-      "last_modified": "2026-03-12T01:06:55+03:00",
+      "last_modified": "2026-03-14T09:10:20+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-12T01:06:55+03:00"
+        "last_modified": "2026-03-14T09:10:20+03:00"
       },
-      "pagerank_score": 0.06649559845066817,
+      "pagerank_score": 0.06580417171176843,
       "path": "src/agents/hydrologist.py",
       "purpose_confidence": null,
       "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 1.0
+      "velocity_score": 2.0
     },
     {
       "architecture_layer": "unknown",
-      "change_velocity_30d": 1.0,
+      "change_velocity_30d": 3.0,
       "classes": [
         {
           "bases": [],
           "docstring_summary": null,
           "methods": [],
           "name": "NavigatorTools",
+          "parent_module": "src/agents/navigator.py"
+        },
+        {
+          "bases": [
+            "dict"
+          ],
+          "docstring_summary": null,
+          "methods": [],
+          "name": "AgentState",
           "parent_module": "src/agents/navigator.py"
         },
         {
@@ -1193,8 +1235,8 @@
           "parent_module": "src/agents/navigator.py"
         }
       ],
-      "commit_count_30d": 1,
-      "complexity_score": 72.0,
+      "commit_count_30d": 3,
+      "complexity_score": 74.0,
       "documentation_drift": null,
       "domain_cluster": null,
       "functions": [
@@ -1233,7 +1275,7 @@
         },
         {
           "call_count_within_repo": 0,
-          "complexity_score": 5,
+          "complexity_score": 6,
           "decorators": [],
           "docstring_summary": null,
           "is_nested": false,
@@ -1301,34 +1343,45 @@
           "call_count_within_repo": 0,
           "complexity_score": 2,
           "decorators": [],
-          "docstring_summary": "Uses LLM to route the question to the most appropriate tool.\n        Returns: (tool_name, extracted_parameter)",
+          "docstring_summary": "LLM-based routing logic.",
           "is_nested": false,
           "is_public_api": true,
           "parent_module": "src/agents/navigator.py",
-          "qualified_name": "_select_tool",
-          "signature": "def _select_tool(self, question: str)"
+          "qualified_name": "_router_node",
+          "signature": "def _router_node(self, state: AgentState)"
         },
         {
           "call_count_within_repo": 0,
           "complexity_score": 5,
           "decorators": [],
-          "docstring_summary": "Main entry point. Routes the question, runs the tool, and formats the output.",
+          "docstring_summary": "Executes the selected tool.",
           "is_nested": false,
           "is_public_api": true,
           "parent_module": "src/agents/navigator.py",
-          "qualified_name": "query",
-          "signature": "def query(self, question: str)"
+          "qualified_name": "_tool_executor_node",
+          "signature": "def _tool_executor_node(self, state: AgentState)"
         },
         {
           "call_count_within_repo": 0,
           "complexity_score": 14,
           "decorators": [],
-          "docstring_summary": "Format structured tool result into a human-readable answer.",
+          "docstring_summary": "Formats the final answer.",
           "is_nested": false,
           "is_public_api": true,
           "parent_module": "src/agents/navigator.py",
-          "qualified_name": "_format_answer",
-          "signature": "def _format_answer(self, question: str, result: Dict[str, Any])"
+          "qualified_name": "_answer_formatter_node",
+          "signature": "def _answer_formatter_node(self, state: AgentState)"
+        },
+        {
+          "call_count_within_repo": 0,
+          "complexity_score": 1,
+          "decorators": [],
+          "docstring_summary": "Executes the LangGraph query pipeline.",
+          "is_nested": false,
+          "is_public_api": true,
+          "parent_module": "src/agents/navigator.py",
+          "qualified_name": "query",
+          "signature": "def query(self, question: str)"
         },
         {
           "call_count_within_repo": 0,
@@ -1372,6 +1425,10 @@
         {
           "name": "utils.similarity",
           "type": "python_import"
+        },
+        {
+          "name": "langgraph.graph",
+          "type": "python_import"
         }
       ],
       "is_architectural_hub": false,
@@ -1381,19 +1438,19 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "py",
-      "last_modified": "2026-03-12T16:14:14+03:00",
+      "last_modified": "2026-03-14T09:10:20+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-12T16:14:14+03:00"
+        "last_modified": "2026-03-14T09:10:20+03:00"
       },
-      "pagerank_score": 0.016456145495881546,
+      "pagerank_score": 0.01628506795894707,
       "path": "src/agents/navigator.py",
       "purpose_confidence": null,
       "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 1.0
+      "velocity_score": 3.0
     },
     {
       "architecture_layer": "unknown",
@@ -1407,7 +1464,7 @@
           "parent_module": "src/agents/semanticist.py"
         }
       ],
-      "commit_count_30d": 2,
+      "commit_count_30d": 3,
       "complexity_score": 24.0,
       "documentation_drift": null,
       "domain_cluster": null,
@@ -1513,7 +1570,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-12T01:15:59+03:00"
       },
-      "pagerank_score": 0.03637779340080239,
+      "pagerank_score": 0.03599954928016811,
       "path": "src/agents/semanticist.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -1523,7 +1580,7 @@
     },
     {
       "architecture_layer": "unknown",
-      "change_velocity_30d": 2.0,
+      "change_velocity_30d": 3.0,
       "classes": [
         {
           "bases": [],
@@ -1533,7 +1590,7 @@
           "parent_module": "src/agents/surveyor.py"
         }
       ],
-      "commit_count_30d": 4,
+      "commit_count_30d": 5,
       "complexity_score": 20.0,
       "documentation_drift": null,
       "domain_cluster": null,
@@ -1611,19 +1668,19 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "py",
-      "last_modified": "2026-03-12T16:14:14+03:00",
+      "last_modified": "2026-03-14T09:19:45+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-12T16:14:14+03:00"
+        "last_modified": "2026-03-14T09:19:45+03:00"
       },
-      "pagerank_score": 0.03536399146252529,
+      "pagerank_score": 0.03499629146212586,
       "path": "src/agents/surveyor.py",
       "purpose_confidence": null,
       "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 2.0
+      "velocity_score": 3.0
     },
     {
       "architecture_layer": "unknown",
@@ -1650,7 +1707,7 @@
         "last_author": "",
         "last_modified": ""
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "src/analyzers/__init__.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -1765,7 +1822,7 @@
         "last_author": "",
         "last_modified": ""
       },
-      "pagerank_score": 0.011495862607412605,
+      "pagerank_score": 0.011376368081589884,
       "path": "src/analyzers/dag_config_parser.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -1798,7 +1855,7 @@
         "last_author": "",
         "last_modified": ""
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "src/analyzers/dag_parsers/__init__.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -1908,7 +1965,7 @@
         "last_author": "",
         "last_modified": ""
       },
-      "pagerank_score": 0.011495862607412605,
+      "pagerank_score": 0.011376368081589884,
       "path": "src/analyzers/dag_parsers/plugins.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -2067,7 +2124,7 @@
         "last_author": "",
         "last_modified": ""
       },
-      "pagerank_score": 0.01643440013529823,
+      "pagerank_score": 0.016263550116376254,
       "path": "src/analyzers/python_dataflow_analyzer.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -2077,7 +2134,7 @@
     },
     {
       "architecture_layer": "unknown",
-      "change_velocity_30d": 1.0,
+      "change_velocity_30d": 2.0,
       "classes": [
         {
           "bases": [],
@@ -2087,7 +2144,7 @@
           "parent_module": "src/analyzers/sql_lineage.py"
         }
       ],
-      "commit_count_30d": 2,
+      "commit_count_30d": 3,
       "complexity_score": 145.0,
       "documentation_drift": null,
       "domain_cluster": null,
@@ -2228,23 +2285,23 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "py",
-      "last_modified": "2026-03-12T01:06:55+03:00",
+      "last_modified": "2026-03-14T09:19:45+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-12T01:06:55+03:00"
+        "last_modified": "2026-03-14T09:19:45+03:00"
       },
-      "pagerank_score": 0.011495862607412605,
+      "pagerank_score": 0.011376368081589884,
       "path": "src/analyzers/sql_lineage.py",
       "purpose_confidence": null,
       "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 1.0
+      "velocity_score": 2.0
     },
     {
       "architecture_layer": "unknown",
-      "change_velocity_30d": 1.0,
+      "change_velocity_30d": 2.0,
       "classes": [
         {
           "bases": [],
@@ -2261,7 +2318,7 @@
           "parent_module": "src/analyzers/tree_sitter_analyzer.py"
         }
       ],
-      "commit_count_30d": 2,
+      "commit_count_30d": 3,
       "complexity_score": 82.0,
       "documentation_drift": null,
       "domain_cluster": null,
@@ -2470,25 +2527,25 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "py",
-      "last_modified": "2026-03-12T01:06:55+03:00",
+      "last_modified": "2026-03-14T09:19:45+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-12T01:06:55+03:00"
+        "last_modified": "2026-03-14T09:19:45+03:00"
       },
-      "pagerank_score": 0.01161986967962433,
+      "pagerank_score": 0.011499085578523813,
       "path": "src/analyzers/tree_sitter_analyzer.py",
       "purpose_confidence": null,
       "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 1.0
+      "velocity_score": 2.0
     },
     {
       "architecture_layer": "unknown",
-      "change_velocity_30d": 3.0,
+      "change_velocity_30d": 4.0,
       "classes": [],
-      "commit_count_30d": 4,
+      "commit_count_30d": 5,
       "complexity_score": 27.0,
       "documentation_drift": null,
       "domain_cluster": null,
@@ -2504,7 +2561,7 @@
           "is_public_api": true,
           "parent_module": "src/cli.py",
           "qualified_name": "analyze",
-          "signature": "def analyze(\n    repo_path: str = typer.Argument(..., help=\"Path to the repository to analyze.\"),\n    output: Optional[str] = typer.Option(None, \"--output\", \"-o\", help=\"Custom output directory\"),\n    llm: bool = typer.Option(False, \"--llm\", help=\"Enable LLM-based semantic analysis\"),\n    semantic_depth: str = typer.Option(\"light\", \"--semantic-depth\", help=\"Depth of semantic analysis (light, deep)\"),\n    store_embeddings: bool = typer.Option(False, \"--store-embeddings\", help=\"Store semantic embeddings in the graph\"),\n    velocity_days: int = typer.Option(30, \"--velocity-days\", help=\"Number of days to look back for git velocity\"),\n    sql_dialect: str = typer.Option(\"duckdb\", \"--sql-dialect\", help=\"SQL dialect for AST parsing (duckdb, snowflake, postgres, etc.)\")\n)"
+          "signature": "def analyze(\n    repo_path: str = typer.Argument(..., help=\"Path to the repository to analyze.\"),\n    output: Optional[str] = typer.Option(None, \"--output\", \"-o\", help=\"Custom output directory\"),\n    llm: bool = typer.Option(False, \"--llm\", help=\"Enable LLM-based semantic analysis\"),\n    semantic_depth: str = typer.Option(\"light\", \"--semantic-depth\", help=\"Depth of semantic analysis (light, deep)\"),\n    store_embeddings: bool = typer.Option(False, \"--store-embeddings\", help=\"Store semantic embeddings in the graph\"),\n    velocity_days: int = typer.Option(30, \"--velocity-days\", help=\"Number of days to look back for git velocity\"),\n    sql_dialect: str = typer.Option(\"duckdb\", \"--sql-dialect\", help=\"SQL dialect for AST parsing (duckdb, snowflake, postgres, etc.)\"),\n    incremental_since: Optional[str] = typer.Option(None, \"--incremental-since\", help=\"Git SHA to perform incremental analysis since\")\n)"
         },
         {
           "call_count_within_repo": 0,
@@ -2660,19 +2717,217 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "py",
-      "last_modified": "2026-03-12T16:41:37+03:00",
+      "last_modified": "2026-03-14T09:10:20+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-12T16:41:37+03:00"
+        "last_modified": "2026-03-14T09:10:20+03:00"
       },
-      "pagerank_score": 0.06711178796015549,
+      "pagerank_score": 0.06641432613798243,
       "path": "src/cli.py",
       "purpose_confidence": null,
       "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 3.0
+      "velocity_score": 4.0
+    },
+    {
+      "architecture_layer": "unknown",
+      "change_velocity_30d": 0.0,
+      "classes": [],
+      "commit_count_30d": 0,
+      "complexity_score": 0.0,
+      "documentation_drift": null,
+      "domain_cluster": null,
+      "functions": [],
+      "identity": "src/codebase_cartographer.egg-info/PKG-INFO",
+      "importance_score": 1,
+      "imports": [],
+      "is_architectural_hub": false,
+      "is_dead_code_candidate": true,
+      "is_high_complexity": false,
+      "is_high_velocity": false,
+      "is_informational": false,
+      "is_sink_node": false,
+      "language": "",
+      "last_modified": "",
+      "metadata": {
+        "author_breadth": 1,
+        "last_author": "",
+        "last_modified": ""
+      },
+      "pagerank_score": 0.010394628106118447,
+      "path": "src/codebase_cartographer.egg-info/PKG-INFO",
+      "purpose_confidence": null,
+      "purpose_statement": null,
+      "semantic_embedding": null,
+      "unique_authors_30d": 0,
+      "velocity_score": 0.0
+    },
+    {
+      "architecture_layer": "meta",
+      "change_velocity_30d": 0.0,
+      "classes": [],
+      "commit_count_30d": 0,
+      "complexity_score": 0.0,
+      "documentation_drift": null,
+      "domain_cluster": null,
+      "functions": [],
+      "identity": "src/codebase_cartographer.egg-info/SOURCES.txt",
+      "importance_score": 1,
+      "imports": [],
+      "is_architectural_hub": false,
+      "is_dead_code_candidate": false,
+      "is_high_complexity": false,
+      "is_high_velocity": false,
+      "is_informational": true,
+      "is_sink_node": false,
+      "language": "txt",
+      "last_modified": "",
+      "metadata": {
+        "author_breadth": 1,
+        "last_author": "",
+        "last_modified": ""
+      },
+      "pagerank_score": 0.0,
+      "path": "src/codebase_cartographer.egg-info/SOURCES.txt",
+      "purpose_confidence": null,
+      "purpose_statement": null,
+      "semantic_embedding": null,
+      "unique_authors_30d": 0,
+      "velocity_score": 0.0
+    },
+    {
+      "architecture_layer": "meta",
+      "change_velocity_30d": 0.0,
+      "classes": [],
+      "commit_count_30d": 0,
+      "complexity_score": 0.0,
+      "documentation_drift": null,
+      "domain_cluster": null,
+      "functions": [],
+      "identity": "src/codebase_cartographer.egg-info/dependency_links.txt",
+      "importance_score": 1,
+      "imports": [],
+      "is_architectural_hub": false,
+      "is_dead_code_candidate": false,
+      "is_high_complexity": false,
+      "is_high_velocity": false,
+      "is_informational": true,
+      "is_sink_node": false,
+      "language": "txt",
+      "last_modified": "",
+      "metadata": {
+        "author_breadth": 1,
+        "last_author": "",
+        "last_modified": ""
+      },
+      "pagerank_score": 0.0,
+      "path": "src/codebase_cartographer.egg-info/dependency_links.txt",
+      "purpose_confidence": null,
+      "purpose_statement": null,
+      "semantic_embedding": null,
+      "unique_authors_30d": 0,
+      "velocity_score": 0.0
+    },
+    {
+      "architecture_layer": "meta",
+      "change_velocity_30d": 0.0,
+      "classes": [],
+      "commit_count_30d": 0,
+      "complexity_score": 0.0,
+      "documentation_drift": null,
+      "domain_cluster": null,
+      "functions": [],
+      "identity": "src/codebase_cartographer.egg-info/entry_points.txt",
+      "importance_score": 1,
+      "imports": [],
+      "is_architectural_hub": false,
+      "is_dead_code_candidate": false,
+      "is_high_complexity": false,
+      "is_high_velocity": false,
+      "is_informational": true,
+      "is_sink_node": false,
+      "language": "txt",
+      "last_modified": "",
+      "metadata": {
+        "author_breadth": 1,
+        "last_author": "",
+        "last_modified": ""
+      },
+      "pagerank_score": 0.0,
+      "path": "src/codebase_cartographer.egg-info/entry_points.txt",
+      "purpose_confidence": null,
+      "purpose_statement": null,
+      "semantic_embedding": null,
+      "unique_authors_30d": 0,
+      "velocity_score": 0.0
+    },
+    {
+      "architecture_layer": "meta",
+      "change_velocity_30d": 0.0,
+      "classes": [],
+      "commit_count_30d": 0,
+      "complexity_score": 0.0,
+      "documentation_drift": null,
+      "domain_cluster": null,
+      "functions": [],
+      "identity": "src/codebase_cartographer.egg-info/requires.txt",
+      "importance_score": 1,
+      "imports": [],
+      "is_architectural_hub": false,
+      "is_dead_code_candidate": false,
+      "is_high_complexity": false,
+      "is_high_velocity": false,
+      "is_informational": true,
+      "is_sink_node": false,
+      "language": "txt",
+      "last_modified": "",
+      "metadata": {
+        "author_breadth": 1,
+        "last_author": "",
+        "last_modified": ""
+      },
+      "pagerank_score": 0.0,
+      "path": "src/codebase_cartographer.egg-info/requires.txt",
+      "purpose_confidence": null,
+      "purpose_statement": null,
+      "semantic_embedding": null,
+      "unique_authors_30d": 0,
+      "velocity_score": 0.0
+    },
+    {
+      "architecture_layer": "meta",
+      "change_velocity_30d": 0.0,
+      "classes": [],
+      "commit_count_30d": 0,
+      "complexity_score": 0.0,
+      "documentation_drift": null,
+      "domain_cluster": null,
+      "functions": [],
+      "identity": "src/codebase_cartographer.egg-info/top_level.txt",
+      "importance_score": 1,
+      "imports": [],
+      "is_architectural_hub": false,
+      "is_dead_code_candidate": false,
+      "is_high_complexity": false,
+      "is_high_velocity": false,
+      "is_informational": true,
+      "is_sink_node": false,
+      "language": "txt",
+      "last_modified": "",
+      "metadata": {
+        "author_breadth": 1,
+        "last_author": "",
+        "last_modified": ""
+      },
+      "pagerank_score": 0.0,
+      "path": "src/codebase_cartographer.egg-info/top_level.txt",
+      "purpose_confidence": null,
+      "purpose_statement": null,
+      "semantic_embedding": null,
+      "unique_authors_30d": 0,
+      "velocity_score": 0.0
     },
     {
       "architecture_layer": "unknown",
@@ -2699,7 +2954,7 @@
         "last_author": "",
         "last_modified": ""
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "src/graph/__init__.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -2835,7 +3090,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-12T15:25:31+03:00"
       },
-      "pagerank_score": 0.01161986967962433,
+      "pagerank_score": 0.011499085578523813,
       "path": "src/graph/graph_builder.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -2845,7 +3100,7 @@
     },
     {
       "architecture_layer": "unknown",
-      "change_velocity_30d": 2.0,
+      "change_velocity_30d": 3.0,
       "classes": [
         {
           "bases": [],
@@ -2855,8 +3110,8 @@
           "parent_module": "src/graph/knowledge_graph.py"
         }
       ],
-      "commit_count_30d": 3,
-      "complexity_score": 63.0,
+      "commit_count_30d": 4,
+      "complexity_score": 66.0,
       "documentation_drift": null,
       "domain_cluster": null,
       "functions": [
@@ -2928,7 +3183,7 @@
         },
         {
           "call_count_within_repo": 0,
-          "complexity_score": 6,
+          "complexity_score": 9,
           "decorators": [],
           "docstring_summary": "Assigns semantic roles (SOURCE, INTERMEDIATE, TERMINAL) based on graph topology.",
           "is_nested": false,
@@ -3071,19 +3326,19 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "py",
-      "last_modified": "2026-03-12T15:25:31+03:00",
+      "last_modified": "2026-03-14T09:10:20+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-12T15:25:31+03:00"
+        "last_modified": "2026-03-14T09:10:20+03:00"
       },
-      "pagerank_score": 0.011495862607412605,
+      "pagerank_score": 0.011376368081589884,
       "path": "src/graph/knowledge_graph.py",
       "purpose_confidence": null,
       "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 2.0
+      "velocity_score": 3.0
     },
     {
       "architecture_layer": "unknown",
@@ -3110,7 +3365,7 @@
         "last_author": "",
         "last_modified": ""
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "src/models/__init__.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -3222,7 +3477,7 @@
         "last_author": "",
         "last_modified": ""
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "src/models/lineage.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -3301,7 +3556,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-12T16:14:14+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "src/models/nodes.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -3311,7 +3566,7 @@
     },
     {
       "architecture_layer": "unknown",
-      "change_velocity_30d": 6.0,
+      "change_velocity_30d": 7.0,
       "classes": [
         {
           "bases": [],
@@ -3321,8 +3576,8 @@
           "parent_module": "src/orchestrator.py"
         }
       ],
-      "commit_count_30d": 6,
-      "complexity_score": 40.0,
+      "commit_count_30d": 8,
+      "complexity_score": 46.0,
       "documentation_drift": null,
       "domain_cluster": null,
       "functions": [
@@ -3394,14 +3649,14 @@
         },
         {
           "call_count_within_repo": 0,
-          "complexity_score": 13,
+          "complexity_score": 19,
           "decorators": [],
           "docstring_summary": "Executes the suite with incremental intelligence and Agent 4 excellence.",
           "is_nested": false,
           "is_public_api": true,
           "parent_module": "src/orchestrator.py",
           "qualified_name": "run_analysis",
-          "signature": "def run_analysis(self, llm_enabled: bool = False, semantic_depth: str = \"light\", \n                     store_embeddings: bool = False, velocity_days: int = 30, sql_dialect: str = \"duckdb\")"
+          "signature": "def run_analysis(self, llm_enabled: bool = False, semantic_depth: str = \"light\", \n                     store_embeddings: bool = False, velocity_days: int = 30, \n                     sql_dialect: str = \"duckdb\", incremental_since: Optional[str] = None)"
         },
         {
           "call_count_within_repo": 0,
@@ -3434,7 +3689,7 @@
           "is_public_api": true,
           "parent_module": "src/orchestrator.py",
           "qualified_name": "analyze_repo",
-          "signature": "def analyze_repo(path: str, llm_enabled: bool = False, semantic_depth: str = \"light\", store_embeddings: bool = False)"
+          "signature": "def analyze_repo(path: str, llm_enabled: bool = False, semantic_depth: str = \"light\", \n                 store_embeddings: bool = False, incremental_since: Optional[str] = None)"
         }
       ],
       "identity": "src/orchestrator.py",
@@ -3508,23 +3763,23 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "py",
-      "last_modified": "2026-03-12T16:14:14+03:00",
+      "last_modified": "2026-03-14T09:10:20+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-12T16:14:14+03:00"
+        "last_modified": "2026-03-14T09:10:20+03:00"
       },
-      "pagerank_score": 0.10050639662857222,
+      "pagerank_score": 0.09946147887859945,
       "path": "src/orchestrator.py",
       "purpose_confidence": null,
       "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 6.0
+      "velocity_score": 7.0
     },
     {
       "architecture_layer": "unknown",
-      "change_velocity_30d": 2.0,
+      "change_velocity_30d": 3.0,
       "classes": [
         {
           "bases": [
@@ -3554,8 +3809,8 @@
           "parent_module": "src/server.py"
         }
       ],
-      "commit_count_30d": 2,
-      "complexity_score": 36.0,
+      "commit_count_30d": 4,
+      "complexity_score": 38.0,
       "documentation_drift": null,
       "domain_cluster": null,
       "functions": [
@@ -3629,11 +3884,11 @@
         },
         {
           "call_count_within_repo": 0,
-          "complexity_score": 4,
+          "complexity_score": 6,
           "decorators": [
             "@app.post(\"/api/clone\")"
           ],
-          "docstring_summary": "Clones a remote git repository into a temp directory and returns the local path.\n    Supports HTTPS (github.com, gitlab.com, etc.) and git@ SSH URLs.",
+          "docstring_summary": "Clones a remote git repository into a temp directory and returns the local path.",
           "is_nested": false,
           "is_public_api": true,
           "parent_module": "src/server.py",
@@ -3816,6 +4071,18 @@
           "type": "python_import"
         },
         {
+          "name": "hashlib",
+          "type": "python_import"
+        },
+        {
+          "name": "shutil",
+          "type": "python_import"
+        },
+        {
+          "name": "shutil",
+          "type": "python_import"
+        },
+        {
           "name": "agents.navigator",
           "type": "python_import"
         },
@@ -3835,19 +4102,19 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "py",
-      "last_modified": "2026-03-12T16:55:51+03:00",
+      "last_modified": "2026-03-12T21:13:20+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-12T16:55:51+03:00"
+        "last_modified": "2026-03-12T21:13:20+03:00"
       },
-      "pagerank_score": 0.03885332630924421,
+      "pagerank_score": 0.03844960865811741,
       "path": "src/server.py",
       "purpose_confidence": null,
       "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 2.0
+      "velocity_score": 3.0
     },
     {
       "architecture_layer": "unknown",
@@ -3874,7 +4141,7 @@
         "last_author": "",
         "last_modified": ""
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "src/utils/__init__.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -3982,7 +4249,7 @@
         "last_author": "",
         "last_modified": ""
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "src/utils/canonicalization_service.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -4036,7 +4303,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-12T00:43:35+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "src/utils/clustering.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -4046,7 +4313,7 @@
     },
     {
       "architecture_layer": "unknown",
-      "change_velocity_30d": 1.0,
+      "change_velocity_30d": 2.0,
       "classes": [
         {
           "bases": [],
@@ -4056,8 +4323,8 @@
           "parent_module": "src/utils/git_provider.py"
         }
       ],
-      "commit_count_30d": 1,
-      "complexity_score": 15.0,
+      "commit_count_30d": 2,
+      "complexity_score": 17.0,
       "documentation_drift": null,
       "domain_cluster": null,
       "functions": [
@@ -4115,6 +4382,17 @@
           "parent_module": "src/utils/git_provider.py",
           "qualified_name": "get_current_sha",
           "signature": "def get_current_sha(self)"
+        },
+        {
+          "call_count_within_repo": 0,
+          "complexity_score": 2,
+          "decorators": [],
+          "docstring_summary": "Returns a set of files changed between since_sha and HEAD.\n        Fulfills strict checklist requirement for git-diff based incremental analysis.",
+          "is_nested": false,
+          "is_public_api": true,
+          "parent_module": "src/utils/git_provider.py",
+          "qualified_name": "get_changed_files",
+          "signature": "def get_changed_files(self, since_sha: str)"
         }
       ],
       "identity": "src/utils/git_provider.py",
@@ -4140,19 +4418,19 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "py",
-      "last_modified": "2026-03-12T15:25:31+03:00",
+      "last_modified": "2026-03-14T09:10:20+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-12T15:25:31+03:00"
+        "last_modified": "2026-03-14T09:10:20+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "src/utils/git_provider.py",
       "purpose_confidence": null,
       "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 1.0
+      "velocity_score": 2.0
     },
     {
       "architecture_layer": "unknown",
@@ -4234,7 +4512,7 @@
         "last_author": "",
         "last_modified": ""
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "src/utils/git_utils.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -4368,7 +4646,7 @@
         "last_author": "",
         "last_modified": ""
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "src/utils/identity_resolver.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -4396,7 +4674,7 @@
         }
       ],
       "commit_count_30d": 1,
-      "complexity_score": 31.0,
+      "complexity_score": 49.0,
       "documentation_drift": null,
       "domain_cluster": null,
       "functions": [
@@ -4435,7 +4713,7 @@
         },
         {
           "call_count_within_repo": 0,
-          "complexity_score": 3,
+          "complexity_score": 4,
           "decorators": [],
           "docstring_summary": null,
           "is_nested": false,
@@ -4446,9 +4724,9 @@
         },
         {
           "call_count_within_repo": 0,
-          "complexity_score": 11,
+          "complexity_score": 19,
           "decorators": [],
-          "docstring_summary": "Handles transient API retries for both providers.",
+          "docstring_summary": "Handles transient API retries and provider fallback.",
           "is_nested": false,
           "is_public_api": true,
           "parent_module": "src/utils/llm_client.py",
@@ -4457,9 +4735,9 @@
         },
         {
           "call_count_within_repo": 0,
-          "complexity_score": 4,
+          "complexity_score": 11,
           "decorators": [],
-          "docstring_summary": "Generates embeddings for a list of strings using the active provider.",
+          "docstring_summary": "Generates embeddings for a list of strings using the best available provider.\n        Prioritizes Ollama (if local) -> Gemini -> OpenAI.",
           "is_nested": false,
           "is_public_api": true,
           "parent_module": "src/utils/llm_client.py",
@@ -4468,9 +4746,20 @@
         },
         {
           "call_count_within_repo": 0,
-          "complexity_score": 10,
+          "complexity_score": 4,
           "decorators": [],
-          "docstring_summary": "Processes a batch of module summaries to get business-level purpose statements.\n        Returns validated results or default fallbacks.",
+          "docstring_summary": "Non-LLM fallback that extracts purpose from docstrings and metadata.\n        Ensures the pipeline continues even if all LLM services are down.",
+          "is_nested": false,
+          "is_public_api": true,
+          "parent_module": "src/utils/llm_client.py",
+          "qualified_name": "_call_heuristic_fallback",
+          "signature": "def _call_heuristic_fallback(self, batched_summaries: List[Dict[str, Any]])"
+        },
+        {
+          "call_count_within_repo": 0,
+          "complexity_score": 8,
+          "decorators": [],
+          "docstring_summary": "Processes a batch of module summaries to get business-level purpose statements.\n        Cascades through: Cloud (OpenAI/Google) -> Local (Ollama) -> Heuristic.",
           "is_nested": false,
           "is_public_api": true,
           "parent_module": "src/utils/llm_client.py",
@@ -4504,6 +4793,10 @@
         {
           "name": "openai",
           "type": "python_import"
+        },
+        {
+          "name": "ollama",
+          "type": "python_import"
         }
       ],
       "is_architectural_hub": false,
@@ -4519,7 +4812,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-12T00:43:35+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "src/utils/llm_client.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -4581,7 +4874,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-12T00:43:35+03:00"
       },
-      "pagerank_score": 0.01161986967962433,
+      "pagerank_score": 0.011499085578523813,
       "path": "src/utils/module_summary.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -4734,7 +5027,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-12T16:14:14+03:00"
       },
-      "pagerank_score": 0.013479975762800182,
+      "pagerank_score": 0.013339848032532759,
       "path": "src/utils/semantic_index.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -4788,7 +5081,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-12T00:43:35+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "src/utils/similarity.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -4898,7 +5191,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-12T15:57:23+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "src/utils/trace_logger.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -4952,7 +5245,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-11T11:06:15+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "test_parse.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -4990,7 +5283,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-10T20:06:21+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "test_pr.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -5048,7 +5341,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-11T11:06:15+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "test_scope.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -5201,7 +5494,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-12T16:14:14+03:00"
       },
-      "pagerank_score": 0.04078807195812716,
+      "pagerank_score": 0.040364227106859406,
       "path": "tests/test_archivist_excellence.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -5281,7 +5574,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-11T11:06:15+03:00"
       },
-      "pagerank_score": 0.011495862607412605,
+      "pagerank_score": 0.011376368081589884,
       "path": "tests/test_lineage_graph.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -5361,7 +5654,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-11T11:06:15+03:00"
       },
-      "pagerank_score": 0.01748831727576848,
+      "pagerank_score": 0.017306517585576327,
       "path": "tests/test_python_dataflow.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -5462,7 +5755,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-12T00:43:35+03:00"
       },
-      "pagerank_score": 0.03005569296004792,
+      "pagerank_score": 0.02974323150796951,
       "path": "tests/test_semanticist.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -5549,7 +5842,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-11T11:06:15+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "tests/test_sql_lineage.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -5622,7 +5915,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-10T20:06:21+03:00"
       },
-      "pagerank_score": 0.025532622447626392,
+      "pagerank_score": 0.025267200351293522,
       "path": "tests/test_surveyor.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -5696,7 +5989,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-12T00:43:35+03:00"
       },
-      "pagerank_score": 0.03396768298648237,
+      "pagerank_score": 0.03361476477549327,
       "path": "tests/verify_recon.py",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -5706,9 +5999,9 @@
     },
     {
       "architecture_layer": "unknown",
-      "change_velocity_30d": 2.0,
+      "change_velocity_30d": 4.0,
       "classes": [],
-      "commit_count_30d": 2,
+      "commit_count_30d": 4,
       "complexity_score": 0.0,
       "documentation_drift": null,
       "domain_cluster": null,
@@ -5723,25 +6016,25 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "js",
-      "last_modified": "2026-03-12T16:55:51+03:00",
+      "last_modified": "2026-03-12T21:13:20+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-12T16:55:51+03:00"
+        "last_modified": "2026-03-12T21:13:20+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "ui/app.js",
       "purpose_confidence": null,
       "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 2.0
+      "velocity_score": 4.0
     },
     {
       "architecture_layer": "unknown",
-      "change_velocity_30d": 2.0,
+      "change_velocity_30d": 3.0,
       "classes": [],
-      "commit_count_30d": 2,
+      "commit_count_30d": 3,
       "complexity_score": 0.0,
       "documentation_drift": null,
       "domain_cluster": null,
@@ -5756,19 +6049,19 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "html",
-      "last_modified": "2026-03-12T16:55:51+03:00",
+      "last_modified": "2026-03-12T20:54:18+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-12T16:55:51+03:00"
+        "last_modified": "2026-03-12T20:54:18+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "ui/index.html",
       "purpose_confidence": null,
       "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 2.0
+      "velocity_score": 3.0
     },
     {
       "architecture_layer": "unknown",
@@ -5795,7 +6088,7 @@
         "last_author": "richh-s",
         "last_modified": "2026-03-12T16:55:51+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "ui/style.css",
       "purpose_confidence": null,
       "purpose_statement": null,
@@ -5805,9 +6098,9 @@
     },
     {
       "architecture_layer": "unknown",
-      "change_velocity_30d": 1.0,
+      "change_velocity_30d": 2.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 2,
       "complexity_score": 0.0,
       "documentation_drift": null,
       "domain_cluster": null,
@@ -5822,23 +6115,23 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "lock",
-      "last_modified": "2026-03-12T00:43:35+03:00",
+      "last_modified": "2026-03-14T09:10:20+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-12T00:43:35+03:00"
+        "last_modified": "2026-03-14T09:10:20+03:00"
       },
-      "pagerank_score": 0.010503806029718819,
+      "pagerank_score": 0.010394628106118447,
       "path": "uv.lock",
       "purpose_confidence": null,
       "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 1.0
+      "velocity_score": 2.0
     }
   ],
   "scc_groups": [],
   "schema_version": "1.0",
-  "timestamp": "2026-03-12T14:07:52.029138+00:00",
+  "timestamp": "2026-03-14T08:46:22.613452+00:00",
   "top_hubs": []
 }

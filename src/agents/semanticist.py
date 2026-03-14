@@ -44,7 +44,7 @@ class SemanticistAgent:
 
         # 2. Embedding & Clustering
         # Only cluster modules with purpose_confidence >= 0.55
-        eligible_for_clustering = [m for m in modules if m.purpose_statement and (m.purpose_confidence or 0) >= 0.55]
+        eligible_for_clustering = [m for m in modules if m.purpose_confidence is not None and m.purpose_confidence >= 0.0]
         
         # Default all to Unclassified if they have a purpose but low confidence
         for m in modules:

@@ -56,6 +56,15 @@
         </ul>
 
         <div class="sidebar-footer">
+            <div class="analyze-options">
+                <label class="control-label">
+                    <input type="checkbox" id="llmEnabledCheckbox" /> Enable LLM Analysis
+                </label>
+                <select id="semanticDepthSelect" class="btn-sm" style="width: 100%; margin-top: 5px;">
+                    <option value="light">Light Depth</option>
+                    <option value="deep">Deep Depth</option>
+                </select>
+            </div>
             <button id="analyzeBtn" class="btn-analyze">
                 <span class="btn-icon-inner">⚡</span> Run Analysis
             </button>
@@ -71,6 +80,7 @@
             <div class="topbar-meta">
                 <span id="commitBadge" class="badge badge-commit hidden"></span>
                 <span id="timestampBadge" class="badge badge-time hidden"></span>
+                <span id="currentRepoIndicator" class="repo-indicator"></span>
                 <div id="statusDot" class="status-dot dot-idle" title="No analysis loaded"></div>
             </div>
         </header>

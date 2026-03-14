@@ -139,6 +139,31 @@ class Orchestrator:
         
         modules = list(module_graph_builder.nodes.values())
         
+        # Merge existing semantic data (Phase 6.5 Master Thinker Polish)
+        m_graph_path = os.path.join(self.output_dir, "module_graph.json")
+        if os.path.exists(m_graph_path):
+            try:
+                with open(m_graph_path, "r") as f:
+                    old_data = json.load(f)
+                    old_nodes = {n["identity"]: n for n in old_data.get("nodes", [])}
+                    for m in modules:
+                        if m.identity in old_nodes:
+                            old = old_nodes[m.identity]
+                            # Preserve semantic fields if they are missing in current node
+                            if not m.purpose_statement:
+                                m.purpose_statement = old.get("purpose_statement")
+                            if not m.domain_cluster:
+                                m.domain_cluster = old.get("domain_cluster")
+                            if m.purpose_confidence is None:
+                                m.purpose_confidence = old.get("purpose_confidence")
+                            if m.documentation_drift is None:
+                                m.documentation_drift = old.get("documentation_drift")
+                            if not m.semantic_embedding:
+                                m.semantic_embedding = old.get("semantic_embedding")
+                print("[Info] Orchestrator: Merged existing semantic data from module_graph.json")
+            except Exception as e:
+                print(f"[Warning] Orchestrator: Failed to merge existing semantic data: {e}")
+        
         # 2. Run Hydrologist for Data Lineage Graph
         print(f"[2/3] Running Hydrologist Agent...")
         start_time = datetime.now()
@@ -174,8 +199,8 @@ class Orchestrator:
                     if "signatures" not in self.cache: self.cache["signatures"] = {}
                     self.cache["signatures"][m.path] = new_sig
                 
-        # Flag Dep-1 neighbors for re-analysis
-        if llm_enabled and (changed_modules or signature_drifted):
+        # Flag Dep-1 neighbors for re-analysis or modules with missing data
+        if llm_enabled:
             blast_radius = set()
             for cm in changed_modules:
                 blast_radius.add(cm.identity)
@@ -186,14 +211,25 @@ class Orchestrator:
                     for u, v in module_graph_builder.graph.in_edges(sid):
                         blast_radius.add(u)
             
+            # Ensure ANY module without a purpose statement gets analyzed if we're in LLM mode
+            # This handles the case where a previous run was non-LLM
+            for m in modules:
+                if not m.purpose_statement or not m.domain_cluster:
+                    blast_radius.add(m.identity)
+
             re_analyze_targets = [m for m in modules if m.identity in blast_radius]
             if re_analyze_targets:
-                print(f"[Info] Incremental: Re-analyzing {len(re_analyze_targets)} modules (Blast Radius D1)")
+                print(f"[Info] Incremental: Re-analyzing {len(re_analyze_targets)} modules (LLM/Drift/Missing)")
                 self.semanticist.analyze_modules(re_analyze_targets, store_embeddings=store_embeddings)
+                
+                # RE-UPDATE: Ensure the internal GraphBuilder nodes reflect Pydantic updates
+                # This ensures any changes to purpose_statement/domain_cluster are persisted
+                for m in re_analyze_targets:
+                    if m.identity in module_graph_builder.nodes:
+                        # Update the graph node attributes as well
+                        module_graph_builder.graph.nodes[m.identity].update(m.model_dump())
             else:
                 print("[Info] Incremental: No modules required re-analysis.")
-        elif llm_enabled:
-            print("[Info] Incremental: No changes detected. Skipping LLM re-analysis.")
         
         # 4. Archivist Enrichment
         print("[4/4] Archivist: Consolidating and Exporting Artifacts...")

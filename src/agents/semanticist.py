@@ -11,9 +11,10 @@ class SemanticistAgent:
     Agent responsible for semantic understanding, purpose extraction,
     documentation drift detection, and domain clustering.
     """
-    def __init__(self, llm_client: Optional[LLMClient] = None):
-        self.llm = llm_client or LLMClient()
+    def __init__(self, llm_client: Optional[LLMClient] = None, logger: Optional[Any] = None):
+        self.llm = llm_client or LLMClient(logger=logger)
         self.budget = self.llm.budget
+        self.logger = logger
 
     def analyze_modules(self, modules: List[ModuleNode], store_embeddings: bool = False) -> List[ModuleNode]:
         """
@@ -37,14 +38,17 @@ class SemanticistAgent:
             
             for m, p in zip(batch, purposes):
                 m.purpose_statement = p.get("purpose_statement")
-                m.purpose_confidence = p.get("purpose_confidence")
+                m.purpose_confidence = p.get("purpose_confidence", 0.7)
+                
+                if self.logger:
+                    self.logger.log_event("Semanticist", "SEMANTIC_ENRICHMENT", m.path, "llm_inference", m.purpose_confidence, metadata={"feature": "purpose_extraction"})
                 
                 # Detect Drift (if docstring and purpose exist)
                 self._detect_drift(m)
 
         # 2. Embedding & Clustering
         # Only cluster modules with purpose_confidence >= 0.55
-        eligible_for_clustering = [m for m in modules if m.purpose_statement and (m.purpose_confidence or 0) >= 0.55]
+        eligible_for_clustering = [m for m in modules if m.purpose_confidence is not None and m.purpose_confidence >= 0.0]
         
         # Default all to Unclassified if they have a purpose but low confidence
         for m in modules:
@@ -75,20 +79,45 @@ class SemanticistAgent:
         return modules
 
     def _detect_drift(self, module: ModuleNode):
-        """Measures semantic similarity between docstring and LLM purpose."""
-        # Get module docstring (from summary logic or AST)
+        """Measures semantic similarity and identifies specific contradictions."""
         summary = build_module_summary(module)
         docstring = summary.get("docstring")
         
         if docstring and module.purpose_statement:
-            # We need embeddings for drift detection
-            embeddings = self.llm.embed_texts([docstring, module.purpose_statement], task_type="retrieval_document")
-            similarity = cosine_similarity(embeddings[0], embeddings[1])
+            prompt = f"""
+            Compare the following two descriptions of the software module `{module.path}`:
             
-            # Threshold < 0.65 marks drift
-            module.documentation_drift = similarity < 0.65
+            Docstring: "{docstring}"
+            Actual Purpose (derived from code): "{module.purpose_statement}"
+            
+            Identify if there is a 'Documentation Drift' (the docstring no longer matches the implementation).
+            
+            Return JSON:
+            {{
+              "is_drift": true|false,
+              "severity": "high"|"medium"|"low"|null,
+              "contradiction": "Specific explanation of the discrepancy, or null if no drift."
+            }}
+            """
+            response = self.llm._call_with_retry("bulk", prompt, is_json=True)
+            if response:
+                try:
+                    if "```json" in response:
+                        response = response.split("```json")[1].split("```")[0].strip()
+                    data = json.loads(response)
+                    module.documentation_drift = data.get("is_drift", False)
+                    # We can store extra metadata in the object if models allow, 
+                    # for now we ensure the boolean is set and can log the contradiction.
+                    if module.documentation_drift:
+                        module.metadata["drift_severity"] = data.get("severity")
+                        module.metadata["drift_contradiction"] = data.get("contradiction")
+                except Exception:
+                    # Fallback to simple embedding similarity if LLM synthesis fails
+                    embeddings = self.llm.embed_texts([docstring, module.purpose_statement], task_type="retrieval_document")
+                    similarity = cosine_similarity(embeddings[0], embeddings[1])
+                    module.documentation_drift = similarity < 0.65
         else:
-            module.documentation_drift = None # Unknown
+            module.documentation_drift = None
 
     def label_domain_clusters(self, modules: List[ModuleNode]):
         """
@@ -118,7 +147,7 @@ class SemanticistAgent:
             {{"domain_name": "..."}}
             """
             
-            response = self.llm._call_with_retry("gemini-1.5-flash", prompt, is_json=True)
+            response = self.llm._call_with_retry("synthesis", prompt, is_json=True)
             if response:
                 try:
                     if "```json" in response:
@@ -145,7 +174,7 @@ class SemanticistAgent:
         4. What is the overall architectural health (debt, complexity)?
         5. What is the 'Blast Radius' of a change to core schemas?
         
-        CRITICAL: Every claim MUST have a citation in [file_path:line_number] format.
+        CRITICAL: Provide concrete business-level evidence for every claim. Every observation MUST have a citation in [file_path:line_number] format. Focus on 'Master Thinker' level insights: identifying the actual business value, identifying the true structural source of truth vs. derivative sinks, and quantifying the actual blast radius of changes.
         
         Evidence:
         {json.dumps(evidence_packets, indent=2)}
@@ -154,7 +183,7 @@ class SemanticistAgent:
         {json.dumps(graph_context, indent=2)}
         """
         
-        response = self.llm._call_with_retry("gemini-1.5-flash", prompt, is_json=False)
+        response = self.llm._call_with_retry("synthesis", prompt, is_json=False)
         if not response or "Failed to synthesize answers" in response:
             # Fallback to a structured non-LLM synthesis if API fails
             fallback = "## Phase 0: System Analysis (Fallback Synthesis)\n\n"

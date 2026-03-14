@@ -40,7 +40,11 @@ class LanguageRouter:
                 elif lang_name == "sql":
                     import tree_sitter_sql
                     cls._grammars[lang_name] = Language(tree_sitter_sql.language())
-            except ImportError:
+            except ImportError as e:
+                print(f"[Warning] TreeSitterAnalyzer: Could not import grammar for {lang_name}: {e}")
+                return None
+            except Exception as e:
+                print(f"[Error] TreeSitterAnalyzer: Unexpected error loading grammar for {lang_name}: {e}")
                 return None
         return cls._grammars.get(lang_name)
 
@@ -254,8 +258,9 @@ class TreeSitterAnalyzer:
             with open(filepath, 'r', encoding='utf-8') as f:
                 content = f.read()
             source_bytes = content.encode('utf-8')
-        except Exception:
+        except Exception as e:
             # Fallback or gracefully ignore unreadable files
+            print(f"[Warning] TreeSitterAnalyzer: Log and Skip - Could not read {filepath}: {e}")
             return {}
 
         result = {
@@ -302,8 +307,10 @@ class TreeSitterAnalyzer:
                 
             # For SQL and YAML, semantic tree-sitter analysis can be added later as needed
             # For now, dbt jinja parses handle the core linkage.
-        except Exception:
+        except Exception as e:
             # Graceful failure on parse errors
+            # Phase 5 Master Thinker: Log and skip
+            print(f"[Warning] TreeSitterAnalyzer: Log and Skip - Parse error in {filepath}: {e}")
             pass
             
         return result

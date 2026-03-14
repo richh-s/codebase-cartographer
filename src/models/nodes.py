@@ -9,6 +9,10 @@ class FunctionNode(BaseModel):
     docstring_summary: Optional[str] = None
     complexity_score: int = 1
     
+    # Rubric: call_count_within_repo and is_public_api
+    call_count_within_repo: int = 0
+    is_public_api: bool = True  # False for _private functions
+    
     # Track nested functions to avoid inflating parent complexity
     is_nested: bool = False
     decorators: List[str] = Field(default_factory=list)
@@ -28,6 +32,9 @@ class ModuleNode(BaseModel):
     language: str
     architecture_layer: str = "unknown"
     
+    # Rubric: last_modified as top-level field
+    last_modified: Optional[str] = None
+    
     # Imports now track {"name": "target_name", "type": "dbt_ref|import"}
     imports: List[Dict[str, str]] = Field(default_factory=list)
     
@@ -37,7 +44,9 @@ class ModuleNode(BaseModel):
     # Intelligence Flags
     complexity_score: float = 0.0
     velocity_score: float = 0.0
-    change_velocity_30d: float = 0.0 # Strict rubric requirement
+    change_velocity_30d: float = 0.0
+    commit_count_30d: int = 0
+    unique_authors_30d: int = 0
     pagerank_score: float = 0.0
     importance_score: int = 1 # 1-100 normalized
     
@@ -56,3 +65,16 @@ class ModuleNode(BaseModel):
     semantic_embedding: Optional[List[float]] = None # Only if --store-embeddings is enabled
     
     metadata: Dict[str, Any] = Field(default_factory=dict)
+
+
+class DatasetNode(BaseModel):
+    """
+    Rubric-compliant DatasetNode schema (alias for DataNode with explicit spec fields).
+    Used for type-safe access to dataset metadata from the lineage graph.
+    """
+    name: str
+    storage_type: str = "table"  # 'table' | 'file' | 'stream' | 'api'
+    schema_snapshot: Optional[List[str]] = None  # list of column names
+    freshness_sla: Optional[str] = None  # e.g. "24h", "1h"
+    owner: Optional[str] = None
+    is_source_of_truth: bool = False

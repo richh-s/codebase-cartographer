@@ -90,8 +90,8 @@ class GraphBuilder:
         # 3. Apply metrics and classify nodes
         # Baseline threshold scales with 1/N. Anything significantly above 1/N is acting as a hub or sink.
         pr_baseline = 1.0 / N if N > 0 else 0.0
-        # Increased multiplier from 1.5 to 2.5 to be more restrictive of what gets called a 'hub'
-        pr_threshold = max(pagerank_threshold, pr_baseline * 2.5)
+        # Adaptive threshold: Lower the hardcoded floor and use a slightly higher multiplier for precision.
+        pr_threshold = max(0.05, pr_baseline * 3.5)
         
         # Calculate min/max PageRank for normalization
         pr_values = [v for v in pagerank.values() if v > 0]
@@ -142,10 +142,8 @@ class GraphBuilder:
             # Update the graph data dict to reflect changes made to the Pydantic model
             self.graph.nodes[identity].update(node.model_dump())
 
-    def export_json(self, output_path: str):
-        """Serializes the graph to the required JSON schema."""
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
-        
+    def export_dict(self) -> Dict[str, Any]:
+        """Returns a dictionary representation of the graph for exporting."""
         # Top hubs: sort by pagerank descending (only include those that pass the threshold)
         hub_candidates = [n for n in self.nodes.values() if n.is_architectural_hub]
         sorted_nodes = sorted(
@@ -167,15 +165,19 @@ class GraphBuilder:
             key=lambda x: x["identity"]
         )
         
-        output = {
+        return {
             "nodes": sorted_nodes_list,
             "edges": structured_edges,
             "top_hubs": top_hubs,
-            "scc_groups": sorted([sorted(g) for g in self.scc_groups]),
+            "scc_groups": sorted([sorted(g) for g in getattr(self, "scc_groups", [])]),
             "metadata": {
                 "total_files": len(self.nodes)
             }
         }
-        
+
+    def export_json(self, output_path: str):
+        """Serializes the graph to the required JSON schema."""
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        output = self.export_dict()
         with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(output, f, indent=2, sort_keys=True)

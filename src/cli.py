@@ -16,7 +16,8 @@ def analyze(
     semantic_depth: str = typer.Option("light", "--semantic-depth", help="Depth of semantic analysis (light, deep)"),
     store_embeddings: bool = typer.Option(False, "--store-embeddings", help="Store semantic embeddings in the graph"),
     velocity_days: int = typer.Option(30, "--velocity-days", help="Number of days to look back for git velocity"),
-    sql_dialect: str = typer.Option("duckdb", "--sql-dialect", help="SQL dialect for AST parsing (duckdb, snowflake, postgres, etc.)")
+    sql_dialect: str = typer.Option("duckdb", "--sql-dialect", help="SQL dialect for AST parsing (duckdb, snowflake, postgres, etc.)"),
+    incremental_since: Optional[str] = typer.Option(None, "--incremental-since", help="Git SHA to perform incremental analysis since")
 ):
     """
     Analyzes a codebase and generates architectural & lineage maps.
@@ -42,7 +43,8 @@ def analyze(
         repo_path, 
         llm_enabled=llm, 
         semantic_depth=semantic_depth, 
-        store_embeddings=store_embeddings
+        store_embeddings=store_embeddings,
+        incremental_since=incremental_since
     )
     typer.echo(f"Analysis successful!")
 
@@ -157,9 +159,69 @@ def impact(
     typer.echo(f"\nTotal Weighted Impact: {total_impact:.1f}")
 
 @app.command()
+def query(
+    repo_path: str = typer.Argument(".", help="Path to the analyzed repository."),
+    question: Optional[str] = typer.Option(None, "--question", "-q", help="Single query to run (non-interactive)."),
+):
+    """
+    Query the codebase knowledge graph using natural language.
+    Launches the Navigator Agent in interactive mode if no --question is provided.
+    """
+    if not os.path.exists(repo_path):
+        typer.echo(f"Error: Path {repo_path} does not exist.")
+        raise typer.Exit(1)
+
+    catalog_path = os.path.join(repo_path, ".cartography", "catalog.json")
+    if not os.path.exists(catalog_path):
+        typer.secho(
+            "No analysis found. Run 'codebase-cartographer analyze <repo_path>' first.",
+            fg=typer.colors.RED
+        )
+        raise typer.Exit(1)
+
+    from agents.navigator import NavigatorAgent
+    navigator = NavigatorAgent(repo_path)
+
+    if question:
+        answer = navigator.query(question)
+        typer.echo(answer)
+    else:
+        navigator.interactive()
+
+
+@app.command()
+def serve(
+    repo_path: str = typer.Argument(".", help="Path to the analyzed repository."),
+    port: int = typer.Option(8370, "--port", "-p", help="Port to run the UI server on."),
+    host: str = typer.Option("0.0.0.0", "--host", help="Host to bind to."),
+):
+    """
+    Start the Codebase Cartographer Web UI.
+    Opens a browser-based interface for exploring module graphs, lineage, and the Navigator.
+    """
+    import sys, os
+    # Add src to path so server.py can import agents
+    src_dir = os.path.dirname(os.path.abspath(__file__))
+    sys.path.insert(0, src_dir)
+
+    import server as srv
+    srv.REPO_PATH = os.path.abspath(repo_path)
+
+    try:
+        import uvicorn
+    except ImportError:
+        typer.secho("❌  uvicorn not installed. Run: pip install uvicorn", fg=typer.colors.RED)
+        raise typer.Exit(1)
+
+    typer.secho(f"🗺️  Codebase Cartographer UI → http://localhost:{port}/", fg=typer.colors.CYAN)
+    typer.echo(f"   Repo: {srv.REPO_PATH}")
+    uvicorn.run(srv.app, host=host, port=port, log_level="warning")
+
+
+@app.command()
 def version():
     """Print the version of Codebase Cartographer."""
-    typer.echo("0.1.0")
+    typer.echo("0.2.0")
 
 if __name__ == "__main__":
     app()

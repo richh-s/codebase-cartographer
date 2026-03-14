@@ -62,6 +62,7 @@ class TransformationNode(BaseModel):
     identity: str  # Module path or task ID
     name: str
     type: str  # 'PYTHON_SCRIPT', 'DBT_MODEL', 'AIRFLOW_TASK'
+    namespace: str = "unknown"
     logic_hash: str
     
     # Traceability

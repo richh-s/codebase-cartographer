@@ -61,6 +61,8 @@ class LineageGraph:
             )
             
             node = self.data_nodes[node_id]
+            
+            # Topological priority
             if not has_transformation_input and len(in_edges) == 0:
                 node.role = DatasetRole.SOURCE
             elif len(out_edges) == 0 and len(in_edges) > 0:
@@ -68,11 +70,21 @@ class LineageGraph:
             else:
                 node.role = DatasetRole.INTERMEDIATE
             
-            # Prefix heuristics as fallback
+            # Prefix heuristics as fallback/refinement, but NEVER override topological reality
+            # that would break validation.
             lname = node.name.lower()
-            if "raw_" in lname or "source_" in lname:
-                node.role = DatasetRole.SOURCE
-            elif "stg_" in lname or "staging_" in lname:
+            if node.role == DatasetRole.SOURCE:
+                # If we think it's a source, confirm with prefixes
+                pass 
+            elif node.role == DatasetRole.INTERMEDIATE:
+                if "stg_" in lname or "staging_" in lname:
+                    node.role = DatasetRole.INTERMEDIATE
+            
+            # Safety Check: If it has incoming edges, it CANNOT be a SOURCE
+            if len(in_edges) > 0 and node.role == DatasetRole.SOURCE:
+                node.role = DatasetRole.INTERMEDIATE
+            # Safety Check: If it has outgoing edges, it CANNOT be a TERMINAL
+            if len(out_edges) > 0 and node.role == DatasetRole.TERMINAL:
                 node.role = DatasetRole.INTERMEDIATE
 
     def compute_importance(self, structural_importances: Dict[str, int]):
@@ -96,20 +108,54 @@ class LineageGraph:
             merged = base_importance + impact_sum
             node.importance_score = min(100, int(merged * 10))  # Scale for visibility
 
-    def save_json(self, path: str):
-        """Serializes the graph to a JSON file."""
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        data = {
-            "data_nodes": [n.model_dump() for n in self.data_nodes.values()],
-            "transformation_nodes": [n.model_dump() for n in self.transformation_nodes.values()],
-            "edges": [
+    def validate_or_raise(self):
+        """
+        Validates the graph for structural integrity.
+        Fills Phase 4 requirements for orphan node prevention.
+        """
+        warnings = self.validate_integrity()
+        high_severity = [w for w in warnings if w["severity"] == "high"]
+        if high_severity:
+            raise ValueError(f"Graph integrity failure (High Severity): {high_severity}")
+
+    def serialize_stable(self) -> Dict[str, Any]:
+        """
+        Returns a dictionary representation with sorted nodes and edges.
+        Fills Phase 4 requirements for deterministic binary-identical artifacts.
+        """
+        # Sort data nodes by identity
+        data_nodes = sorted(
+            [n.model_dump() for n in self.data_nodes.values()],
+            key=lambda x: x["identity"]
+        )
+        # Sort transformation nodes by identity
+        transformation_nodes = sorted(
+            [n.model_dump() for n in self.transformation_nodes.values()],
+            key=lambda x: x["identity"]
+        )
+        # Sort edges by source then target
+        edges = sorted(
+            [
                 {"source": u, "target": v, **d} 
                 for u, v, d in self.graph.edges(data=True)
             ],
+            key=lambda x: (x["source"], x["target"])
+        )
+
+        return {
+            "data_nodes": data_nodes,
+            "transformation_nodes": transformation_nodes,
+            "edges": edges,
             "health": self.get_health_report()
         }
+
+    def save_json(self, path: str):
+        """Serializes the graph to a JSON file with stable ordering."""
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        data = self.serialize_stable()
+        # sort_keys=True ensures key-level determinism
         with open(path, "w") as f:
-            json.dump(data, f, indent=2, default=str)
+            json.dump(data, f, indent=2, sort_keys=True, default=str)
 
     def load_json(self, path: str):
         """Deserializes the graph from a JSON file."""

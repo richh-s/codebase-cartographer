@@ -143,6 +143,7 @@ class HydrologistAgent:
                     identity=identity, # Use file path as identity to avoid self-cycles
                     name=os.path.basename(file),
                     type="DBT_MODEL",
+                    namespace="dbt",
                     logic_hash=(edges[0].logic_hash if edges else None) or "unknown",
                     operations=metadata.get("operations", []),
                     column_lineage=metadata.get("column_lineage", []),
@@ -169,6 +170,7 @@ class HydrologistAgent:
                         identity=scope["identity"],
                         name=scope["name"],
                         type=scope["type"],
+                        namespace="sql",
                         logic_hash=scope.get("logic_hash") or "unknown",
                         metadata={"parent_module": identity}
                     )
@@ -259,7 +261,7 @@ class HydrologistAgent:
                             name=raw,
                             canonical_name=canon,
                             canonical_identity=self.identity_resolver.resolve_canonical(raw),
-                            namespace=ns,
+                            namespace=system if ns == "unknown" else ns,
                             system=system,
                             environment=env,
                             type=dataset_type,
@@ -281,6 +283,7 @@ class HydrologistAgent:
                         identity=edge.source,
                         name=os.path.basename(edge.source),
                         type="PYTHON_SCRIPT" if edge.source.endswith(".py") else "DBT_MODEL",
+                        namespace="python" if edge.source.endswith(".py") else "dbt",
                         logic_hash=edge.logic_hash or "unknown",
                         environment="production"
                     ))
@@ -292,6 +295,7 @@ class HydrologistAgent:
                         identity=edge.target,
                         name=os.path.basename(edge.target),
                         type="PYTHON_SCRIPT" if edge.target.endswith(".py") else "DBT_MODEL",
+                        namespace="python" if edge.target.endswith(".py") else "dbt",
                         logic_hash=edge.logic_hash or "unknown",
                         environment="production"
                     ))
@@ -303,21 +307,7 @@ class HydrologistAgent:
         # Pass 3: Intelligence
         self.lineage_graph.assign_roles()
         
-        # Phase 2.6: Override roles based on intent heuristics
-        for identity, node in self.lineage_graph.data_nodes.items():
-            raw_name_lower = node.name.lower()
-            # Heuristic override
-            if "raw" in raw_name_lower or "source" in raw_name_lower:
-                node.role = DatasetRole.SOURCE
-            elif any(p in raw_name_lower for p in ["report", "dashboard", "export"]):
-                node.role = DatasetRole.TERMINAL
-            elif any(p in raw_name_lower for p in ["customers", "orders"]) and not ("stg_" in raw_name_lower or "staging_" in raw_name_lower):
-                # Only mark orders/customers as terminal if they are NOT staging models
-                node.role = DatasetRole.TERMINAL
-            
-            # Topological safety check: if out-degree > 0, it CANNOT be terminal
-            if self.lineage_graph.graph.out_degree(identity) > 0 and node.role == DatasetRole.TERMINAL:
-                node.role = DatasetRole.INTERMEDIATE
+        # Phase 2.6: Override roles based on intent heuristics (MOVED TO topological safety in knowledge_graph.py)
 
         self.lineage_graph.compute_importance({}) 
 

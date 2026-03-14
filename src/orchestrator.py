@@ -1,78 +1,297 @@
 import os
 import json
-from datetime import datetime
+import ast
+import hashlib
+from datetime import datetime, timezone
+from typing import List, Dict, Any, Optional, Set
 from agents.surveyor import SurveyorAgent
 from agents.hydrologist import HydrologistAgent
 from agents.semanticist import SemanticistAgent
 from agents.archivist import ArchivistAgent
+from utils.git_provider import GitProvider
+from utils.trace_logger import TraceLogger, TraceEvents, Agents
+from utils.semantic_index import SemanticIndex
 from models.lineage import DatasetRole
 
 class Orchestrator:
     """
     Wires Surveyor, Hydrologist, Semanticist, and Archivist in sequence, 
-    orchestrating the full codebase analysis pipeline.
+    orchestrating the full codebase analysis pipeline with Agent 4 excellence.
     """
     
     def __init__(self, repo_path: str):
         self.repo_path = os.path.abspath(repo_path)
         self.output_dir = os.path.join(self.repo_path, ".cartography")
+        self.artifacts_dir = os.path.join(self.repo_path, "artifacts")
         os.makedirs(self.output_dir, exist_ok=True)
+        os.makedirs(self.artifacts_dir, exist_ok=True)
         
+        self.git = GitProvider(self.repo_path)
+        self.logger = TraceLogger(self.output_dir)
         self.surveyor = SurveyorAgent(self.repo_path)
         self.hydrologist = HydrologistAgent(self.repo_path)
-        self.semanticist = SemanticistAgent()
-        self.archivist = ArchivistAgent()
+        self.semanticist = SemanticistAgent(logger=self.logger)
+        self.archivist = ArchivistAgent(self.repo_path, logger=self.logger)
+        self.semantic_index = SemanticIndex(self.repo_path)
         
+        self.cache_path = os.path.join(self.output_dir, "cache.json")
+        self.cache = self._load_cache()
+
+    def _load_cache(self) -> Dict[str, Any]:
+        if os.path.exists(self.cache_path):
+            try:
+                with open(self.cache_path, "r") as f:
+                    data = json.load(f)
+                if data.get("cache_schema_version") == "1.0":
+                    return data
+            except:
+                pass
+        return {"cache_schema_version": "1.0", "files": {}}
+
+    def _save_cache(self):
+        with open(self.cache_path, "w") as f:
+            json.dump(self.cache, f, indent=2)
+
+    def _compute_ast_hash(self, file_path: str) -> Optional[str]:
+        """Computes a SHA256 hash of the normalized AST structure."""
+        # Ensure we use the absolute path for reading
+        abs_path = file_path if os.path.isabs(file_path) else os.path.join(self.repo_path, file_path)
+        
+        if not os.path.exists(abs_path):
+            return None
+        try:
+            with open(abs_path, "r") as f:
+                source = f.read()
+            tree = ast.parse(source)
+            ast_dump = ast.dump(tree, annotate_fields=False)
+            return hashlib.sha256(ast_dump.encode("utf-8")).hexdigest()
+        except Exception:
+            try:
+                with open(abs_path, "rb") as f:
+                    return hashlib.sha256(f.read()).hexdigest()
+            except:
+                return None
+
+    def _compute_signature_hash(self, file_path: str) -> Optional[str]:
+        """
+        Computes a hash of only the public signatures (function/class names + params).
+        Fills Phase 4.5 requirement for Bazel-style optimization.
+        """
+        abs_path = file_path if os.path.isabs(file_path) else os.path.join(self.repo_path, file_path)
+        if not os.path.exists(abs_path) or not abs_path.endswith(".py"):
+            return None
+            
+        try:
+            with open(abs_path, "r") as f:
+                source = f.read()
+            tree = ast.parse(source)
+            signatures = []
+            for node in ast.walk(tree):
+                if isinstance(node, ast.FunctionDef):
+                    # Canonical signature: name(args, defaults)
+                    args = [a.arg for a in node.args.args]
+                    signatures.append(f"func:{node.name}({','.join(args)})")
+                elif isinstance(node, ast.ClassDef):
+                    signatures.append(f"class:{node.name}")
+            
+            sig_str = "|".join(sorted(signatures))
+            return hashlib.sha256(sig_str.encode("utf-8")).hexdigest()
+        except:
+            return None
+
+    def _update_catalog(self, git_sha: str, module_graph: str, lineage_graph: str, codebase_report: str):
+        """Generates catalog.json to point Phase 5 Navigator to latest artifacts."""
+        catalog = {
+            "latest_analysis": {
+                "git_commit": git_sha,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "module_graph": os.path.relpath(module_graph, self.repo_path),
+                "lineage_graph": os.path.relpath(lineage_graph, self.repo_path),
+                "codebase_report": os.path.relpath(codebase_report, self.repo_path)
+            }
+        }
+        catalog_path = os.path.join(self.output_dir, "catalog.json")
+        with open(catalog_path, "w") as f:
+            json.dump(catalog, f, indent=2)
+        print(f"[Info] Orchestrator: Catalog updated at {catalog_path}")
+
     def run_analysis(self, llm_enabled: bool = False, semantic_depth: str = "light", 
-                     store_embeddings: bool = False, velocity_days: int = 30, sql_dialect: str = "duckdb"):
-        """Executes the full analysis suite with rubric-compliant configuration."""
-        print(f"--- Starting Full Analysis on {self.repo_path} ---")
+                     store_embeddings: bool = False, velocity_days: int = 30, 
+                     sql_dialect: str = "duckdb", incremental_since: Optional[str] = None):
+        """Executes the suite with incremental intelligence and Agent 4 excellence."""
+        git_sha = self.git.get_current_sha()
+        self.logger.log_event(Agents.ORCHESTRATOR, TraceEvents.FILE_PARSED, "repo_root", metadata={"sha": git_sha})
         
-        # 1. Run Surveyor for Structural Graph (Configurable velocity window)
-        print(f"[1/3] Running Surveyor Agent (Velocity Window: {velocity_days} days)...")
-        module_graph_builder = self.surveyor.run(
-            output_json=".cartography/module_graph.json", 
-            velocity_days=velocity_days
-        )
+        print(f"--- Starting Analysis (Git: {git_sha}) ---")
+        if incremental_since:
+            print(f"[Info] Incremental Mode: Analyzing changes since {incremental_since}")
         
-        # 2. Run Hydrologist for Data Lineage Graph (Configurable SQL dialect)
-        print(f"[2/3] Running Hydrologist Agent (SQL Dialect: {sql_dialect})...")
-        lineage_graph = self.hydrologist.run(
-            output_json=".cartography/lineage_graph.json",
-            sql_dialect=sql_dialect
-        )
+        # Prefetch Git Metrics
+        self.git.prefetch_metadata(days=velocity_days)
+
+        # 1. Run Surveyor for Structural Graph
+        print(f"[1/3] Running Surveyor Agent...")
+        start_time = datetime.now()
+        # Surveyor always runs to build the skeleton, but internal extraction can be cached
+        module_graph_builder = self.surveyor.run()
+        duration = int((datetime.now() - start_time).total_seconds() * 1000)
+        self.logger.log_event(Agents.SURVEYOR, TraceEvents.ARTIFACT_GENERATED, "module_graph.json", duration_ms=duration)
         
-        # 3. Run Semanticist Agent (if enabled)
+        modules = list(module_graph_builder.nodes.values())
+        
+        # Merge existing semantic data (Phase 6.5 Master Thinker Polish)
+        m_graph_path = os.path.join(self.output_dir, "module_graph.json")
+        if os.path.exists(m_graph_path):
+            try:
+                with open(m_graph_path, "r") as f:
+                    old_data = json.load(f)
+                    old_nodes = {n["identity"]: n for n in old_data.get("nodes", [])}
+                    for m in modules:
+                        if m.identity in old_nodes:
+                            old = old_nodes[m.identity]
+                            # Preserve semantic fields if they are missing in current node
+                            if not m.purpose_statement:
+                                m.purpose_statement = old.get("purpose_statement")
+                            if not m.domain_cluster:
+                                m.domain_cluster = old.get("domain_cluster")
+                            if m.purpose_confidence is None:
+                                m.purpose_confidence = old.get("purpose_confidence")
+                            if m.documentation_drift is None:
+                                m.documentation_drift = old.get("documentation_drift")
+                            if not m.semantic_embedding:
+                                m.semantic_embedding = old.get("semantic_embedding")
+                print("[Info] Orchestrator: Merged existing semantic data from module_graph.json")
+            except Exception as e:
+                print(f"[Warning] Orchestrator: Failed to merge existing semantic data: {e}")
+        
+        # 2. Run Hydrologist for Data Lineage Graph
+        print(f"[2/3] Running Hydrologist Agent...")
+        start_time = datetime.now()
+        lineage_graph = self.hydrologist.run(sql_dialect=sql_dialect)
+        duration = int((datetime.now() - start_time).total_seconds() * 1000)
+        self.logger.log_event(Agents.HYDROLOGIST, TraceEvents.ARTIFACT_GENERATED, "lineage_graph.json", duration_ms=duration)
+        
+        # 3. Handle Incremental Logic
+        changed_modules = []
+        signature_drifted = set()
+        
+        # Strict Checklist: Using git diff for incremental tracking if SHA provided
+        git_changed_files = set()
+        if incremental_since:
+            git_changed_files = self.git.get_changed_files(incremental_since)
+            print(f"[Info] Git Diff: {len(git_changed_files)} files changed since {incremental_since}")
+
+        for m in modules:
+            # Re-analyze if file changed in git OR AST hash changed
+            file_changed = m.path in git_changed_files
+            new_hash = self._compute_ast_hash(m.path)
+            old_hash = self.cache["files"].get(m.path)
+            
+            if file_changed or new_hash != old_hash:
+                changed_modules.append(m)
+                self.cache["files"][m.path] = new_hash
+                
+                # Check for signature drift
+                new_sig = self._compute_signature_hash(m.path)
+                old_sig = self.cache.get("signatures", {}).get(m.path)
+                if new_sig != old_sig:
+                    signature_drifted.add(m.identity)
+                    if "signatures" not in self.cache: self.cache["signatures"] = {}
+                    self.cache["signatures"][m.path] = new_sig
+                
+        # Flag Dep-1 neighbors for re-analysis or modules with missing data
         if llm_enabled:
-            print("[3/3] Running Semanticist Agent...")
-            modules = list(module_graph_builder.nodes.values())
-            self.semanticist.analyze_modules(modules, store_embeddings=store_embeddings)
+            blast_radius = set()
+            for cm in changed_modules:
+                blast_radius.add(cm.identity)
+                
+            # Trigger neighbor re-analysis if signatures changed (Bazel-style)
+            for sid in signature_drifted:
+                if sid in module_graph_builder.graph:
+                    for u, v in module_graph_builder.graph.in_edges(sid):
+                        blast_radius.add(u)
             
-            # 4. Generate CODEBASE.md and RECONNAISSANCE.md
-            print("[4/4] Generating Documentation Artifacts...")
-            self.archivist.generate_codebase_report(modules, os.path.join(self.repo_path, "CODEBASE.md"))
-            
-            # Propagate Domains to DataNodes
-            self._propagate_domains(modules, lineage_graph)
-            
-            # Re-export with semantic data
-            module_graph_builder.export_json(os.path.join(self.output_dir, "module_graph.json"))
-            self._re_export_lineage(lineage_graph, os.path.join(self.output_dir, "lineage_graph.json"))
-            
-            # Update Metadata with Semantic Metrics
-            self._update_graph_metadata(llm_enabled=True)
-            
-            # 4. Generate Reconnaissance Report
-            print("[4/4] Generating RECONNAISSANCE.md...")
-            self.generate_reconnaissance_report(modules, lineage_graph)
-        else:
-            print("[3/3] Semantic Analysis Skipped.")
-            self._update_graph_metadata(llm_enabled=False)
-            
-        print(f"--- Analysis Complete! Artifacts saved to {self.output_dir} ---")
+            # Ensure ANY module without a purpose statement gets analyzed if we're in LLM mode
+            # This handles the case where a previous run was non-LLM
+            for m in modules:
+                if not m.purpose_statement or not m.domain_cluster:
+                    blast_radius.add(m.identity)
+
+            re_analyze_targets = [m for m in modules if m.identity in blast_radius]
+            if re_analyze_targets:
+                print(f"[Info] Incremental: Re-analyzing {len(re_analyze_targets)} modules (LLM/Drift/Missing)")
+                self.semanticist.analyze_modules(re_analyze_targets, store_embeddings=store_embeddings)
+                
+                # RE-UPDATE: Ensure the internal GraphBuilder nodes reflect Pydantic updates
+                # This ensures any changes to purpose_statement/domain_cluster are persisted
+                for m in re_analyze_targets:
+                    if m.identity in module_graph_builder.nodes:
+                        # Update the graph node attributes as well
+                        module_graph_builder.graph.nodes[m.identity].update(m.model_dump())
+            else:
+                print("[Info] Incremental: No modules required re-analysis.")
+        
+        # 4. Archivist Enrichment
+        print("[4/4] Archivist: Consolidating and Exporting Artifacts...")
+        
+        # Apply Overrides
+        overrides_path = os.path.join(self.repo_path, "overrides.json")
+        self.archivist.apply_overrides(modules, overrides_path)
+        
+        # Attach Git Metrics to Modules for the report
+        for m in modules:
+            metrics = self.git.get_file_metrics(m.path)
+            m.commit_count_30d = metrics.get("commit_count_30d", 0)
+            m.unique_authors_30d = metrics.get("unique_authors_30d", 0)
+
+        # Propagate Domains & Handle Truth Hierarchy
+        self._propagate_domains(modules, lineage_graph)
+
+        # Standardize strictly to .cartography/ for ALL artifacts per checklist
+        cb_report_path = os.path.join(self.output_dir, "CODEBASE.md")
+        brief_path = os.path.join(self.output_dir, "onboarding_brief.md")
+        m_graph_path = os.path.join(self.output_dir, "module_graph.json")
+        l_graph_path = os.path.join(self.output_dir, "lineage_graph.json")
+
+        # Lineage Summary for Archivist (Sources/Sinks)
+        lineage_summary = {
+            "sources": [n.model_dump() for n in lineage_graph.find_sources()],
+            "sinks": [n.model_dump() for n in lineage_graph.find_sinks()]
+        }
+        
+        # Critical Path Calculation (Longest Path in Module Graph)
+        critical_path = self._calculate_critical_path(module_graph_builder.graph)
+
+        self.archivist.generate_codebase_report(
+            modules, git_sha, cb_report_path, 
+            scc_groups=module_graph_builder.scc_groups,
+            lineage_summary=lineage_summary,
+            critical_path=critical_path
+        )
+        self.generate_reconnaissance_report(modules, lineage_graph, brief_path)
+        
+        self.archivist.export_graph_json(module_graph_builder.export_dict(), git_sha, m_graph_path)
+        
+        lineage_graph.validate_or_raise()
+        self.archivist.export_graph_json(lineage_graph.serialize_stable(), git_sha, l_graph_path)
+        
+        # Update Catalog for Phase 5 Navigator
+        self._update_catalog(git_sha, m_graph_path, l_graph_path, cb_report_path)
+        
+        # Build / update semantic index for Navigator queries
+        graph_dict = module_graph_builder.export_dict()
+        indexed = self.semantic_index.build_from_graph(
+            graph_dict,
+            llm_client=self.semanticist.llm if llm_enabled else None
+        )
+        if indexed > 0:
+            print(f"[Info] Orchestrator: Semantic index updated ({indexed} entries)")
+        
+        self._save_cache()
+        print(f"--- Analysis Complete! Artifacts in {self.output_dir} ---")
         return {
-            "module_graph": os.path.join(self.output_dir, "module_graph.json"),
-            "lineage_graph": os.path.join(self.output_dir, "lineage_graph.json")
+            "module_graph": m_graph_path,
+            "lineage_graph": l_graph_path
         }
 
     def _propagate_domains(self, modules: List[Any], lineage_graph: Any):
@@ -108,75 +327,18 @@ class Orchestrator:
             else:
                 node.domain_cluster = "Unknown"
 
-    def _re_export_lineage(self, lineage_graph: Any, out_path: str):
-        """Helper to re-serialize lineage graph after semantic enrichment."""
-        data_nodes = sorted(
-            [n.model_dump() for n in lineage_graph.data_nodes.values()],
-            key=lambda x: x["canonical_name"]
-        )
-        
-        transformation_nodes = sorted(
-            [n.model_dump() for n in lineage_graph.transformation_nodes.values()],
-            key=lambda x: x["identity"]
-        )
-        
-        edges = sorted(
-            [lineage_graph.graph.edges[u, v] for u, v in lineage_graph.graph.edges()],
-            key=lambda x: (x.get("source", ""), x.get("target", ""))
-        )
-
-        with open(out_path, "w") as f:
-            data = {
-                "version": lineage_graph.graph_version if hasattr(lineage_graph, "graph_version") else "1.0",
-                "timestamp": datetime.now().isoformat(),
-                "nodes": {
-                    "data": data_nodes,
-                    "transformations": transformation_nodes
-                },
-                "edges": edges,
-                "health": lineage_graph.get_health_report(),
-                "mermaid": lineage_graph.to_mermaid()
-            }
-            json.dump(data, f, indent=2, sort_keys=True, default=str)
-
-    def _update_graph_metadata(self, llm_enabled: bool):
-        """Enriches the graph metadata with semantic processing metrics."""
-        paths = [
-            os.path.join(self.output_dir, "module_graph.json"),
-            os.path.join(self.output_dir, "lineage_graph.json")
-        ]
-        
-        for path in paths:
-            if not os.path.exists(path):
-                continue
-                
-            try:
-                with open(path, "r") as f:
-                    data = json.load(f)
-                
-                # Add semantic metadata
-                data["semantic_analysis_complete"] = llm_enabled and (self.semanticist.budget.modules_processed >= self.semanticist.budget.modules_eligible) if llm_enabled else False
-                data["semantic_modules_total"] = self.semanticist.budget.modules_eligible if llm_enabled else 0
-                data["semantic_modules_processed"] = self.semanticist.budget.modules_processed if llm_enabled else 0
-                
-                with open(path, "w") as f:
-                    json.dump(data, f, indent=2, sort_keys=True, default=str)
-            except Exception as e:
-                print(f"Warning: Failed to update metadata for {path}: {e}")
-
-    def generate_reconnaissance_report(self, modules: List[Any], lineage_graph: Any):
+    def generate_reconnaissance_report(self, modules: List[Any], lineage_graph: Any, output_path: str):
         """
         Compiles evidence and generates a business-level reconnaissance report.
+        Standardizes on 'onboarding_brief.md' for Phase 4.
         """
         evidence_packets = []
         for m in modules:
             if m.purpose_statement:
                 evidence_lines = []
-                # Cite functions for code modules
                 for f in m.functions[:2]:
                     evidence_lines.append({"file": m.path, "line": (f.line_range[0] if hasattr(f, "line_range") and f.line_range else 1)})
                 
-                # Cite file directly for non-code or simple modules
                 if not evidence_lines:
                     evidence_lines.append({"file": m.path, "line": 1})
                 
@@ -196,15 +358,42 @@ class Orchestrator:
 
         report_content = self.semanticist.answer_day_one_questions(graph_context, evidence_packets)
         
-        report_path = os.path.join(self.repo_path, "RECONNAISSANCE.md")
-        with open(report_path, "w") as f:
-            f.write(f"# Phase 0: Business Reconnaissance Report\n\n")
+        with open(output_path, "w") as f:
+            f.write(f"# Phase 0: Business Reconnaissance Report (Onboarding Brief)\n\n")
             f.write(f"*Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*\n\n")
             f.write(report_content)
         
-        print(f"Report saved to {report_path}")
+        print(f"[Info] Archivist: Onboarding Brief saved to {output_path}")
 
-def analyze_repo(path: str, llm_enabled: bool = False, semantic_depth: str = "light", store_embeddings: bool = False):
+    def _calculate_critical_path(self, graph: Any) -> List[str]:
+        """
+        Computes the longest path in the directed acyclic graph (module graph).
+        Returns a list of module identities.
+        """
+        import networkx as nx
+        if not graph or graph.number_of_nodes() == 0:
+            return []
+            
+        # Ensure we work on the DAG (break cycles for this specific calculation)
+        dag = graph.copy()
+        cycles = list(nx.simple_cycles(dag))
+        for cycle in cycles:
+            if len(cycle) >= 2:
+                dag.remove_edge(cycle[0], cycle[1])
+        
+        try:
+            # dag_longest_path returns the identities in order
+            return nx.dag_longest_path(dag)
+        except Exception:
+            return []
+
+def analyze_repo(path: str, llm_enabled: bool = False, semantic_depth: str = "light", 
+                 store_embeddings: bool = False, incremental_since: Optional[str] = None):
     """Convenience function for CLI/external calls."""
     orchestrator = Orchestrator(path)
-    return orchestrator.run_analysis(llm_enabled, semantic_depth, store_embeddings)
+    return orchestrator.run_analysis(
+        llm_enabled=llm_enabled, 
+        semantic_depth=semantic_depth, 
+        store_embeddings=store_embeddings,
+        incremental_since=incremental_since
+    )

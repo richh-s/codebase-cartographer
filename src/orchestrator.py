@@ -30,6 +30,7 @@ class Orchestrator:
         self.logger = TraceLogger(self.output_dir)
         self.surveyor = SurveyorAgent(self.repo_path)
         self.hydrologist = HydrologistAgent(self.repo_path)
+        self.hydrologist.logger = self.logger
         self.semanticist = SemanticistAgent(logger=self.logger)
         self.archivist = ArchivistAgent(self.repo_path, logger=self.logger)
         self.semantic_index = SemanticIndex(self.repo_path)

@@ -8,7 +8,7 @@ from analyzers.sql_lineage import SQLLineageAnalyzer
 from analyzers.dag_config_parser import DAGConfigAnalyzer
 from analyzers.dag_parsers.plugins import AirflowDagParser, DbtConfigParser
 from utils.identity_resolver import IdentityResolver
-from graph.knowledge_graph import LineageGraph
+from graph.knowledge_graph import DataLineageGraph
 from models.lineage import DataNode, LineageEdge, TransformationNode, DatasetRole
 
 class HydrologistAgent:
@@ -24,7 +24,8 @@ class HydrologistAgent:
         
         # Phase 2.6 refinement: IdentityResolver replaces basic Canonicalization
         self.identity_resolver = IdentityResolver()
-        self.lineage_graph = LineageGraph()
+        self.lineage_graph = DataLineageGraph()
+        self.logger = None  # Injected by orchestrator
         
         self.discovered_schemas: Dict[str, List[Any]] = {}
         self.inferred_schemas: Dict[str, set] = {}
@@ -104,8 +105,12 @@ class HydrologistAgent:
                 
             if file.endswith(".py"):
                 edges, _ = self.python_analyzer.analyze(filepath, identity, self.shared_constants)
+                if self.logger and edges:
+                    self.logger.log_event("Hydrologist", "LINEAGE_EXTRACTED", filepath, "python_dataflow", 0.9, metadata={"edge_count": len(edges)})
                 all_edges.extend(edges)
                 dag_edges = self.dag_analyzer.analyze(filepath, identity)
+                if self.logger and dag_edges:
+                    self.logger.log_event("Hydrologist", "LINEAGE_EXTRACTED", filepath, "dag_config", 1.0, metadata={"edge_count": len(dag_edges)})
                 all_edges.extend(dag_edges)
             
             elif file.endswith(".sql"):
@@ -132,6 +137,8 @@ class HydrologistAgent:
                 edges, schemas, metadata = self.sql_analyzer.analyze(
                     filepath, canon_identity, schema=sqlglot_schema, dialect=sql_dialect
                 )
+                if self.logger and edges:
+                    self.logger.log_event("Hydrologist", "LINEAGE_EXTRACTED", filepath, "sqlglot_parsing", 1.0, metadata={"edge_count": len(edges)})
                 all_edges.extend(edges)
                 
                 # Create a TransformationNode linked to the canonical product

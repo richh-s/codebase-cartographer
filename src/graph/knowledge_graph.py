@@ -3,7 +3,7 @@ import math
 from typing import List, Dict, Any, Optional, Set
 from models.lineage import DataNode, LineageEdge, TransformationNode, DatasetRole
 
-class LineageGraph:
+class DataLineageGraph:
     """Manages the directed graph of data entities and their code lineages with phase 2.6 topological intelligence."""
     
     def __init__(self):
@@ -179,12 +179,45 @@ class LineageGraph:
             target = edge.pop("target")
             self.graph.add_edge(source, target, **edge)
 
+    def get_unified_lineage(self, node_identity: str) -> Dict[str, Any]:
+        """
+        Public Query API: Returns a unified summary of SQL, Python, and Config lineages for a node.
+        """
+        if node_identity not in self.graph:
+            return {"error": "Node not found"}
+            
+        in_edges = []
+        for u, v, d in self.graph.in_edges(node_identity, data=True):
+            in_edges.append({
+                "source": u,
+                "type": d.get("type"),
+                "origin": d.get("origin_analyzer", "unknown"),
+                "confidence": d.get("confidence_score", 1.0)
+            })
+            
+        out_edges = []
+        for u, v, d in self.graph.out_edges(node_identity, data=True):
+            out_edges.append({
+                "target": v,
+                "type": d.get("type"),
+                "origin": d.get("origin_analyzer", "unknown"),
+                "confidence": d.get("confidence_score", 1.0)
+            })
+            
+        return {
+            "identity": node_identity,
+            "upstream": in_edges,
+            "downstream": out_edges,
+            "is_source": self.graph.in_degree(node_identity) == 0,
+            "is_sink": self.graph.out_degree(node_identity) == 0
+        }
+
     def find_sources(self) -> List[DataNode]:
-        """Returns all entry points (SOURCE nodes) in the data system."""
+        """Public Query API: Returns all entry points (SOURCE nodes) in the data system."""
         return [n for n in self.data_nodes.values() if n.role == DatasetRole.SOURCE]
 
     def find_sinks(self) -> List[DataNode]:
-        """Returns all exit points (TERMINAL nodes) in the data system."""
+        """Public Query API: Returns all exit points (TERMINAL nodes) in the data system."""
         return [n for n in self.data_nodes.values() if n.role == DatasetRole.TERMINAL]
 
     def validate_integrity(self, canonical_registry: Optional[Dict[str, Set[tuple]]] = None) -> List[Dict[str, Any]]:

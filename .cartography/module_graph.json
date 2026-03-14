@@ -272,7 +272,7 @@
       "type": "python_import"
     }
   ],
-  "git_commit": "391fb7ca6ac4e19fa6a28d9b1b8ab98d505e304c",
+  "git_commit": "a94f183c107926dd1c4accba6f8c8d2eef11c37e",
   "metadata": {
     "total_files": 71
   },
@@ -345,9 +345,9 @@
     },
     {
       "architecture_layer": "meta",
-      "change_velocity_30d": 2.0,
+      "change_velocity_30d": 3.0,
       "classes": [],
-      "commit_count_30d": 2,
+      "commit_count_30d": 3,
       "complexity_score": 0.0,
       "documentation_drift": null,
       "domain_cluster": "ProjectConfigurationTools",
@@ -362,11 +362,11 @@
       "is_informational": true,
       "is_sink_node": false,
       "language": "",
-      "last_modified": "2026-03-12T01:06:55+03:00",
+      "last_modified": "2026-03-15T01:54:35+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-12T01:06:55+03:00"
+        "last_modified": "2026-03-15T01:54:35+03:00"
       },
       "pagerank_score": 0.0,
       "path": ".gitignore",
@@ -374,7 +374,7 @@
       "purpose_statement": "Defines files and directories to ignore during version control operations.",
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 2.0
+      "velocity_score": 3.0
     },
     {
       "architecture_layer": "meta",
@@ -449,7 +449,7 @@
       "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeBaseOrchestrator",
       "functions": [],
       "identity": ".pytest_cache/README.md",
       "importance_score": 1,
@@ -581,7 +581,7 @@
       "commit_count_30d": 4,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "ProjectInsight",
       "functions": [],
       "identity": "README.md",
       "importance_score": 1,
@@ -647,7 +647,7 @@
       "commit_count_30d": 1,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "CodeBaseOrchestrator",
       "functions": [],
       "identity": "fix_pagerank.py",
       "importance_score": 1,
@@ -685,7 +685,7 @@
       "commit_count_30d": 1,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "CodeBaseOrchestrator",
       "functions": [],
       "identity": "mock_project/dag.py",
       "importance_score": 1,
@@ -723,7 +723,7 @@
       "commit_count_30d": 1,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeBaseOrchestrator",
       "functions": [],
       "identity": "mock_project/models/schema.yml",
       "importance_score": 1,
@@ -756,7 +756,7 @@
       "commit_count_30d": 1,
       "complexity_score": 1.0,
       "documentation_drift": null,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "DataIntegrationAndAnalysis",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -806,7 +806,7 @@
       "commit_count_30d": 1,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeInsight",
       "functions": [],
       "identity": "mock_project/process_orders.py",
       "importance_score": 1,
@@ -839,7 +839,7 @@
       "commit_count_30d": 5,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeInsight",
       "functions": [],
       "identity": "pyproject.toml",
       "importance_score": 1,
@@ -867,9 +867,9 @@
     },
     {
       "architecture_layer": "meta",
-      "change_velocity_30d": 5.0,
+      "change_velocity_30d": 6.0,
       "classes": [],
-      "commit_count_30d": 5,
+      "commit_count_30d": 6,
       "complexity_score": 0.0,
       "documentation_drift": null,
       "domain_cluster": "ResourceRepository",
@@ -884,11 +884,11 @@
       "is_informational": true,
       "is_sink_node": false,
       "language": "json",
-      "last_modified": "2026-03-15T01:05:50+03:00",
+      "last_modified": "2026-03-15T01:50:22+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-15T01:05:50+03:00"
+        "last_modified": "2026-03-15T01:50:22+03:00"
       },
       "pagerank_score": 0.0,
       "path": "semantic_index/index.json",
@@ -896,7 +896,7 @@
       "purpose_statement": "Data/Static resource: Stores structured data or plain text used by the system.",
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 5.0
+      "velocity_score": 6.0
     },
     {
       "architecture_layer": "agent",
@@ -905,7 +905,7 @@
       "commit_count_30d": 1,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeInsight",
       "functions": [],
       "identity": "src/agents/__init__.py",
       "importance_score": 1,
@@ -933,7 +933,7 @@
     },
     {
       "architecture_layer": "agent",
-      "change_velocity_30d": 5.0,
+      "change_velocity_30d": 6.0,
       "classes": [
         {
           "bases": [],
@@ -943,7 +943,7 @@
           "parent_module": "src/agents/archivist.py"
         }
       ],
-      "commit_count_30d": 6,
+      "commit_count_30d": 7,
       "complexity_score": 32.0,
       "documentation_drift": null,
       "domain_cluster": "DataScienceTools",
@@ -1028,11 +1028,11 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "py",
-      "last_modified": "2026-03-15T01:05:50+03:00",
+      "last_modified": "2026-03-15T01:50:22+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-15T01:05:50+03:00"
+        "last_modified": "2026-03-15T01:50:22+03:00"
       },
       "pagerank_score": 0.011499085578523813,
       "path": "src/agents/archivist.py",
@@ -1040,7 +1040,7 @@
       "purpose_statement": "Inferred purpose: This module manages 4 functions and imports 6 dependencies. Key features likely include __init__, apply_overrides.",
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 5.0
+      "velocity_score": 6.0
     },
     {
       "architecture_layer": "agent",
@@ -1055,9 +1055,9 @@
         }
       ],
       "commit_count_30d": 4,
-      "complexity_score": 69.0,
+      "complexity_score": 72.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeInsight",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -1116,7 +1116,7 @@
         },
         {
           "call_count_within_repo": 0,
-          "complexity_score": 58,
+          "complexity_score": 61,
           "decorators": [],
           "docstring_summary": "Traverses the codebase and extracts lineage edges with Phase 2.6 refinements.",
           "is_nested": false,
@@ -1238,7 +1238,7 @@
       "commit_count_30d": 4,
       "complexity_score": 75.0,
       "documentation_drift": true,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeInsight",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -1456,7 +1456,7 @@
     },
     {
       "architecture_layer": "agent",
-      "change_velocity_30d": 3.0,
+      "change_velocity_30d": 4.0,
       "classes": [
         {
           "bases": [],
@@ -1466,7 +1466,7 @@
           "parent_module": "src/agents/semanticist.py"
         }
       ],
-      "commit_count_30d": 5,
+      "commit_count_30d": 6,
       "complexity_score": 28.0,
       "documentation_drift": null,
       "domain_cluster": "DataScienceTools",
@@ -1566,11 +1566,11 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "py",
-      "last_modified": "2026-03-15T01:05:50+03:00",
+      "last_modified": "2026-03-15T01:50:22+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-15T01:05:50+03:00"
+        "last_modified": "2026-03-15T01:50:22+03:00"
       },
       "pagerank_score": 0.03599954928016811,
       "path": "src/agents/semanticist.py",
@@ -1578,7 +1578,7 @@
       "purpose_statement": "Inferred purpose: This module manages 5 functions and imports 7 dependencies. Key features likely include __init__, analyze_modules.",
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 3.0
+      "velocity_score": 4.0
     },
     {
       "architecture_layer": "agent",
@@ -1691,7 +1691,7 @@
       "commit_count_30d": 1,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeInsight",
       "functions": [],
       "identity": "src/analyzers/__init__.py",
       "importance_score": 1,
@@ -1741,7 +1741,7 @@
       "commit_count_30d": 1,
       "complexity_score": 7.0,
       "documentation_drift": null,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "DataIntegrationAndAnalysis",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -1839,7 +1839,7 @@
       "commit_count_30d": 1,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeInsight",
       "functions": [],
       "identity": "src/analyzers/dag_parsers/__init__.py",
       "importance_score": 1,
@@ -1887,7 +1887,7 @@
       "commit_count_30d": 1,
       "complexity_score": 14.0,
       "documentation_drift": null,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "DataIntegrationAndAnalysis",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -2327,7 +2327,7 @@
       "commit_count_30d": 3,
       "complexity_score": 82.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeInsight",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -2554,7 +2554,7 @@
       "commit_count_30d": 5,
       "complexity_score": 27.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeBaseOrchestrator",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -2744,7 +2744,7 @@
       "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeInsight",
       "functions": [],
       "identity": "src/codebase_cartographer.egg-info/PKG-INFO",
       "importance_score": 1,
@@ -2942,7 +2942,7 @@
       "commit_count_30d": 1,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeInsight",
       "functions": [],
       "identity": "src/graph/__init__.py",
       "importance_score": 1,
@@ -2983,7 +2983,7 @@
       "commit_count_30d": 3,
       "complexity_score": 26.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeBaseOrchestrator",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -3112,14 +3112,14 @@
           "bases": [],
           "docstring_summary": null,
           "methods": [],
-          "name": "LineageGraph",
+          "name": "DataLineageGraph",
           "parent_module": "src/graph/knowledge_graph.py"
         }
       ],
       "commit_count_30d": 4,
-      "complexity_score": 66.0,
+      "complexity_score": 70.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeBaseOrchestrator",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -3255,9 +3255,20 @@
         },
         {
           "call_count_within_repo": 0,
+          "complexity_score": 4,
+          "decorators": [],
+          "docstring_summary": "Public Query API: Returns a unified summary of SQL, Python, and Config lineages for a node.",
+          "is_nested": false,
+          "is_public_api": true,
+          "parent_module": "src/graph/knowledge_graph.py",
+          "qualified_name": "get_unified_lineage",
+          "signature": "def get_unified_lineage(self, node_identity: str)"
+        },
+        {
+          "call_count_within_repo": 0,
           "complexity_score": 1,
           "decorators": [],
-          "docstring_summary": "Returns all entry points (SOURCE nodes) in the data system.",
+          "docstring_summary": "Public Query API: Returns all entry points (SOURCE nodes) in the data system.",
           "is_nested": false,
           "is_public_api": true,
           "parent_module": "src/graph/knowledge_graph.py",
@@ -3268,7 +3279,7 @@
           "call_count_within_repo": 0,
           "complexity_score": 1,
           "decorators": [],
-          "docstring_summary": "Returns all exit points (TERMINAL nodes) in the data system.",
+          "docstring_summary": "Public Query API: Returns all exit points (TERMINAL nodes) in the data system.",
           "is_nested": false,
           "is_public_api": true,
           "parent_module": "src/graph/knowledge_graph.py",
@@ -3341,7 +3352,7 @@
       "pagerank_score": 0.011376368081589884,
       "path": "src/graph/knowledge_graph.py",
       "purpose_confidence": 1.0,
-      "purpose_statement": "This module manages the creation and manipulation of a knowledge graph, including adding nodes (data nodes, transformation nodes, module nodes) and edges representing lineage relationships.",
+      "purpose_statement": "This module manages the creation and manipulation of a knowledge graph representing data lineage, including adding nodes for different types of entities (data nodes, transformation nodes, module nodes) and edges between them.",
       "semantic_embedding": null,
       "unique_authors_30d": 1,
       "velocity_score": 3.0
@@ -3353,7 +3364,7 @@
       "commit_count_30d": 1,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeInsight",
       "functions": [],
       "identity": "src/models/__init__.py",
       "importance_score": 1,
@@ -3433,7 +3444,7 @@
       "commit_count_30d": 2,
       "complexity_score": 1.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeBaseOrchestrator",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -3486,7 +3497,7 @@
       "pagerank_score": 0.010394628106118447,
       "path": "src/models/lineage.py",
       "purpose_confidence": 1.0,
-      "purpose_statement": "This module defines classes for different types of nodes in the knowledge graph, such as dataset roles, column references, data nodes, transformation nodes, and lineage edges.",
+      "purpose_statement": "This module defines classes representing various components in the data lineage graph such as dataset roles, column references, data nodes, transformation nodes, and lineage edges, which are essential for tracking how data flows through different stages of processing.",
       "semantic_embedding": null,
       "unique_authors_30d": 1,
       "velocity_score": 0.0
@@ -3535,7 +3546,7 @@
       "commit_count_30d": 4,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "DataIntegrationAndAnalysis",
       "functions": [],
       "identity": "src/models/nodes.py",
       "importance_score": 1,
@@ -3572,7 +3583,7 @@
     },
     {
       "architecture_layer": "core",
-      "change_velocity_30d": 9.0,
+      "change_velocity_30d": 10.0,
       "classes": [
         {
           "bases": [],
@@ -3582,10 +3593,10 @@
           "parent_module": "src/orchestrator.py"
         }
       ],
-      "commit_count_30d": 10,
+      "commit_count_30d": 11,
       "complexity_score": 61.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeBaseOrchestrator",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -3780,19 +3791,19 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "py",
-      "last_modified": "2026-03-15T01:05:50+03:00",
+      "last_modified": "2026-03-15T01:50:22+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-15T01:05:50+03:00"
+        "last_modified": "2026-03-15T01:50:22+03:00"
       },
       "pagerank_score": 0.09946147887859945,
       "path": "src/orchestrator.py",
       "purpose_confidence": 1.0,
-      "purpose_statement": "This module orchestrates various analysis tasks for a codebase, including loading cache, saving cache, computing hashes, updating catalogs, running analyses, and generating reconnaissance reports.",
+      "purpose_statement": "This module orchestrates the analysis process by managing tasks such as loading and saving cache, computing hashes, propagating domains, running analyses, and generating reports, ensuring that data lineage information is accurately tracked throughout a repository.",
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 9.0
+      "velocity_score": 10.0
     },
     {
       "architecture_layer": "core",
@@ -3829,7 +3840,7 @@
       "commit_count_30d": 6,
       "complexity_score": 39.0,
       "documentation_drift": true,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeBaseOrchestrator",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -4135,7 +4146,7 @@
       "last_modified": "2026-03-15T01:05:50+03:00",
       "metadata": {
         "author_breadth": 1,
-        "drift_contradiction": "The docstring describes a FastAPI backend for serving a web UI and exposing REST APIs, while the actual purpose is to provide a backend server for handling requests related to cloning repositories, analyzing codebases, and managing various artifacts and logs. These descriptions are significantly different.",
+        "drift_contradiction": "The docstring describes a FastAPI backend that serves the UI and exposes REST APIs for the frontend, while the actual purpose of the module is to provide the backend for a web UI server that interacts with codebase analysis and management functionalities. This discrepancy indicates that the documentation does not accurately reflect the current implementation.",
         "drift_severity": "high",
         "last_author": "richh-s",
         "last_modified": "2026-03-15T01:05:50+03:00"
@@ -4143,7 +4154,7 @@
       "pagerank_score": 0.03844960865811741,
       "path": "src/server.py",
       "purpose_confidence": 1.0,
-      "purpose_statement": "This module provides the backend server for serving the UI of a codebase analysis tool, handling requests related to cloning repositories, analyzing codebases, and managing various artifacts and logs.",
+      "purpose_statement": "This module provides the backend for a web UI server that serves REST APIs to interact with the codebase analysis and management functionalities, including cloning repositories, analyzing them, and providing metadata.",
       "semantic_embedding": null,
       "unique_authors_30d": 1,
       "velocity_score": 5.0
@@ -4155,7 +4166,7 @@
       "commit_count_30d": 1,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeInsight",
       "functions": [],
       "identity": "src/utils/__init__.py",
       "importance_score": 1,
@@ -4196,7 +4207,7 @@
       "commit_count_30d": 1,
       "complexity_score": 12.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeBaseOrchestrator",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -4284,19 +4295,19 @@
       "pagerank_score": 0.010394628106118447,
       "path": "src/utils/canonicalization_service.py",
       "purpose_confidence": 1.0,
-      "purpose_statement": "This module provides utilities for normalizing and canonicalizing paths within a codebase, as well as detecting collisions and simplifying paths to avoid naming conflicts.",
+      "purpose_statement": "This module handles the normalization and canonicalization of paths to ensure consistency in how files are referenced within a codebase, which is crucial for accurate data lineage tracking.",
       "semantic_embedding": null,
       "unique_authors_30d": 1,
       "velocity_score": 0.0
     },
     {
       "architecture_layer": "utility",
-      "change_velocity_30d": 1.0,
+      "change_velocity_30d": 2.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 2,
       "complexity_score": 4.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeBaseOrchestrator",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -4329,19 +4340,19 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "py",
-      "last_modified": "2026-03-12T00:43:35+03:00",
+      "last_modified": "2026-03-15T01:50:22+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-12T00:43:35+03:00"
+        "last_modified": "2026-03-15T01:50:22+03:00"
       },
       "pagerank_score": 0.010394628106118447,
       "path": "src/utils/clustering.py",
       "purpose_confidence": 1.0,
-      "purpose_statement": "This module clusters files or directories based on their content similarity using clustering algorithms from the SciPy library, aiding in domain identification and analysis.",
+      "purpose_statement": "This module clusters different parts of the codebase into domains based on their similarity and dependencies, aiding in understanding how various components interact within a repository.",
       "semantic_embedding": null,
       "unique_authors_30d": 1,
-      "velocity_score": 1.0
+      "velocity_score": 2.0
     },
     {
       "architecture_layer": "utility",
@@ -4358,7 +4369,7 @@
       "commit_count_30d": 2,
       "complexity_score": 17.0,
       "documentation_drift": null,
-      "domain_cluster": "AIIntegrationTools",
+      "domain_cluster": "CodeBaseOrchestrator",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -4458,8 +4469,8 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "src/utils/git_provider.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 6 functions and imports 3 dependencies. Key features likely include __init__, prefetch_metadata.",
+      "purpose_confidence": 1.0,
+      "purpose_statement": "This module provides utilities for interacting with Git repositories to fetch metadata such as file metrics, current SHA, and changed files, which is essential for tracking changes in the codebase over time.",
       "semantic_embedding": null,
       "unique_authors_30d": 1,
       "velocity_score": 2.0
@@ -4708,7 +4719,7 @@
       "commit_count_30d": 4,
       "complexity_score": 57.0,
       "documentation_drift": null,
-      "domain_cluster": "AIIntegrationTools",
+      "domain_cluster": "DataScienceTools",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -4859,7 +4870,7 @@
       "commit_count_30d": 1,
       "complexity_score": 8.0,
       "documentation_drift": null,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "DataIntegrationAndAnalysis",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -4929,7 +4940,7 @@
       "commit_count_30d": 1,
       "complexity_score": 21.0,
       "documentation_drift": false,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeInsight",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -5076,7 +5087,7 @@
       "commit_count_30d": 1,
       "complexity_score": 3.0,
       "documentation_drift": null,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "DataIntegrationAndAnalysis",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -5240,7 +5251,7 @@
       "commit_count_30d": 1,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "DataIntegrationAndAnalysis",
       "functions": [],
       "identity": "test_parse.py",
       "importance_score": 1,
@@ -5294,7 +5305,7 @@
       "commit_count_30d": 1,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "DataIntegrationAndAnalysis",
       "functions": [],
       "identity": "test_pr.py",
       "importance_score": 1,
@@ -5332,7 +5343,7 @@
       "commit_count_30d": 1,
       "complexity_score": 5.0,
       "documentation_drift": null,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "DataIntegrationAndAnalysis",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -5390,7 +5401,7 @@
       "commit_count_30d": 3,
       "complexity_score": 10.0,
       "documentation_drift": null,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "DataIntegrationAndAnalysis",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -5543,7 +5554,7 @@
       "commit_count_30d": 1,
       "complexity_score": 3.0,
       "documentation_drift": null,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "DataIntegrationAndAnalysis",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -5623,7 +5634,7 @@
       "commit_count_30d": 1,
       "complexity_score": 3.0,
       "documentation_drift": null,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "DataIntegrationAndAnalysis",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -5703,7 +5714,7 @@
       "commit_count_30d": 1,
       "complexity_score": 4.0,
       "documentation_drift": null,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "DataIntegrationAndAnalysis",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -5804,7 +5815,7 @@
       "commit_count_30d": 1,
       "complexity_score": 4.0,
       "documentation_drift": null,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "DataIntegrationAndAnalysis",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -5891,7 +5902,7 @@
       "commit_count_30d": 1,
       "complexity_score": 2.0,
       "documentation_drift": null,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "DataIntegrationAndAnalysis",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -5964,7 +5975,7 @@
       "commit_count_30d": 1,
       "complexity_score": 1.0,
       "documentation_drift": null,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "DataIntegrationAndAnalysis",
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -6038,7 +6049,7 @@
       "commit_count_30d": 6,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeInsight",
       "functions": [],
       "identity": "ui/app.js",
       "importance_score": 1,
@@ -6071,7 +6082,7 @@
       "commit_count_30d": 4,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeInsight",
       "functions": [],
       "identity": "ui/index.html",
       "importance_score": 1,
@@ -6104,7 +6115,7 @@
       "commit_count_30d": 3,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeInsight",
       "functions": [],
       "identity": "ui/style.css",
       "importance_score": 1,
@@ -6137,7 +6148,7 @@
       "commit_count_30d": 2,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "CodeBaseOrchestrator",
       "functions": [],
       "identity": "uv.lock",
       "importance_score": 1,
@@ -6166,7 +6177,7 @@
   ],
   "scc_groups": [],
   "schema_version": "1.0",
-  "timestamp": "2026-03-14T22:48:09.148468+00:00",
+  "timestamp": "2026-03-14T23:26:03.482660+00:00",
   "top_hubs": [
     "src/orchestrator.py",
     "src/cli.py",

@@ -7,7 +7,7 @@
       "columns": [],
       "database": null,
       "dataset_type_confidence": 0.5,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeBaseOrchestrator",
       "environment": "production",
       "format": null,
       "identity": "orders",
@@ -24,9 +24,9 @@
       "schema_": null,
       "system": "warehouse",
       "table": "__dbt_source_internal_raw_orders__",
-      "timestamp": "2026-03-15 01:21:47.318962",
+      "timestamp": "2026-03-15 01:59:43.576822",
       "type": "database_table",
-      "version": "git:391fb7c"
+      "version": "git:a94f183"
     },
     {
       "canonical_identity": "process_orders",
@@ -51,9 +51,9 @@
       "schema_": null,
       "system": "unknown",
       "table": "process_orders",
-      "timestamp": "2026-03-15 01:21:47.319821",
+      "timestamp": "2026-03-15 01:59:43.577259",
       "type": "database_table",
-      "version": "git:391fb7c"
+      "version": "git:a94f183"
     },
     {
       "canonical_identity": "processed_orders",
@@ -61,7 +61,7 @@
       "columns": [],
       "database": null,
       "dataset_type_confidence": 0.5,
-      "domain_cluster": "DocumentationAndTools",
+      "domain_cluster": "CodeInsight",
       "environment": "production",
       "format": null,
       "identity": "processed_orders",
@@ -78,9 +78,9 @@
       "schema_": null,
       "system": "s3",
       "table": "processed_orders",
-      "timestamp": "2026-03-15 01:21:47.319790",
+      "timestamp": "2026-03-15 01:59:43.577234",
       "type": "object_storage",
-      "version": "git:391fb7c"
+      "version": "git:a94f183"
     },
     {
       "canonical_identity": "stg_orders",
@@ -97,7 +97,7 @@
       ],
       "database": null,
       "dataset_type_confidence": 1.0,
-      "domain_cluster": "Data Analytics Orchestration",
+      "domain_cluster": "DataIntegrationAndAnalysis",
       "environment": "staging",
       "format": null,
       "identity": "stg_orders",
@@ -114,9 +114,9 @@
       "schema_": null,
       "system": "dbt",
       "table": "stg_orders",
-      "timestamp": "2026-03-15 01:21:47.319681",
+      "timestamp": "2026-03-15 01:59:43.577140",
       "type": "database_table",
-      "version": "git:391fb7c"
+      "version": "git:a94f183"
     },
     {
       "canonical_identity": "task_a",
@@ -141,9 +141,9 @@
       "schema_": null,
       "system": "unknown",
       "table": "task_a",
-      "timestamp": "2026-03-15 01:21:47.319889",
+      "timestamp": "2026-03-15 01:59:43.577314",
       "type": "database_table",
-      "version": "git:391fb7c"
+      "version": "git:a94f183"
     },
     {
       "canonical_identity": "task_b",
@@ -168,9 +168,9 @@
       "schema_": null,
       "system": "unknown",
       "table": "task_b",
-      "timestamp": "2026-03-15 01:21:47.319902",
+      "timestamp": "2026-03-15 01:59:43.577325",
       "type": "database_table",
-      "version": "git:391fb7c"
+      "version": "git:a94f183"
     },
     {
       "canonical_identity": "utf-8",
@@ -195,9 +195,9 @@
       "schema_": null,
       "system": "unknown",
       "table": "utf-8",
-      "timestamp": "2026-03-15 01:21:47.319861",
+      "timestamp": "2026-03-15 01:59:43.577292",
       "type": "database_table",
-      "version": "git:391fb7c"
+      "version": "git:a94f183"
     }
   ],
   "edges": [
@@ -322,7 +322,7 @@
       "type": "CONFIG_DEPENDENCY"
     }
   ],
-  "git_commit": "391fb7ca6ac4e19fa6a28d9b1b8ab98d505e304c",
+  "git_commit": "a94f183c107926dd1c4accba6f8c8d2eef11c37e",
   "health": {
     "dangling_sinks": 0,
     "data_nodes": 7,
@@ -337,7 +337,7 @@
     "warning_count": 0
   },
   "schema_version": "1.0",
-  "timestamp": "2026-03-14T22:48:09.153847+00:00",
+  "timestamp": "2026-03-14T23:26:03.489234+00:00",
   "transformation_nodes": [
     {
       "column_lineage": [],

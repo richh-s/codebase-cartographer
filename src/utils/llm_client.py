@@ -252,7 +252,20 @@ class LLMClient:
                 purpose = f"Inferred purpose: This module manages {len(funcs)} functions and imports {len(imports)} dependencies. Key features likely include {', '.join(funcs[:2]) if funcs else 'system coordination'}."
                 confidence = 0.2
             else:
-                purpose = "Unknown purpose (Fallback enabled)"
+                # Better heuristics for boilerplate or config files
+                base = mpath.lower()
+                if base.endswith("__init__.py"):
+                    purpose = "Package initialization: Defines the module structure and exposes public interfaces for this directory."
+                elif base.endswith(".toml") or base.endswith(".yml") or base.endswith(".yaml"):
+                    purpose = "Configuration file: Defines project settings, dependencies, or environment-specific parameters."
+                elif base.endswith(".md"):
+                    purpose = "Documentation: Provides high-level project information, instructions, or architectural context."
+                elif ".env" in base:
+                    purpose = "Environment variables: Manages secrets and environment-specific configurations."
+                elif base.endswith(".json") or base.endswith(".txt"):
+                    purpose = "Data/Static resource: Stores structured data or plain text used by the system."
+                else:
+                    purpose = "Unknown purpose (Fallback enabled)"
                 confidence = 0.1
                 
             results.append({

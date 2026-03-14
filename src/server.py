@@ -177,8 +177,8 @@ def lineage_graph(repo_path: Optional[str] = None):
 def codebase_md(repo_path: Optional[str] = None):
     repo = _get_repo(repo_path)
     for candidate in [
-        os.path.join(repo, "artifacts", "CODEBASE.md"),
         os.path.join(repo, ".cartography", "CODEBASE.md"),
+        os.path.join(repo, "artifacts", "CODEBASE.md"),
     ]:
         if os.path.exists(candidate):
             with open(candidate) as f:
@@ -190,8 +190,8 @@ def codebase_md(repo_path: Optional[str] = None):
 def onboarding_brief(repo_path: Optional[str] = None):
     repo = _get_repo(repo_path)
     for candidate in [
-        os.path.join(repo, "artifacts", "onboarding_brief.md"),
         os.path.join(repo, ".cartography", "onboarding_brief.md"),
+        os.path.join(repo, "artifacts", "onboarding_brief.md"),
     ]:
         if os.path.exists(candidate):
             with open(candidate) as f:

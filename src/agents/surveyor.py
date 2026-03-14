@@ -76,6 +76,8 @@ class SurveyorAgent:
                     if ext in {'.md', '.txt', '.csv', '.json', '.yml', '.yaml'} or base in {'license', 'dbt_project.yml', 'readme.md', '.gitignore', '.gitkeep'}:
                         is_info = True
                         layer = "meta"
+                        if base.endswith(".toml") or base.endswith(".yml") or base.endswith(".yaml"):
+                            layer = "tooling"
                     
                     # Explicit override for seed files (they are raw executable data, not informational meta)
                     if identity.startswith("seeds/") or identity.startswith("data/"):
@@ -84,10 +86,29 @@ class SurveyorAgent:
                         if base not in {'.gitkeep', 'readme.md'} and ext != '.md':
                             is_info = False
                     elif not is_info:
+                        # Broaden for standard Python/General patterns
                         if "staging/" in identity:
                             layer = "staging"
                         elif "models/marts/" in identity or identity.startswith("models/"):
                             layer = "product"
+                        elif "/agents/" in identity or identity.startswith("src/agents/"):
+                            layer = "agent"
+                        elif "/models/" in identity or identity.startswith("src/models/"):
+                            layer = "model"
+                        elif "/utils/" in identity or identity.startswith("src/utils/"):
+                            layer = "utility"
+                        elif "/graph/" in identity or identity.startswith("src/graph/"):
+                            layer = "graph"
+                        elif "/analyzers/" in identity or identity.startswith("src/analyzers/"):
+                            layer = "analyzer"
+                        elif "tests/" in identity or identity.startswith("tests/"):
+                            layer = "test"
+                        elif identity.startswith("src/"):
+                            layer = "core"
+                        elif ext == ".py":
+                            layer = "core" # Default for root or other python files
+                        elif ext in {".toml", ".yml", ".yaml"}:
+                            layer = "tooling"
                     
                     # Create Node
                     node = ModuleNode(

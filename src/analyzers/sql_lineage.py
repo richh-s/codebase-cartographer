@@ -256,7 +256,9 @@ class SQLLineageAnalyzer:
                 if op_key not in seen_ops: unique_ops.append(op); seen_ops.add(op_key)
             metadata["operations"] = unique_ops
             confidence = 1.0
-        except Exception:
+        except Exception as e:
+            # Phase 5 Master Thinker: Log and skip
+            print(f"[Warning] SQLLineageAnalyzer: Log and Skip - sqlglot parse failure in {filepath}: {e}")
             patterns = [r"FROM\s+([a-zA-Z0-9_\.]+)", r"JOIN\s+([a-zA-Z0-9_\.]+)"]
             found = set()
             for p in patterns:

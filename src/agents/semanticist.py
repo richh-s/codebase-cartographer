@@ -145,7 +145,7 @@ class SemanticistAgent:
         4. What is the overall architectural health (debt, complexity)?
         5. What is the 'Blast Radius' of a change to core schemas?
         
-        CRITICAL: Every claim MUST have a citation in [file_path:line_number] format.
+        CRITICAL: Provide concrete business-level evidence for every claim. Every observation MUST have a citation in [file_path:line_number] format. Focus on 'Master Thinker' level insights: identifying the actual business value, identifying the true structural source of truth vs. derivative sinks, and quantifying the actual blast radius of changes.
         
         Evidence:
         {json.dumps(evidence_packets, indent=2)}

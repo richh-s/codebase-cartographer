@@ -38,79 +38,83 @@ class SurveyorAgent:
             for file in files:
                 filepath = os.path.join(root, file)
                 
-                # Enforce relative paths globally
-                identity = os.path.relpath(filepath, self.target_dir)
-                
-                if file.lower() == '.gitkeep':
+                try:
+                    # Enforce relative paths globally
+                    identity = os.path.relpath(filepath, self.target_dir)
+                    
+                    if file.lower() == '.gitkeep':
+                        continue
+                    
+                    # Extract AST data
+                    ast_data = self.analyzer.analyze_file(filepath, identity=identity)
+                    if not ast_data:
+                        continue # Unsupported or unreadable file
+                    
+                    # Extract functions correctly from AST
+                    funcs = ast_data.get("functions", [])
+                    
+                    # Calculate complexity metrics
+                    module_complexity = 0.0
+                    is_high_complexity = False
+                    
+                    if funcs:
+                        module_complexity = sum(f.complexity_score for f in funcs)
+                        if any(f.complexity_score > 10 for f in funcs):
+                            is_high_complexity = True
+                    
+                    # Attach Git Metadata
+                    g_meta = git_data.get(identity, {})
+                    velocity_score = g_meta.get("velocity_score", 0.0)
+                    
+                    # Determine Layer and Informational Status
+                    layer = "unknown"
+                    is_info = False
+                    ext = os.path.splitext(file)[1].lower()
+                    base = file.lower()
+                    
+                    # Default informational files
+                    if ext in {'.md', '.txt', '.csv', '.json', '.yml', '.yaml'} or base in {'license', 'dbt_project.yml', 'readme.md', '.gitignore', '.gitkeep'}:
+                        is_info = True
+                        layer = "meta"
+                    
+                    # Explicit override for seed files (they are raw executable data, not informational meta)
+                    if identity.startswith("seeds/") or identity.startswith("data/"):
+                        layer = "raw"
+                        # Only treat raw data (like csv) as executable entries; preserve .gitkeep/.md as info
+                        if base not in {'.gitkeep', 'readme.md'} and ext != '.md':
+                            is_info = False
+                    elif not is_info:
+                        if "staging/" in identity:
+                            layer = "staging"
+                        elif "models/marts/" in identity or identity.startswith("models/"):
+                            layer = "product"
+                    
+                    # Create Node
+                    node = ModuleNode(
+                        path=identity,
+                        identity=identity,
+                        language=os.path.splitext(file)[1][1:],
+                        architecture_layer=layer,
+                        is_informational=is_info,
+                        imports=ast_data.get("imports", []),
+                        functions=funcs,
+                        classes=ast_data.get("classes", []),
+                        complexity_score=module_complexity,
+                        is_high_complexity=is_high_complexity,
+                        velocity_score=velocity_score,
+                        change_velocity_30d=velocity_score,
+                        last_modified=g_meta.get("last_modified", ""),  # Rubric field
+                        metadata={
+                            **ast_data.get("metadata", {}),
+                            "last_modified": g_meta.get("last_modified", ""),
+                            "last_author": g_meta.get("last_author", ""),
+                            "author_breadth": g_meta.get("author_breadth", 1)
+                        }
+                    )
+                    self.graph_builder.add_module(node)
+                except Exception as e:
+                    print(f"[Warning] Surveyor Agent: Log and Skip - Error processing {file}: {e}")
                     continue
-                
-                # Extract AST data
-                ast_data = self.analyzer.analyze_file(filepath, identity=identity)
-                if not ast_data:
-                    continue # Unsupported or unreadable file
-                
-                # Extract functions correctly from AST
-                funcs = ast_data.get("functions", [])
-                
-                # Calculate complexity metrics
-                module_complexity = 0.0
-                is_high_complexity = False
-                
-                if funcs:
-                    module_complexity = sum(f.complexity_score for f in funcs)
-                    if any(f.complexity_score > 10 for f in funcs):
-                        is_high_complexity = True
-                
-                # Attach Git Metadata
-                g_meta = git_data.get(identity, {})
-                velocity_score = g_meta.get("velocity_score", 0.0)
-                
-                # Determine Layer and Informational Status
-                layer = "unknown"
-                is_info = False
-                ext = os.path.splitext(file)[1].lower()
-                base = file.lower()
-                
-                # Default informational files
-                if ext in {'.md', '.txt', '.csv', '.json', '.yml', '.yaml'} or base in {'license', 'dbt_project.yml', 'readme.md', '.gitignore', '.gitkeep'}:
-                    is_info = True
-                    layer = "meta"
-                
-                # Explicit override for seed files (they are raw executable data, not informational meta)
-                if identity.startswith("seeds/") or identity.startswith("data/"):
-                    layer = "raw"
-                    # Only treat raw data (like csv) as executable entries; preserve .gitkeep/.md as info
-                    if base not in {'.gitkeep', 'readme.md'} and ext != '.md':
-                        is_info = False
-                elif not is_info:
-                    if "staging/" in identity:
-                        layer = "staging"
-                    elif "models/marts/" in identity or identity.startswith("models/"):
-                        layer = "product"
-                
-                # Create Node
-                node = ModuleNode(
-                    path=identity,
-                    identity=identity,
-                    language=os.path.splitext(file)[1][1:],
-                    architecture_layer=layer,
-                    is_informational=is_info,
-                    imports=ast_data.get("imports", []),
-                    functions=funcs,
-                    classes=ast_data.get("classes", []),
-                    complexity_score=module_complexity,
-                    is_high_complexity=is_high_complexity,
-                    velocity_score=velocity_score,
-                    change_velocity_30d=velocity_score,
-                    last_modified=g_meta.get("last_modified", ""),  # Rubric field
-                    metadata={
-                        **ast_data.get("metadata", {}),
-                        "last_modified": g_meta.get("last_modified", ""),
-                        "last_author": g_meta.get("last_author", ""),
-                        "author_breadth": g_meta.get("author_breadth", 1)
-                    }
-                )
-                self.graph_builder.add_module(node)
 
         # 2. Build edges based on imports
         print(f"Extracted {len(self.graph_builder.nodes)} modules. Building edges...")

@@ -65,7 +65,7 @@ class ArchivistAgent:
         except Exception as e:
             print(f"[Error] Archivist: Failed to apply overrides: {e}")
 
-    def generate_codebase_report(self, modules: List[ModuleNode], git_sha: str, output_path: str):
+    def generate_codebase_report(self, modules: List[ModuleNode], git_sha: str, output_path: str, scc_groups: Optional[List[List[str]]] = None):
         """
         Generates a deterministic CODEBASE.md summarizing the repository context.
         Includes freshness indicators and categorized debt.
@@ -80,8 +80,8 @@ class ArchivistAgent:
             f"**Total Modules:** {len(modules)}",
             "",
             "## 📂 Module Inventory",
-            "| Module | Domain | Layer | Status | Purpose |",
-            "| :--- | :--- | :--- | :--- | :--- |"
+            "| Module | Domain | Layer | Status | Sync | Purpose |",
+            "| :--- | :--- | :--- | :--- | :--- | :--- |"
         ]
         
         for m in modules:
@@ -97,10 +97,17 @@ class ArchivistAgent:
             domain = m.domain_cluster or "General"
             layer = m.architecture_layer or "Unknown"
             
+            # Drift Status (Phase 5 Master Thinker)
+            drift_status = "✅"
+            if getattr(m, "documentation_drift", False):
+                drift_status = "⚠️ Drift"
+            elif getattr(m, "documentation_drift", None) is None:
+                drift_status = "—"
+            
             # Use relative paths for portability
             rel_path = os.path.relpath(m.path, self.repo_path) if os.path.isabs(m.path) else m.path
             
-            lines.append(f"| `{rel_path}` | {domain} | {layer} | {status} | {purpose} |")
+            lines.append(f"| `{rel_path}` | {domain} | {layer} | {status} | {drift_status} | {purpose} |")
             
         # Add Categorized Debt Section
         lines.extend([
@@ -118,6 +125,24 @@ class ArchivistAgent:
                 lines.append(f"| `{m.identity}` | Logic | Low | Potential dead code (produced but never consumed). |")
             if m.is_architectural_hub:
                 lines.append(f"| `{m.identity}` | Coupling | Low | Significant architectural hub; changes may have high blast radius. |")
+
+        # Add Circular Dependencies Section (Phase 5 Master Thinker)
+        if scc_groups:
+            lines.extend([
+                "",
+                "## 🔄 Circular Dependencies",
+                "The following groups of modules have circular dependency chains:",
+                ""
+            ])
+            for i, group in enumerate(scc_groups):
+                group_list = ", ".join([f"`{g}`" for g in sorted(group)])
+                lines.append(f"{i+1}. {group_list}")
+        else:
+            lines.extend([
+                "",
+                "## 🔄 Circular Dependencies",
+                "✅ No circular dependencies detected."
+            ])
 
         with open(output_path, "w") as f:
             f.write("\n".join(lines))

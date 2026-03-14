@@ -217,7 +217,7 @@ class Orchestrator:
         m_graph_path = os.path.join(self.output_dir, "module_graph.json")
         l_graph_path = os.path.join(self.output_dir, "lineage_graph.json")
 
-        self.archivist.generate_codebase_report(modules, git_sha, cb_report_path)
+        self.archivist.generate_codebase_report(modules, git_sha, cb_report_path, scc_groups=module_graph_builder.scc_groups)
         self.generate_reconnaissance_report(modules, lineage_graph, brief_path)
         
         self.archivist.export_graph_json(module_graph_builder.export_dict(), git_sha, m_graph_path)

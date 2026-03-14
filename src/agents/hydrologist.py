@@ -303,21 +303,7 @@ class HydrologistAgent:
         # Pass 3: Intelligence
         self.lineage_graph.assign_roles()
         
-        # Phase 2.6: Override roles based on intent heuristics
-        for identity, node in self.lineage_graph.data_nodes.items():
-            raw_name_lower = node.name.lower()
-            # Heuristic override
-            if "raw" in raw_name_lower or "source" in raw_name_lower:
-                node.role = DatasetRole.SOURCE
-            elif any(p in raw_name_lower for p in ["report", "dashboard", "export"]):
-                node.role = DatasetRole.TERMINAL
-            elif any(p in raw_name_lower for p in ["customers", "orders"]) and not ("stg_" in raw_name_lower or "staging_" in raw_name_lower):
-                # Only mark orders/customers as terminal if they are NOT staging models
-                node.role = DatasetRole.TERMINAL
-            
-            # Topological safety check: if out-degree > 0, it CANNOT be terminal
-            if self.lineage_graph.graph.out_degree(identity) > 0 and node.role == DatasetRole.TERMINAL:
-                node.role = DatasetRole.INTERMEDIATE
+        # Phase 2.6: Override roles based on intent heuristics (MOVED TO topological safety in knowledge_graph.py)
 
         self.lineage_graph.compute_importance({}) 
 

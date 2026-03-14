@@ -61,6 +61,8 @@ class LineageGraph:
             )
             
             node = self.data_nodes[node_id]
+            
+            # Topological priority
             if not has_transformation_input and len(in_edges) == 0:
                 node.role = DatasetRole.SOURCE
             elif len(out_edges) == 0 and len(in_edges) > 0:
@@ -68,11 +70,21 @@ class LineageGraph:
             else:
                 node.role = DatasetRole.INTERMEDIATE
             
-            # Prefix heuristics as fallback
+            # Prefix heuristics as fallback/refinement, but NEVER override topological reality
+            # that would break validation.
             lname = node.name.lower()
-            if "raw_" in lname or "source_" in lname:
-                node.role = DatasetRole.SOURCE
-            elif "stg_" in lname or "staging_" in lname:
+            if node.role == DatasetRole.SOURCE:
+                # If we think it's a source, confirm with prefixes
+                pass 
+            elif node.role == DatasetRole.INTERMEDIATE:
+                if "stg_" in lname or "staging_" in lname:
+                    node.role = DatasetRole.INTERMEDIATE
+            
+            # Safety Check: If it has incoming edges, it CANNOT be a SOURCE
+            if len(in_edges) > 0 and node.role == DatasetRole.SOURCE:
+                node.role = DatasetRole.INTERMEDIATE
+            # Safety Check: If it has outgoing edges, it CANNOT be a TERMINAL
+            if len(out_edges) > 0 and node.role == DatasetRole.TERMINAL:
                 node.role = DatasetRole.INTERMEDIATE
 
     def compute_importance(self, structural_importances: Dict[str, int]):

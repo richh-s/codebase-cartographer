@@ -16,7 +16,8 @@ def analyze(
     semantic_depth: str = typer.Option("light", "--semantic-depth", help="Depth of semantic analysis (light, deep)"),
     store_embeddings: bool = typer.Option(False, "--store-embeddings", help="Store semantic embeddings in the graph"),
     velocity_days: int = typer.Option(30, "--velocity-days", help="Number of days to look back for git velocity"),
-    sql_dialect: str = typer.Option("duckdb", "--sql-dialect", help="SQL dialect for AST parsing (duckdb, snowflake, postgres, etc.)")
+    sql_dialect: str = typer.Option("duckdb", "--sql-dialect", help="SQL dialect for AST parsing (duckdb, snowflake, postgres, etc.)"),
+    incremental_since: Optional[str] = typer.Option(None, "--incremental-since", help="Git SHA to perform incremental analysis since")
 ):
     """
     Analyzes a codebase and generates architectural & lineage maps.
@@ -42,7 +43,8 @@ def analyze(
         repo_path, 
         llm_enabled=llm, 
         semantic_depth=semantic_depth, 
-        store_embeddings=store_embeddings
+        store_embeddings=store_embeddings,
+        incremental_since=incremental_since
     )
     typer.echo(f"Analysis successful!")
 

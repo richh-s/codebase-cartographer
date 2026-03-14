@@ -116,12 +116,15 @@ class Orchestrator:
         print(f"[Info] Orchestrator: Catalog updated at {catalog_path}")
 
     def run_analysis(self, llm_enabled: bool = False, semantic_depth: str = "light", 
-                     store_embeddings: bool = False, velocity_days: int = 30, sql_dialect: str = "duckdb"):
+                     store_embeddings: bool = False, velocity_days: int = 30, 
+                     sql_dialect: str = "duckdb", incremental_since: Optional[str] = None):
         """Executes the suite with incremental intelligence and Agent 4 excellence."""
         git_sha = self.git.get_current_sha()
         self.logger.log_event(Agents.ORCHESTRATOR, TraceEvents.FILE_PARSED, "repo_root", metadata={"sha": git_sha})
         
-        print(f"--- Starting Full Analysis (Git: {git_sha}) ---")
+        print(f"--- Starting Analysis (Git: {git_sha}) ---")
+        if incremental_since:
+            print(f"[Info] Incremental Mode: Analyzing changes since {incremental_since}")
         
         # Prefetch Git Metrics
         self.git.prefetch_metadata(days=velocity_days)
@@ -129,6 +132,7 @@ class Orchestrator:
         # 1. Run Surveyor for Structural Graph
         print(f"[1/3] Running Surveyor Agent...")
         start_time = datetime.now()
+        # Surveyor always runs to build the skeleton, but internal extraction can be cached
         module_graph_builder = self.surveyor.run()
         duration = int((datetime.now() - start_time).total_seconds() * 1000)
         self.logger.log_event(Agents.SURVEYOR, TraceEvents.ARTIFACT_GENERATED, "module_graph.json", duration_ms=duration)
@@ -142,15 +146,23 @@ class Orchestrator:
         duration = int((datetime.now() - start_time).total_seconds() * 1000)
         self.logger.log_event(Agents.HYDROLOGIST, TraceEvents.ARTIFACT_GENERATED, "lineage_graph.json", duration_ms=duration)
         
-        # 3. Handle Incremental Logic (Depth 1)
+        # 3. Handle Incremental Logic
         changed_modules = []
         signature_drifted = set()
         
+        # Strict Checklist: Using git diff for incremental tracking if SHA provided
+        git_changed_files = set()
+        if incremental_since:
+            git_changed_files = self.git.get_changed_files(incremental_since)
+            print(f"[Info] Git Diff: {len(git_changed_files)} files changed since {incremental_since}")
+
         for m in modules:
+            # Re-analyze if file changed in git OR AST hash changed
+            file_changed = m.path in git_changed_files
             new_hash = self._compute_ast_hash(m.path)
             old_hash = self.cache["files"].get(m.path)
             
-            if new_hash != old_hash:
+            if file_changed or new_hash != old_hash:
                 changed_modules.append(m)
                 self.cache["files"][m.path] = new_hash
                 
@@ -168,10 +180,11 @@ class Orchestrator:
             for cm in changed_modules:
                 blast_radius.add(cm.identity)
                 
-            # Only trigger neighbor re-analysis if signatures changed (Bazel-style)
+            # Trigger neighbor re-analysis if signatures changed (Bazel-style)
             for sid in signature_drifted:
-                for u, v in module_graph_builder.graph.in_edges(sid):
-                    blast_radius.add(u)
+                if sid in module_graph_builder.graph:
+                    for u, v in module_graph_builder.graph.in_edges(sid):
+                        blast_radius.add(u)
             
             re_analyze_targets = [m for m in modules if m.identity in blast_radius]
             if re_analyze_targets:
@@ -180,7 +193,7 @@ class Orchestrator:
             else:
                 print("[Info] Incremental: No modules required re-analysis.")
         elif llm_enabled:
-            print("[Info] Incremental: No AST changes detected. Skipping LLM re-analysis.")
+            print("[Info] Incremental: No changes detected. Skipping LLM re-analysis.")
         
         # 4. Archivist Enrichment
         print("[4/4] Archivist: Consolidating and Exporting Artifacts...")
@@ -198,22 +211,17 @@ class Orchestrator:
         # Propagate Domains & Handle Truth Hierarchy
         self._propagate_domains(modules, lineage_graph)
 
-        # Generate Reports in artifacts/
-        self.archivist.generate_codebase_report(
-            modules, git_sha, os.path.join(self.artifacts_dir, "CODEBASE.md")
-        )
-        self.generate_reconnaissance_report(
-            modules, lineage_graph, os.path.join(self.artifacts_dir, "onboarding_brief.md")
-        )
+        # Standardize strictly to .cartography/ for ALL artifacts per checklist
+        cb_report_path = os.path.join(self.output_dir, "CODEBASE.md")
+        brief_path = os.path.join(self.output_dir, "onboarding_brief.md")
+        m_graph_path = os.path.join(self.output_dir, "module_graph.json")
+        l_graph_path = os.path.join(self.output_dir, "lineage_graph.json")
 
-        # Final Stable Exports
-        m_graph_path = os.path.join(self.artifacts_dir, f"module_graph_git_{git_sha[:8]}.json")
-        l_graph_path = os.path.join(self.artifacts_dir, f"lineage_graph_git_{git_sha[:8]}.json")
-        cb_report_path = os.path.join(self.artifacts_dir, "CODEBASE.md")
+        self.archivist.generate_codebase_report(modules, git_sha, cb_report_path)
+        self.generate_reconnaissance_report(modules, lineage_graph, brief_path)
         
         self.archivist.export_graph_json(module_graph_builder.export_dict(), git_sha, m_graph_path)
         
-        # Validate and export lineage
         lineage_graph.validate_or_raise()
         self.archivist.export_graph_json(lineage_graph.serialize_stable(), git_sha, l_graph_path)
         
@@ -227,10 +235,10 @@ class Orchestrator:
             llm_client=self.semanticist.llm if llm_enabled else None
         )
         if indexed > 0:
-            print(f"[Info] Orchestrator: Semantic index updated ({indexed} entries) at semantic_index/")
+            print(f"[Info] Orchestrator: Semantic index updated ({indexed} entries)")
         
         self._save_cache()
-        print(f"--- Analysis Complete! Artifacts in {self.artifacts_dir} ---")
+        print(f"--- Analysis Complete! Artifacts in {self.output_dir} ---")
         return {
             "module_graph": m_graph_path,
             "lineage_graph": l_graph_path
@@ -307,7 +315,13 @@ class Orchestrator:
         
         print(f"[Info] Archivist: Onboarding Brief saved to {output_path}")
 
-def analyze_repo(path: str, llm_enabled: bool = False, semantic_depth: str = "light", store_embeddings: bool = False):
+def analyze_repo(path: str, llm_enabled: bool = False, semantic_depth: str = "light", 
+                 store_embeddings: bool = False, incremental_since: Optional[str] = None):
     """Convenience function for CLI/external calls."""
     orchestrator = Orchestrator(path)
-    return orchestrator.run_analysis(llm_enabled, semantic_depth, store_embeddings)
+    return orchestrator.run_analysis(
+        llm_enabled=llm_enabled, 
+        semantic_depth=semantic_depth, 
+        store_embeddings=store_embeddings,
+        incremental_since=incremental_since
+    )

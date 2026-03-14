@@ -13,10 +13,12 @@ class ArchivistAgent:
     
     def __init__(self, repo_path: str, st_threshold: int = 5, logger: Optional[Any] = None):
         self.repo_path = os.path.abspath(repo_path)
+        self.output_dir = os.path.join(self.repo_path, ".cartography")
         self.st_threshold = st_threshold
         self.logger = logger
         self.schema_version = "1.0"
         self.analysis_version = "cartographer_phase4"
+        os.makedirs(self.output_dir, exist_ok=True)
 
     def apply_overrides(self, modules: List[ModuleNode], overrides_path: str):
         """

@@ -118,3 +118,17 @@ class GitProvider:
             ).strip()
         except:
             return "unknown_sha"
+
+    def get_changed_files(self, since_sha: str) -> Set[str]:
+        """
+        Returns a set of files changed between since_sha and HEAD.
+        Fulfills strict checklist requirement for git-diff based incremental analysis.
+        """
+        if not self._is_git_repo:
+            return set()
+        try:
+            cmd = ["git", "diff", "--name-only", since_sha, "HEAD"]
+            output = subprocess.check_output(cmd, cwd=self.repo_path, text=True)
+            return {line.strip() for line in output.splitlines() if line.strip()}
+        except subprocess.CalledProcessError:
+            return set()

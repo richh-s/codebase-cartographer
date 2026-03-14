@@ -419,10 +419,27 @@ Format as JSON:
 # Navigator Agent — Tool-Loop Orchestrator
 # ---------------------------------------------------------------------------
 
+from langgraph.graph import StateGraph, END
+
+
+# ---------------------------------------------------------------------------
+# Navigator Agent — LangGraph Tool-Loop Orchestrator
+# ---------------------------------------------------------------------------
+
+class AgentState(dict):
+    """The state of the Navigator agent."""
+    question: str
+    tool: str
+    parameter: str
+    direction: str
+    result: Dict[str, Any]
+    answer: str
+
+
 class NavigatorAgent:
     """
-    The query-loop agent. Accepts a natural language question,
-    selects the appropriate tool, runs it, and formats a citation-backed answer.
+    Refactored Navigator Agent using LangGraph.
+    Provides a tool-loop for codebase interrogation with Phase 5 excellence.
     """
 
     TOOL_DESCRIPTIONS = {
@@ -436,12 +453,24 @@ class NavigatorAgent:
         self.repo_path = os.path.abspath(repo_path)
         self.llm = LLMClient()
         self.tools = NavigatorTools(repo_path, llm=self.llm)
+        
+        # Build the LangGraph
+        workflow = StateGraph(AgentState)
+        
+        workflow.add_node("router", self._router_node)
+        workflow.add_node("tool_executor", self._tool_executor_node)
+        workflow.add_node("answer_formatter", self._answer_formatter_node)
+        
+        workflow.set_entry_point("router")
+        workflow.add_edge("router", "tool_executor")
+        workflow.add_edge("tool_executor", "answer_formatter")
+        workflow.add_edge("answer_formatter", END)
+        
+        self.app = workflow.compile()
 
-    def _select_tool(self, question: str) -> Tuple[str, str]:
-        """
-        Uses LLM to route the question to the most appropriate tool.
-        Returns: (tool_name, extracted_parameter)
-        """
+    def _router_node(self, state: AgentState) -> Dict:
+        """LLM-based routing logic."""
+        question = state["question"]
         tool_desc = "\n".join(f"- {k}: {v}" for k, v in self.TOOL_DESCRIPTIONS.items())
         prompt = f"""You are a routing agent for a codebase analysis system.
 
@@ -460,20 +489,22 @@ Return JSON only:
             if response and "```json" in response:
                 response = response.split("```json")[1].split("```")[0].strip()
             data = json.loads(response) if response else {}
-            return data.get("tool", "find_implementation"), data.get("parameter", question), data.get("direction", "upstream")
+            return {
+                "tool": data.get("tool", "find_implementation"),
+                "parameter": data.get("parameter", question),
+                "direction": data.get("direction", "upstream")
+            }
         except Exception:
-            return "find_implementation", question, "upstream"
+            return {"tool": "find_implementation", "parameter": question, "direction": "upstream"}
 
-    def query(self, question: str) -> str:
-        """
-        Main entry point. Routes the question, runs the tool, and formats the output.
-        """
-        print(f"\n🧭 Navigator: Processing query: '{question}'")
-
-        tool_name, param, direction = self._select_tool(question)
+    def _tool_executor_node(self, state: AgentState) -> Dict:
+        """Executes the selected tool."""
+        tool_name = state["tool"]
+        param = state["parameter"]
+        direction = state.get("direction", "upstream")
+        
         print(f"🔧 Routing to: {tool_name}({param!r})")
 
-        # Dispatch to tool
         if tool_name == "find_implementation":
             result = self.tools.find_implementation(param)
         elif tool_name == "trace_lineage":
@@ -484,14 +515,15 @@ Return JSON only:
             result = self.tools.explain_module(param)
         else:
             result = self.tools.find_implementation(param)
+            
+        return {"result": result}
 
-        # Format answer
-        answer = self._format_answer(question, result)
-        return answer
-
-    def _format_answer(self, question: str, result: Dict[str, Any]) -> str:
-        """Format structured tool result into a human-readable answer."""
-        tool = result.get("tool", "")
+    def _answer_formatter_node(self, state: AgentState) -> Dict:
+        """Formats the final answer."""
+        result = state["result"]
+        question = state["question"]
+        tool = result.get("tool", state["tool"])
+        
         lines = [f"## Navigator Answer\n**Query:** {question}\n**Tool Used:** `{tool}`\n"]
 
         if tool == "find_implementation":
@@ -541,11 +573,18 @@ Return JSON only:
                 lines.append(f"**Purpose:** {existing}")
             lines.append(f"\n**Citation:** `{result['citation']['source']}` via `{result['citation']['method']}`")
 
-        return "\n".join(lines)
+        return {"answer": "\n".join(lines)}
+
+    def query(self, question: str) -> str:
+        """Executes the LangGraph query pipeline."""
+        print(f"\n🧭 Navigator: Processing query: '{question}'")
+        inputs = {"question": question}
+        final_state = self.app.invoke(inputs)
+        return final_state.get("answer", "Failed to generate an answer.")
 
     def interactive(self):
         """Starts an interactive REPL session."""
-        print("🗺️  Codebase Cartographer — Navigator Agent")
+        print("🗺️  Codebase Cartographer — Navigator Agent (LangGraph Mode)")
         print("   Ask questions about the codebase. Type 'exit' to quit.\n")
         while True:
             try:

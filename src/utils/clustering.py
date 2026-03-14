@@ -1,8 +1,8 @@
 import numpy as np
 from scipy.cluster.vq import kmeans2, whiten
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
-def cluster_into_domains(embeddings: List[List[float]], module_count: int) -> List[int]:
+def cluster_into_domains(embeddings: List[List[float]], module_count: int, n_clusters: Optional[int] = None) -> List[int]:
     """
     Groups modules into functional domains using K-means clustering on embeddings.
     Returns a list of cluster indices corresponding to the input embeddings.
@@ -11,8 +11,12 @@ def cluster_into_domains(embeddings: List[List[float]], module_count: int) -> Li
         # Skip clustering for very small repositories
         return [0] * len(embeddings)
 
-    # Dynamic k calculation: k = min(8, max(2, module_count // 3))
-    k = min(8, max(2, module_count // 3))
+    # Use provided n_clusters or calculate dynamically
+    if n_clusters:
+        k = n_clusters
+    else:
+        # Dynamic k calculation: k = min(8, max(2, module_count // 3))
+        k = min(8, max(2, module_count // 3))
     
     # K-means requires a numpy array
     data = np.array(embeddings)

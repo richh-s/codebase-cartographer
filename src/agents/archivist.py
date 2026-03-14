@@ -207,6 +207,10 @@ class ArchivistAgent:
 
         with open(output_path, "w") as f:
             f.write("\n".join(lines))
+        
+        if self.logger:
+            self.logger.log_event("Archivist", "ARTIFACT_GENERATED", os.path.basename(output_path), "artifact_synthesis", 1.0)
+        
         print(f"[Info] Archivist: Codebase report saved to {output_path}")
 
     def export_graph_json(self, data: Dict[str, Any], git_sha: str, output_path: str):
@@ -226,6 +230,10 @@ class ArchivistAgent:
         try:
             with open(output_path, "w") as f:
                 json.dump(payload, f, indent=2, sort_keys=True, default=str)
+            
+            if self.logger:
+                self.logger.log_event("Archivist", "ARTIFACT_GENERATED", os.path.basename(output_path), "graph_export", 1.0)
+                
             print(f"[Info] Archivist: Artifact saved to {output_path}")
         except Exception as e:
             print(f"[Error] Archivist: Failed to export artifact: {e}")

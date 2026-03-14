@@ -123,6 +123,8 @@ class Orchestrator:
         self.logger.log_event(Agents.ORCHESTRATOR, TraceEvents.FILE_PARSED, "repo_root", metadata={"sha": git_sha})
         
         print(f"--- Starting Analysis (Git: {git_sha}) ---")
+        if self.logger:
+            self.logger.log_event("Orchestrator", "FILE_PARSED", "repo_root", "lifecycle_start", 1.0, metadata={"sha": git_sha})
         if incremental_since:
             print(f"[Info] Incremental Mode: Analyzing changes since {incremental_since}")
         
@@ -288,6 +290,10 @@ class Orchestrator:
             print(f"[Info] Orchestrator: Semantic index updated ({indexed} entries)")
         
         self._save_cache()
+        
+        if self.logger:
+             self.logger.log_event("Orchestrator", "ARTIFACT_GENERATED", "analysis_complete", "lifecycle_finish", 1.0)
+             
         print(f"--- Analysis Complete! Artifacts in {self.output_dir} ---")
         return {
             "module_graph": m_graph_path,
@@ -336,8 +342,11 @@ class Orchestrator:
         for m in modules:
             if m.purpose_statement:
                 evidence_lines = []
-                for f in m.functions[:2]:
-                    evidence_lines.append({"file": m.path, "line": (f.line_range[0] if hasattr(f, "line_range") and f.line_range else 1)})
+                for f in m.functions[:3]: # Increase sample for better citations
+                    line_no = 1
+                    if hasattr(f, "line_range") and f.line_range:
+                        line_no = f.line_range[0]
+                    evidence_lines.append({"file": m.path, "line": line_no})
                 
                 if not evidence_lines:
                     evidence_lines.append({"file": m.path, "line": 1})

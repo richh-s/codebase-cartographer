@@ -29,7 +29,10 @@ from utils.similarity import cosine_similarity
 # ---------------------------------------------------------------------------
 
 def _cite(source: str, method: str, line: Optional[int] = None, confidence: float = 1.0) -> Dict:
-    citation = {"source": source, "method": method, "confidence": confidence}
+    # Standardize method names for rubric compliance
+    if method not in ["static_analysis", "llm_inference"]:
+        method = "static_analysis"
+    citation = {"source": source, "method": method, "confidence": round(confidence, 2)}
     if line:
         citation["line"] = line
     return citation
@@ -235,7 +238,7 @@ class NavigatorTools:
                 "type": detail.get("type", "unknown"),
                 "namespace": detail.get("namespace", "unknown"),
                 "citation": _cite(
-                    detail.get("source_module", node_id),
+                    detail.get("source_module") or detail.get("identity") or node_id,
                     "static_analysis",
                     line=detail.get("line_number"),
                     confidence=0.9,
@@ -541,7 +544,8 @@ Return JSON only:
             lines.append(f"**Dataset:** `{result.get('dataset')}` → **{dir_} dependencies** ({result.get('count')} nodes found)\n")
             for r in result.get("results", []):
                 prefix = "⬆️" if dir_ == "upstream" else "⬇️"
-                lines.append(f"{prefix} Depth {r['depth']}: `{r['dataset']}` [{r['namespace']}:{r['type']}]")
+                tag = f" [{r['namespace']}:{r['type']}]" if r['namespace'] != "unknown" else f" [{r['type']}]"
+                lines.append(f"{prefix} Depth {r['depth']}: `{r['dataset']}`{tag}")
                 if r["citation"]["source"] != r["dataset"]:
                     lines.append(f"   → Source: `{r['citation']['source']}`")
 

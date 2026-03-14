@@ -1,0 +1,89 @@
+# Final Technical Report: Codebase Cartographer
+**Author**: Rahel Samson
+**Date**: March 15, 2026
+
+## 1. Accuracy Analysis: Manual vs. System-Generated
+We compared the manual reconnaissance of `jaffle-shop-classic` against the outputs of the Cartographer agents.
+
+| FDE Question | Manual Ground Truth | System Result | Verdict | Root-Cause / Component |
+| :--- | :--- | :--- | :--- | :--- |
+| **Ingestion Path** | `seeds/` -> `stg_` | Correct | ✅ | `SQL Lineage Analyzer` correctly resolved dbt `ref` calls. |
+| **Output Sinks** | `customers`, `orders` | Correct | ✅ | `Hydrologist` identified nodes with 0 out-degree in lineage graph. |
+| **Blast Radius** | 100% downstream impact (stg_orders – highest downstream dependency count in the lineage graph) | Correct | ✅ | `Hydrologist` recursively identified all downstream paths. |
+| **Logic Centers** | `customers.sql` (L45) | Partially Correct | ⚠️ | `Semanticist` correctly labeled the domain but missed the specific lines. |
+| **Change Velocity** | `staging/` (High) | Correct | ✅ | `GitProvider` metrics matched the 30-day git history logs. |
+
+### 🔍 Failure Mode Analysis
+The `Semanticist` agent identified `models/customers.sql` as a high-value module but categorized it as "CustomerDataPipeline" generally. It failed to highlight specific line ranges (L45-80) as business logic concentrations without explicit prompting for "Code Density" metrics. This highlights the boundary between **Semantic Insight** (what the code does) and **Structural Profiling** (where the complexity lives).
+
+### ⚠️ False Confidence Warning
+Although the `Semanticist` correctly classified the business domain of `customers.sql`, its failure to identify the exact line ranges of business logic creates a risk of **False Confidence**. Relying solely on automated semantic labels without structural profiling could mislead an FDE during complex refactoring decisions, potentially missing hidden logic concentrations.
+
+## 2. Systemic Limitations & Failure Mode Awareness
+A professional engineering assessment identifies the following systemic boundaries:
+
+### A. Fixable Engineering Gaps
+-   **Jinja Templating**: Currently, dbt models using complex loops or dynamic filters are opaque. This could be resolved by integrating `sqlglot`'s transpilation layer to render SQL before parsing.
+-   **TypeScript Lineage**: While the `Surveyor` can parse TS/JS, the `Hydrologist` does not yet trace data flow through frontend state management (e.g., Redux).
+
+### B. Fundamental Constraints
+-   **Dynamic Runtime Injection**: Lineage involving table names constructed from environment variables (e.g., `SELECT * FROM ${ENV}_data`) is unresolvable by static analysis. Any tool producing a "complete" graph in this scenario would be providing **False Confidence**.
+-   **Implicit Dependencies**: Side-effects like database triggers are invisible to source-code analysis.
+
+## 3. FDE Deployment Applicability
+Codebase Cartographer is designed to be an FDE's "force multiplier" during client engagements:
+
+1.  **Phase 1: Cold Start (Hours 1-4)**
+    The FDE clones the client repo and runs `analyze --llm`. The generated `onboarding_brief.md` provides an instant "mental map" that usually takes 2-3 days of manual reading to build.
+2.  **Phase 2: Exploration (Engagement Week 1)**
+    As the FDE is tasked with features, they use the `Navigator` to query the **Blast Radius**. For example: *"If I move this credit card validation to a separate service, what breaks?"* 
+3.  **Phase 3: Living Context (Ongoing)**
+    Every PR run triggers the `Archivist` to update `CODEBASE.md`. This ensures that "Technical Debt" and "High Velocity" warnings are surfaced to the client in real-time, feeding directly into quarterly architectural reviews.
+
+### 🤝 Human-in-the-Loop Validation
+The FDE acts as the final verification layer because static analysis cannot fully resolve dynamic constructs such as complex Jinja loops, runtime-generated table names, or environment-variable table injections. The FDE must manually validate the Archivist's "Critical Path" output and lineage traces for these edge cases before presenting architectural conclusions to a client.
+
+## 4. ARCHITECTURE: SYSTEM DESIGN & PIPELINE RATIONALE
+
+The Codebase Cartographer follows a strictly sequenced, four-agent pipeline centered around a persistent Knowledge Graph.
+
+### 📊 Visual Architecture Diagram
+```mermaid
+graph TD
+    User([FDE User]) -- "Natural Language Queries" --> Navigator
+    
+    subgraph "Query Interface"
+        Navigator[Navigator Agent] -- "Read-Only Queries" --> KG
+    end
+
+    subgraph "Cartographer Pipeline"
+        Surveyor[Surveyor Agent] -- "AST + Git Metadata" --> KG
+        Hydrologist[Hydrologist Agent] -- "Lineage Edges" --> KG
+        Semanticist[Semanticist Agent] -- "Purpose + Domain Labels" --> KG
+        Archivist[Archivist Agent] -- "Artifact Consolidation" --> KG
+    end
+    
+    KG[(Knowledge Graph\nNetworkX DAG)]
+    
+    %% Labeled Flows
+    Surveyor -.-> |"Module Graph"| KG
+    Hydrologist -.-> |"Lineage Graph"| KG
+    Semanticist -.-> |"Semantic Insights"| KG
+    Archivist -.-> |"Generated Artifacts"| KG
+    
+    style KG fill:#f9f,stroke:#333,stroke-width:2px
+    style Navigator fill:#bbf,stroke:#333
+    style User fill:#fff,stroke:#333
+```
+
+### ⛓️ Dependency Chain & Data Flow Rationale
+The pipeline is structured to ensure that each agent operates on a grounded foundation of data provided by its predecessors:
+
+1.  **Surveyor → Hydrologist**: The Surveyor generates the fundamental structural map (AST). The **Hydrologist** requires this structure to identify the files and functions where data flow (READ/WRITE) occurs to build the Lineage Graph.
+2.  **Surveyor + Hydrologist → Semanticist**: The **Semanticist** requires both structural context (what the file is called) and lineage context (what data it touches) to generate accurate purpose statements and perform K-Means Domain Clustering.
+3.  **All Agents → Archivist**: The **Archivist** consumes the finalized Knowledge Graph—containing structure, lineage, and meaning—to synthesize human-readable artifacts like `CODEBASE.md` and the **Critical Path** analysis.
+4.  **Knowledge Graph ↔ Navigator**: The **Navigator** acts as a standalone query layer. It does not modify the graph but provides the FDE user with a natural language interface to traverse complex lineages and perform blast radius assessments.
+
+### ⚖️ Design Tradeoffs
+-   **NetworkX-based DAG**: We utilized an in-memory NetworkX DAG for the central store rather than a full graph database (like Neo4j) to maintain local portability and zero-infra overhead for FDEs.
+-   **Separated Query Layer**: The Navigator is decoupled from the analysis agents to allow for interactive exploration without re-running expensive AST or LLM passes.

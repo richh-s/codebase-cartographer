@@ -143,6 +143,7 @@ class HydrologistAgent:
                     identity=identity, # Use file path as identity to avoid self-cycles
                     name=os.path.basename(file),
                     type="DBT_MODEL",
+                    namespace="dbt",
                     logic_hash=(edges[0].logic_hash if edges else None) or "unknown",
                     operations=metadata.get("operations", []),
                     column_lineage=metadata.get("column_lineage", []),
@@ -169,6 +170,7 @@ class HydrologistAgent:
                         identity=scope["identity"],
                         name=scope["name"],
                         type=scope["type"],
+                        namespace="sql",
                         logic_hash=scope.get("logic_hash") or "unknown",
                         metadata={"parent_module": identity}
                     )
@@ -259,7 +261,7 @@ class HydrologistAgent:
                             name=raw,
                             canonical_name=canon,
                             canonical_identity=self.identity_resolver.resolve_canonical(raw),
-                            namespace=ns,
+                            namespace=system if ns == "unknown" else ns,
                             system=system,
                             environment=env,
                             type=dataset_type,
@@ -281,6 +283,7 @@ class HydrologistAgent:
                         identity=edge.source,
                         name=os.path.basename(edge.source),
                         type="PYTHON_SCRIPT" if edge.source.endswith(".py") else "DBT_MODEL",
+                        namespace="python" if edge.source.endswith(".py") else "dbt",
                         logic_hash=edge.logic_hash or "unknown",
                         environment="production"
                     ))
@@ -292,6 +295,7 @@ class HydrologistAgent:
                         identity=edge.target,
                         name=os.path.basename(edge.target),
                         type="PYTHON_SCRIPT" if edge.target.endswith(".py") else "DBT_MODEL",
+                        namespace="python" if edge.target.endswith(".py") else "dbt",
                         logic_hash=edge.logic_hash or "unknown",
                         environment="production"
                     ))

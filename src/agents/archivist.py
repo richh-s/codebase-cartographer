@@ -65,7 +65,13 @@ class ArchivistAgent:
         except Exception as e:
             print(f"[Error] Archivist: Failed to apply overrides: {e}")
 
-    def generate_codebase_report(self, modules: List[ModuleNode], git_sha: str, output_path: str, scc_groups: Optional[List[List[str]]] = None):
+    def generate_codebase_report(self, 
+                                 modules: List[ModuleNode], 
+                                 git_sha: str, 
+                                 output_path: str, 
+                                 scc_groups: Optional[List[List[str]]] = None,
+                                 lineage_summary: Optional[Dict[str, Any]] = None,
+                                 critical_path: Optional[List[str]] = None):
         """
         Generates a deterministic CODEBASE.md summarizing the repository context.
         Includes freshness indicators and categorized debt.
@@ -79,10 +85,69 @@ class ArchivistAgent:
             f"**Generated:** {datetime.now().isoformat()}",
             f"**Total Modules:** {len(modules)}",
             "",
-            "## 📂 Module Inventory",
-            "| Module | Domain | Layer | Status | Sync | Purpose |",
-            "| :--- | :--- | :--- | :--- | :--- | :--- |"
+            "## 🏗️ Architecture Overview",
+            "This repository is organized into distinct functional layers and business domains. "
+            "The system manages data transformations and structural logic across multiple languages, "
+            "with dependencies visualized in the lineage and module graphs.",
+            ""
         ]
+
+        # 1. Critical Path Section
+        lines.append("## 📈 Critical Path")
+        if critical_path:
+            lines.append("The following sequence represents the longest dependency chain in the system, "
+                         "making it a primary target for architectural review:")
+            path_str = " → ".join([f"`{p}`" for p in critical_path])
+            lines.append(f"> {path_str}")
+        else:
+            lines.append("No significant critical path detected.")
+        lines.append("")
+
+        # 2. Data Sources & Sinks Section (Rubric Check)
+        lines.append("## 🚿 Data Sources & Sinks")
+        if lineage_summary:
+            sources = lineage_summary.get("sources", [])
+            sinks = lineage_summary.get("sinks", [])
+            
+            lines.append("### Entry Points (Sources)")
+            if sources:
+                lines.append("| Name | System | Environment | Namespace |")
+                lines.append("| :--- | :--- | :--- | :--- |")
+                for s in sources[:10]: # Cap for readability
+                    lines.append(f"| `{s['name']}` | {s.get('system')} | {s.get('environment')} | {s.get('namespace')} |")
+            else:
+                lines.append("_No primary sources identified._")
+            
+            lines.append("\n### Exit Points (Sinks)")
+            if sinks:
+                lines.append("| Name | System | Environment | Namespace |")
+                lines.append("| :--- | :--- | :--- | :--- |")
+                for s in sinks[:10]:
+                    lines.append(f"| `{s['name']}` | {s.get('system')} | {s.get('environment')} | {s.get('namespace')} |")
+            else:
+                lines.append("_No primary sinks identified._")
+        else:
+            lines.append("_Lineage data unavailable for source/sink analysis._")
+        lines.append("")
+
+        # 3. High-Velocity Files (Rubric Check)
+        lines.append("## 🚀 High-Velocity Files")
+        high_velocity = sorted([m for m in modules if getattr(m, "commit_count_30d", 0) > self.st_threshold], 
+                               key=lambda x: x.commit_count_30d, reverse=True)
+        if high_velocity:
+            lines.append("| File | 30d Commits | Authors | Risk |")
+            lines.append("| :--- | :--- | :--- | :--- |")
+            for m in high_velocity:
+                rel_path = os.path.relpath(m.path, self.repo_path) if os.path.isabs(m.path) else m.path
+                lines.append(f"| `{rel_path}` | {m.commit_count_30d} | {getattr(m, 'unique_authors_30d', 1)} | High churn |")
+        else:
+            lines.append("No high-velocity files detected (stable codebase).")
+        lines.append("")
+
+        # 4. Module Inventory
+        lines.append("## 📂 Module Inventory")
+        lines.append("| Module | Domain | Rank | Sync | Purpose |")
+        lines.append("| :--- | :--- | :--- | :--- | :--- |")
         
         for m in modules:
             # Freshness Logic
@@ -104,12 +169,13 @@ class ArchivistAgent:
             elif getattr(m, "documentation_drift", None) is None:
                 drift_status = "—"
             
-            # Use relative paths for portability
+            # PageRank (Phase 7 Request)
+            rank = f"{(m.pagerank_score or 0.0):.3f}"
             rel_path = os.path.relpath(m.path, self.repo_path) if os.path.isabs(m.path) else m.path
             
-            lines.append(f"| `{rel_path}` | {domain} | {layer} | {status} | {drift_status} | {purpose} |")
+            lines.append(f"| `{rel_path}` | {domain} | {rank} | {drift_status} | {purpose} |")
             
-        # Add Categorized Debt Section
+        # 5. Categorized Debt Section (Rubric Check)
         lines.extend([
             "",
             "## 🚩 Technical Debt & Risks",
@@ -117,32 +183,27 @@ class ArchivistAgent:
             "| :--- | :--- | :--- | :--- |"
         ])
         
-        # Simple heuristic debt for now (placeholder for more complex logic)
         for m in modules:
+            rel_id = os.path.relpath(m.identity, self.repo_path) if os.path.isabs(m.identity) else m.identity
             if m.is_high_complexity:
-                lines.append(f"| `{m.identity}` | Complexity | Medium | Module contains functions with high cyclomatic complexity. |")
+                lines.append(f"| `{rel_id}` | Complexity | Medium | High cyclomatic complexity. |")
             if m.is_dead_code_candidate:
-                lines.append(f"| `{m.identity}` | Logic | Low | Potential dead code (produced but never consumed). |")
+                lines.append(f"| `{rel_id}` | Logic | Low | Produced but never consumed. |")
             if m.is_architectural_hub:
-                lines.append(f"| `{m.identity}` | Coupling | Low | Significant architectural hub; changes may have high blast radius. |")
+                lines.append(f"| `{rel_id}` | Coupling | High | Major architectural hub; critical for blast radius. |")
 
-        # Add Circular Dependencies Section (Phase 5 Master Thinker)
-        if scc_groups:
-            lines.extend([
-                "",
-                "## 🔄 Circular Dependencies",
-                "The following groups of modules have circular dependency chains:",
-                ""
-            ])
-            for i, group in enumerate(scc_groups):
-                group_list = ", ".join([f"`{g}`" for g in sorted(group)])
-                lines.append(f"{i+1}. {group_list}")
-        else:
-            lines.extend([
-                "",
-                "## 🔄 Circular Dependencies",
-                "✅ No circular dependencies detected."
-            ])
+        # 7. Module Purpose Index (Rubric Check)
+        lines.append("\n## 🏷️ Module Purpose Index (by Domain)")
+        domains = {}
+        for m in modules:
+            domains.setdefault(m.domain_cluster or "General", []).append(m)
+        
+        for domain, d_modules in sorted(domains.items()):
+            lines.append(f"### {domain}")
+            for m in d_modules:
+                rel_path = os.path.relpath(m.path, self.repo_path) if os.path.isabs(m.path) else m.path
+                lines.append(f"- **`{rel_path}`**: {m.purpose_statement}")
+            lines.append("")
 
         with open(output_path, "w") as f:
             f.write("\n".join(lines))

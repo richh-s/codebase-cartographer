@@ -137,6 +137,8 @@ async function handleSetRepo() {
 
     state.moduleGraph = null;
     state.lineageGraph = null;
+    state.status = null;
+    $('#artifactContent').innerHTML = '<p class="placeholder-text">Select an artifact to view</p>';
     btn.disabled = false;
     initDashboard();
 }
@@ -268,17 +270,39 @@ document.getElementById('analyzeBtn').addEventListener('click', async () => {
     }).then(r => r.json()).catch(() => null);
 
     if (result?.status === 'started') {
-        status.textContent = '✅ Analysis started in background…';
-        setTimeout(() => {
-            status.textContent = '🔄 Refreshing results…';
-            state.moduleGraph = null;
-            state.lineageGraph = null;
-            initDashboard();
-            setTimeout(() => {
+        status.textContent = '✅ Analysis running in background…';
+        
+        let attempts = 0;
+        const maxAttempts = 20;
+        const initialTimestamp = state.status?.timestamp;
+
+        const poll = async () => {
+            attempts++;
+            const currentStatus = await apiFetch('/api/status');
+            
+            if (currentStatus && currentStatus.timestamp !== initialTimestamp) {
+                status.textContent = '✨ Analysis complete! Refreshing…';
+                state.moduleGraph = null;
+                state.lineageGraph = null;
+                await initDashboard();
+                if ($('#tab-artifacts.active')) {
+                    loadArtifact($('.artifact-tab.active')?.dataset.artifact || 'codebase');
+                }
+                setTimeout(() => {
+                    btn.disabled = false;
+                    status.classList.add('hidden');
+                }, 2000);
+            } else if (attempts < maxAttempts) {
+                status.textContent = `⚡ Analysis running… (Attempt ${attempts}/${maxAttempts})`;
+                setTimeout(poll, 4000);
+            } else {
+                status.textContent = '⚠️ Analysis taking longer than expected. Please check back later.';
                 btn.disabled = false;
-                status.classList.add('hidden');
-            }, 3000);
-        }, 5000);
+                initDashboard();
+            }
+        };
+
+        setTimeout(poll, 5000);
     } else {
         status.textContent = '❌ Could not start analysis.';
         btn.disabled = false;

@@ -30,7 +30,7 @@ class Orchestrator:
         self.logger = TraceLogger(self.output_dir)
         self.surveyor = SurveyorAgent(self.repo_path)
         self.hydrologist = HydrologistAgent(self.repo_path)
-        self.semanticist = SemanticistAgent()
+        self.semanticist = SemanticistAgent(logger=self.logger)
         self.archivist = ArchivistAgent(self.repo_path, logger=self.logger)
         self.semantic_index = SemanticIndex(self.repo_path)
         
@@ -253,7 +253,21 @@ class Orchestrator:
         m_graph_path = os.path.join(self.output_dir, "module_graph.json")
         l_graph_path = os.path.join(self.output_dir, "lineage_graph.json")
 
-        self.archivist.generate_codebase_report(modules, git_sha, cb_report_path, scc_groups=module_graph_builder.scc_groups)
+        # Lineage Summary for Archivist (Sources/Sinks)
+        lineage_summary = {
+            "sources": [n.model_dump() for n in lineage_graph.find_sources()],
+            "sinks": [n.model_dump() for n in lineage_graph.find_sinks()]
+        }
+        
+        # Critical Path Calculation (Longest Path in Module Graph)
+        critical_path = self._calculate_critical_path(module_graph_builder.graph)
+
+        self.archivist.generate_codebase_report(
+            modules, git_sha, cb_report_path, 
+            scc_groups=module_graph_builder.scc_groups,
+            lineage_summary=lineage_summary,
+            critical_path=critical_path
+        )
         self.generate_reconnaissance_report(modules, lineage_graph, brief_path)
         
         self.archivist.export_graph_json(module_graph_builder.export_dict(), git_sha, m_graph_path)
@@ -350,6 +364,28 @@ class Orchestrator:
             f.write(report_content)
         
         print(f"[Info] Archivist: Onboarding Brief saved to {output_path}")
+
+    def _calculate_critical_path(self, graph: Any) -> List[str]:
+        """
+        Computes the longest path in the directed acyclic graph (module graph).
+        Returns a list of module identities.
+        """
+        import networkx as nx
+        if not graph or graph.number_of_nodes() == 0:
+            return []
+            
+        # Ensure we work on the DAG (break cycles for this specific calculation)
+        dag = graph.copy()
+        cycles = list(nx.simple_cycles(dag))
+        for cycle in cycles:
+            if len(cycle) >= 2:
+                dag.remove_edge(cycle[0], cycle[1])
+        
+        try:
+            # dag_longest_path returns the identities in order
+            return nx.dag_longest_path(dag)
+        except Exception:
+            return []
 
 def analyze_repo(path: str, llm_enabled: bool = False, semantic_depth: str = "light", 
                  store_embeddings: bool = False, incremental_since: Optional[str] = None):

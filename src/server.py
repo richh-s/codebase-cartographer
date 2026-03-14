@@ -29,6 +29,14 @@ sys.path.insert(0, SRC_DIR)
 app = FastAPI(title="Codebase Cartographer API", version="1.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
+@app.middleware("http")
+async def add_no_cache_header(request, call_next):
+    response = await call_next(request)
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
 # Global repo path (set at startup)
 REPO_PATH: str = "."
 
@@ -182,7 +190,11 @@ def codebase_md(repo_path: Optional[str] = None):
     ]:
         if os.path.exists(candidate):
             with open(candidate) as f:
-                return {"content": f.read()}
+                content = f.read()
+            return JSONResponse(
+                content={"content": content, "source": candidate},
+                headers={"Cache-Control": "no-cache, no-store, must-revalidate"}
+            )
     raise HTTPException(404, "CODEBASE.md not found.")
 
 
@@ -195,7 +207,11 @@ def onboarding_brief(repo_path: Optional[str] = None):
     ]:
         if os.path.exists(candidate):
             with open(candidate) as f:
-                return {"content": f.read()}
+                content = f.read()
+            return JSONResponse(
+                content={"content": content, "source": candidate},
+                headers={"Cache-Control": "no-cache, no-store, must-revalidate"}
+            )
     raise HTTPException(404, "onboarding_brief.md not found.")
 
 

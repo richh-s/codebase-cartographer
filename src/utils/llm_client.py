@@ -40,9 +40,10 @@ class LLMClient:
     Wrapper for LLM interactions ensuring determinism, retry logic, and budget compliance.
     Supports Google Gemini and OpenAI.
     """
-    def __init__(self, api_key: Optional[str] = None, budget: Optional[ContextWindowBudget] = None):
+    def __init__(self, api_key: Optional[str] = None, budget: Optional[ContextWindowBudget] = None, logger: Optional[Any] = None):
         self.google_api_key = api_key or os.getenv("GOOGLE_API_KEY")
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
+        self.logger = logger
         
         self.provider = "heuristics"
         
@@ -73,8 +74,11 @@ class LLMClient:
             "top_p": 0.1,
         }
 
-    def _call_with_retry(self, model_name: str, prompt: str, is_json: bool = False) -> Optional[str]:
-        """Handles transient API retries and provider fallback."""
+    def _call_with_retry(self, model_tier: str, prompt: str, is_json: bool = False) -> Optional[str]:
+        """
+        Handles transient API retries and provider fallback.
+        model_tier: 'bulk' (cheap, fast) or 'synthesis' (expensive, deep)
+        """
         providers_to_try = []
         if ollama: providers_to_try.append("ollama")
         if self.google_api_key: providers_to_try.append("google")
@@ -112,6 +116,8 @@ class LLMClient:
                             )
                             if response and response.get('response'):
                                 self.budget.record_usage(len(response['response']) // 4, 0.0)
+                                if self.logger:
+                                    self.logger.log_event("LLMClient", "SEMANTIC_ENRICHMENT", "N/A", "llm_inference", 1.0, metadata={"provider": "ollama", "model": local_model, "tier": model_tier})
                                 return response['response']
                             else:
                                 print(f"[DEBUG] LLMClient: Ollama generation returned empty response. Response: {response}")
@@ -121,8 +127,8 @@ class LLMClient:
                             break # Skip to next provider
                     
                     elif current_provider == "google":
-                        # Ensure we use the model name passed or a default
-                        actual_model = "gemini-2.0-flash-lite"
+                        # model_tier: bulk (flash) vs synthesis (pro)
+                        actual_model = "gemini-1.5-flash" if model_tier == "bulk" else "gemini-1.5-pro"
                         model = genai.GenerativeModel(actual_model)
                         config = {**self.generation_config}
                         if is_json:
@@ -138,13 +144,15 @@ class LLMClient:
                             if tokens:
                                 cost = (tokens.total_token_count / 1_000_000) * 0.10
                                 self.budget.record_usage(tokens.total_token_count, cost)
+                            if self.logger:
+                                self.logger.log_event("LLMClient", "SEMANTIC_ENRICHMENT", "N/A", "llm_inference", 1.0, metadata={"provider": "google", "model": actual_model, "tier": model_tier})
                             return response.text
                     
                     elif current_provider == "openai":
                         if not hasattr(self, 'client'):
                             self.client = OpenAI(api_key=self.openai_api_key)
                         
-                        actual_model = "gpt-4o-mini"
+                        actual_model = "gpt-4o-mini" if model_tier == "bulk" else "gpt-4o"
                         kwargs = {
                             "model": actual_model,
                             "messages": [{"role": "user", "content": prompt}],
@@ -160,6 +168,8 @@ class LLMClient:
                             usage = response.usage
                             cost = (usage.total_tokens / 1_000_000) * 0.15
                             self.budget.record_usage(usage.total_tokens, cost)
+                            if self.logger:
+                                self.logger.log_event("LLMClient", "SEMANTIC_ENRICHMENT", "N/A", "llm_inference", 1.0, metadata={"provider": "openai", "model": actual_model, "tier": model_tier})
                             return response.choices[0].message.content
 
                 except Exception as e:
@@ -279,6 +289,7 @@ class LLMClient:
         """
         Processes a batch of module summaries to get business-level purpose statements.
         Cascades through: Cloud (OpenAI/Google) -> Local (Ollama) -> Heuristic.
+        Uses 'bulk' model tier for cost efficiency.
         """
         if not batched_summaries:
             return []
@@ -295,6 +306,10 @@ class LLMClient:
         Explain the BUSINESS PURPOSE of each module, not implementation details.
         Return 2-3 sentences per module.
         
+        CRITICAL: Derive the purpose from the code implementation ONLY (functions, imports, logic). 
+        Explicitly IGNORE any existing docstrings or comments that might describe the purpose, 
+        as they may be outdated or misleading.
+        
         Modules to analyze:
         {json.dumps(batched_summaries, indent=2)}
         
@@ -310,8 +325,7 @@ class LLMClient:
         }}
         """
 
-        model_name = "gemini-2.0-flash-lite" # Default used in fallback check
-        response_text = self._call_with_retry(model_name, prompt, is_json=True)
+        response_text = self._call_with_retry("bulk", prompt, is_json=True)
         
         if response_text:
             try:

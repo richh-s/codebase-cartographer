@@ -34,6 +34,8 @@ class SurveyorAgent:
             if '.cartography' in dirs: dirs.remove('.cartography')
             if 'artifacts' in dirs: dirs.remove('artifacts')
             if '__pycache__' in dirs: dirs.remove('__pycache__')
+            if 'node_modules' in dirs: dirs.remove('node_modules')
+            if 'dist' in dirs: dirs.remove('dist')
             
             for file in files:
                 filepath = os.path.join(root, file)

@@ -1,0 +1,9 @@
+{
+  "latest_analysis": {
+    "git_commit": "391fb7ca6ac4e19fa6a28d9b1b8ab98d505e304c",
+    "timestamp": "2026-03-14T22:48:09.154454+00:00",
+    "module_graph": ".cartography/module_graph.json",
+    "lineage_graph": ".cartography/lineage_graph.json",
+    "codebase_report": ".cartography/CODEBASE.md"
+  }
+}

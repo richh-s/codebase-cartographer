@@ -34,8 +34,7 @@ env/
 .idea/
 
 # Project Specific
-.cartography/*
-!.cartography/.gitkeep
+
 
 # Secrets
 .env

@@ -16,67 +16,57 @@ class SemanticistAgent:
         self.budget = self.llm.budget
         self.logger = logger
 
-    def analyze_modules(self, modules: List[ModuleNode], store_embeddings: bool = False, n_clusters: Optional[int] = None) -> List[ModuleNode]:
+    def analyze_modules(self, target_modules: List[ModuleNode], store_embeddings: bool = False, 
+                        n_clusters: Optional[int] = None, all_modules: Optional[List[ModuleNode]] = None) -> List[ModuleNode]:
         """
-        Runs the full semantic analysis pipeline for a list of modules.
+        Runs the full semantic analysis pipeline.
+        - target_modules: Modules needing new LLM purpose extraction.
+        - all_modules: Full list of modules for global clustering consistency.
         """
-        # Sort modules by path for determinism
-        modules = sorted(modules, key=lambda m: m.identity)
-        self.budget.modules_eligible = len(modules)
+        # 1. Purpose Extraction (Only for targets)
+        target_modules = sorted(target_modules, key=lambda m: m.identity)
+        self.budget.modules_eligible = len(target_modules)
         
-        # 1. Purpose Extraction (Batched)
         batch_size = 10
-        for i in range(0, len(modules), batch_size):
-            # Pre-batch budget check
-            if not self.budget.can_afford_batch(100): # Small constant for check
+        for i in range(0, len(target_modules), batch_size):
+            if not self.budget.can_afford_batch(100):
                 break
                 
-            batch = modules[i:i + batch_size]
+            batch = target_modules[i:i + batch_size]
             summaries = [build_module_summary(m) for m in batch]
-            
             purposes = self.llm.get_purpose_statements(summaries)
             
             for m, p in zip(batch, purposes):
                 m.purpose_statement = p.get("purpose_statement")
                 m.purpose_confidence = p.get("purpose_confidence", 0.7)
-                
-                if self.logger:
-                    self.logger.log_event("Semanticist", "SEMANTIC_ENRICHMENT", m.path, "llm_inference", m.purpose_confidence, metadata={"feature": "purpose_extraction"})
-                
-                # Detect Drift (if docstring and purpose exist)
                 self._detect_drift(m)
 
-        # 2. Embedding & Clustering
-        # Only cluster modules with purpose_confidence >= 0.55
-        eligible_for_clustering = [m for m in modules if m.purpose_confidence is not None and m.purpose_confidence >= 0.0]
+        # 2. Embedding & Clustering (Over ALL modules for consistency)
+        clustering_pool = all_modules if all_modules else target_modules
+        eligible_for_clustering = [m for m in clustering_pool if m.purpose_statement and (m.purpose_confidence or 0) >= 0.0]
         
-        # Default all to Unclassified if they have a purpose but low confidence
-        for m in modules:
+        # Default labels
+        for m in clustering_pool:
             if m.purpose_statement and (m.purpose_confidence or 0) < 0.55:
                 m.domain_cluster = "Unclassified"
-            elif m.purpose_statement and len(modules) < 4:
+            elif m.purpose_statement and len(clustering_pool) < 4:
                 m.domain_cluster = "Unclustered"
 
         if len(eligible_for_clustering) >= 4:
             purpose_texts = [m.purpose_statement for m in eligible_for_clustering]
             embeddings = self.llm.embed_texts(purpose_texts)
             
-            # Store embeddings if flag enabled
             if store_embeddings:
                 for m, emb in zip(eligible_for_clustering, embeddings):
                     m.semantic_embedding = emb
             
-            # Perform Clustering with optional n_clusters override
-            labels = cluster_into_domains(embeddings, len(modules), n_clusters=n_clusters)
-            
+            labels = cluster_into_domains(embeddings, len(clustering_pool), n_clusters=n_clusters)
             for m, label in zip(eligible_for_clustering, labels):
-                # Placeholder for label_domain_clusters logic
                 m.domain_cluster = f"Cluster_{label}"
             
-            # Label Clusters with LLM
             self.label_domain_clusters(eligible_for_clustering)
         
-        return modules
+        return target_modules
 
     def _detect_drift(self, module: ModuleNode):
         """Measures semantic similarity and identifies specific contradictions."""

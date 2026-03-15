@@ -541,7 +541,7 @@
     },
     {
       "architecture_layer": "meta",
-      "change_velocity_30d": 2.0,
+      "change_velocity_30d": 3.0,
       "classes": [],
       "commit_count_30d": 0,
       "complexity_score": 0.0,
@@ -558,11 +558,11 @@
       "is_informational": true,
       "is_sink_node": false,
       "language": "md",
-      "last_modified": "2026-03-15T01:09:54+03:00",
+      "last_modified": "2026-03-15T04:29:55+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-15T01:09:54+03:00"
+        "last_modified": "2026-03-15T04:29:55+03:00"
       },
       "pagerank_score": 0.0,
       "path": "FINAL_REPORT.md",
@@ -570,7 +570,7 @@
       "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 0,
-      "velocity_score": 2.0
+      "velocity_score": 3.0
     },
     {
       "architecture_layer": "meta",
@@ -1452,7 +1452,7 @@
     },
     {
       "architecture_layer": "agent",
-      "change_velocity_30d": 4.0,
+      "change_velocity_30d": 5.0,
       "classes": [
         {
           "bases": [],
@@ -1463,7 +1463,7 @@
         }
       ],
       "commit_count_30d": 0,
-      "complexity_score": 28.0,
+      "complexity_score": 27.0,
       "documentation_drift": null,
       "domain_cluster": null,
       "functions": [
@@ -1480,14 +1480,14 @@
         },
         {
           "call_count_within_repo": 0,
-          "complexity_score": 12,
+          "complexity_score": 11,
           "decorators": [],
-          "docstring_summary": "Runs the full semantic analysis pipeline for a list of modules.",
+          "docstring_summary": "Runs the full semantic analysis pipeline.\n        - target_modules: Modules needing new LLM purpose extraction.\n        - all_modules: Full list of modules for global clustering consistency.",
           "is_nested": false,
           "is_public_api": true,
           "parent_module": "src/agents/semanticist.py",
           "qualified_name": "analyze_modules",
-          "signature": "def analyze_modules(self, modules: List[ModuleNode], store_embeddings: bool = False, n_clusters: Optional[int] = None)"
+          "signature": "def analyze_modules(self, target_modules: List[ModuleNode], store_embeddings: bool = False, \n                        n_clusters: Optional[int] = None, all_modules: Optional[List[ModuleNode]] = None)"
         },
         {
           "call_count_within_repo": 0,
@@ -1562,11 +1562,11 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "py",
-      "last_modified": "2026-03-15T01:50:22+03:00",
+      "last_modified": "2026-03-15T04:29:55+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-15T01:50:22+03:00"
+        "last_modified": "2026-03-15T04:29:55+03:00"
       },
       "pagerank_score": 0.03599954928016811,
       "path": "src/agents/semanticist.py",
@@ -1574,7 +1574,7 @@
       "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 0,
-      "velocity_score": 4.0
+      "velocity_score": 5.0
     },
     {
       "architecture_layer": "agent",
@@ -3579,7 +3579,7 @@
     },
     {
       "architecture_layer": "core",
-      "change_velocity_30d": 10.0,
+      "change_velocity_30d": 11.0,
       "classes": [
         {
           "bases": [],
@@ -3787,11 +3787,11 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "py",
-      "last_modified": "2026-03-15T01:50:22+03:00",
+      "last_modified": "2026-03-15T04:29:55+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-15T01:50:22+03:00"
+        "last_modified": "2026-03-15T04:29:55+03:00"
       },
       "pagerank_score": 0.09946147887859945,
       "path": "src/orchestrator.py",
@@ -3799,7 +3799,7 @@
       "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 0,
-      "velocity_score": 10.0
+      "velocity_score": 11.0
     },
     {
       "architecture_layer": "core",

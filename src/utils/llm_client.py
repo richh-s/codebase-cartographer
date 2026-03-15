@@ -111,7 +111,9 @@ class LLMClient:
                                 format='json' if is_json else '',
                                 options={
                                     "temperature": self.generation_config["temperature"],
-                                    "top_p": self.generation_config["top_p"]
+                                    "top_p": self.generation_config["top_p"],
+                                    "num_predict": 1000, # Cap response length
+                                    "timeout": 30 # Rubric/Safety: Prevent hangs
                                 }
                             )
                             if response and response.get('response'):
@@ -211,6 +213,7 @@ class LLMClient:
                         continue
                     
                     # Newer Ollama library uses .embed(model=..., input=...)
+                    # Correct timeout usage for embeddings if applicable
                     response = ollama.embed(model=local_model, input=texts)
                     if response and response.get('embeddings'):
                         total_chars = sum(len(t) for t in texts)

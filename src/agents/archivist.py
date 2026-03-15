@@ -76,133 +76,111 @@ class ArchivistAgent:
         Generates a deterministic CODEBASE.md summarizing the repository context.
         Includes freshness indicators and categorized debt.
         """
-        # Deterministic sort
-        modules = sorted(modules, key=lambda m: (m.domain_cluster or "Unknown", m.path))
+    def generate_codebase_report(self, 
+                                 modules: List[ModuleNode], 
+                                 git_sha: str, 
+                                 output_path: str, 
+                                 scc_groups: Optional[List[List[str]]] = None,
+                                 lineage_summary: Optional[Dict[str, Any]] = None,
+                                 critical_path: Optional[List[str]] = None):
+        """
+        Generates a premium, deterministic CODEBASE.md summarizing the repository context.
+        Includes a highlighted Critical Path, Data Flow summary, and categorized risks.
+        """
+        # Deterministic sort for the inventory
+        modules_sorted = sorted(modules, key=lambda m: (m.domain_cluster or "General", m.path))
         
         lines = [
             "# 🗺️ Codebase Technical Overview",
             f"**Commit SHA:** `{git_sha}`",
-            f"**Generated:** {datetime.now().isoformat()}",
+            f"**Analysis Timestamp:** `{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}`",
             f"**Total Modules:** {len(modules)}",
             "",
-            "## 🏗️ Architecture Overview",
-            "This repository is organized into distinct functional layers and business domains. "
-            "The system manages data transformations and structural logic across multiple languages, "
-            "with dependencies visualized in the lineage and module graphs.",
+            "## 🏗️ Architecture Layer Summary",
+            "This repository is organized into functional layers that manage data flow and logic.",
             ""
         ]
 
-        # 1. Critical Path Section
-        lines.append("## 📈 Critical Path")
-        if critical_path:
-            lines.append("The following sequence represents the longest dependency chain in the system, "
-                         "making it a primary target for architectural review:")
-            path_str = " → ".join([f"`{p}`" for p in critical_path])
-            lines.append(f"> {path_str}")
-        else:
-            lines.append("No significant critical path detected.")
+        # Summary of layers
+        layer_counts = {}
+        for m in modules:
+            layer_counts[m.architecture_layer] = layer_counts.get(m.architecture_layer, 0) + 1
+        
+        lines.append("| Layer | Module Count | Description |")
+        lines.append("| :--- | :--- | :--- |")
+        for layer, count in sorted(layer_counts.items()):
+            desc = {
+                "raw": "Untransformed source data.",
+                "staging": "Basic cleaning and standardisation.",
+                "product": "Core business logic and final models.",
+                "meta": "Configuration and documentation.",
+                "utility": "Shared helper functions.",
+                "core": "Primary application logic."
+            }.get(layer, "General system component.")
+            lines.append(f"| **{layer}** | {count} | {desc} |")
         lines.append("")
 
-        # 2. Data Sources & Sinks Section (Rubric Check)
-        lines.append("## 🚿 Data Sources & Sinks")
+        # 1. Critical Path Highlight (New Visual Style)
+        lines.append("## 📈 Critical Dependency Path")
+        if critical_path:
+            lines.append("The sequence below represents the longest data transformation chain. "
+                         "Changes to these files have the highest probability of cascading impacts:")
+            lines.append("")
+            # Visual breadcrumbs
+            path_display = "  \n  └─ ".join([f"**{p}**" for p in critical_path])
+            lines.append(f"┌─ {path_display}")
+        else:
+            lines.append("> *No significant multi-stage data path detected.*")
+        lines.append("")
+
+        # 2. Key Architectural Hubs (Blast Radius Risk)
+        lines.append("## 🚩 High-Impact Modules (Architectural Hubs)")
+        hubs = sorted([m for m in modules if m.is_architectural_hub], key=lambda x: x.pagerank_score, reverse=True)[:5]
+        if hubs:
+            lines.append("The following files are central to the codebase. Modifications here require careful review.")
+            lines.append("| Hub Module | Importance | Layer | Potential Risk |")
+            lines.append("| :--- | :--- | :--- | :--- |")
+            for h in hubs:
+                lines.append(f"| `{h.identity}` | **{h.importance_score}** | {h.architecture_layer} | High Blast Radius |")
+        else:
+            lines.append("_No major architectural hubs identified._")
+        lines.append("")
+
+        # 3. Data Sources & Sinks
+        lines.append("## 🚿 Data Life Cycle")
         if lineage_summary:
             sources = lineage_summary.get("sources", [])
             sinks = lineage_summary.get("sinks", [])
+            lines.append(f"- **Primary Sources:** {len(sources)} entry points detected.")
+            lines.append(f"- **Primary Sinks:** {len(sinks)} terminal datasets detected.")
             
-            lines.append("### Entry Points (Sources)")
             if sources:
-                lines.append("| Name | System | Environment | Namespace |")
-                lines.append("| :--- | :--- | :--- | :--- |")
-                for s in sources[:10]: # Cap for readability
-                    lines.append(f"| `{s['name']}` | {s.get('system')} | {s.get('environment')} | {s.get('namespace')} |")
-            else:
-                lines.append("_No primary sources identified._")
-            
-            lines.append("\n### Exit Points (Sinks)")
+                lines.append("\n**Key Sources:** " + ", ".join([f"`{s['name']}`" for s in sources[:5]]))
             if sinks:
-                lines.append("| Name | System | Environment | Namespace |")
-                lines.append("| :--- | :--- | :--- | :--- |")
-                for s in sinks[:10]:
-                    lines.append(f"| `{s['name']}` | {s.get('system')} | {s.get('environment')} | {s.get('namespace')} |")
-            else:
-                lines.append("_No primary sinks identified._")
-        else:
-            lines.append("_Lineage data unavailable for source/sink analysis._")
+                lines.append("\n**Key Sinks:** " + ", ".join([f"`{s['name']}`" for s in sinks[:5]]))
         lines.append("")
 
-        # 3. High-Velocity Files (Rubric Check)
-        lines.append("## 🚀 High-Velocity Files")
-        high_velocity = sorted([m for m in modules if getattr(m, "commit_count_30d", 0) > self.st_threshold], 
-                               key=lambda x: x.commit_count_30d, reverse=True)
-        if high_velocity:
-            lines.append("| File | 30d Commits | Authors | Risk |")
-            lines.append("| :--- | :--- | :--- | :--- |")
-            for m in high_velocity:
-                rel_path = os.path.relpath(m.path, self.repo_path) if os.path.isabs(m.path) else m.path
-                lines.append(f"| `{rel_path}` | {m.commit_count_30d} | {getattr(m, 'unique_authors_30d', 1)} | High churn |")
-        else:
-            lines.append("No high-velocity files detected (stable codebase).")
-        lines.append("")
-
-        # 4. Module Inventory
+        # 4. Detailed Module Inventory
         lines.append("## 📂 Module Inventory")
-        lines.append("| Module | Domain | Rank | Sync | Purpose |")
-        lines.append("| :--- | :--- | :--- | :--- | :--- |")
+        lines.append("| Module | Layer | Importance | Purpose |")
+        lines.append("| :--- | :--- | :--- | :--- |")
         
-        for m in modules:
-            # Freshness Logic
-            # Note: commit_count_30d would ideally be passed in or stored on ModuleNode
-            # For now, we assume it's attached via metadata or available in context
-            commit_count = getattr(m, "commit_count_30d", 0)
-            status = "✅ Stable"
-            if commit_count > self.st_threshold:
-                status = "⚠️ Potentially Stale"
+        for m in modules_sorted:
+            purpose = (m.purpose_statement or "No purpose statement generated.").split('.')[0] + "." # First sentence
+            lines.append(f"| `{m.path}` | {m.architecture_layer} | {m.importance_score} | {purpose} |")
             
-            purpose = (m.purpose_statement or "No purpose statement generated.").replace("\n", " ")
-            domain = m.domain_cluster or "General"
-            layer = m.architecture_layer or "Unknown"
-            
-            # Drift Status (Phase 5 Master Thinker)
-            drift_status = "✅"
-            if getattr(m, "documentation_drift", False):
-                drift_status = "⚠️ Drift"
-            elif getattr(m, "documentation_drift", None) is None:
-                drift_status = "—"
-            
-            # PageRank (Phase 7 Request)
-            rank = f"{(m.pagerank_score or 0.0):.3f}"
-            rel_path = os.path.relpath(m.path, self.repo_path) if os.path.isabs(m.path) else m.path
-            
-            lines.append(f"| `{rel_path}` | {domain} | {rank} | {drift_status} | {purpose} |")
-            
-        # 5. Categorized Debt Section (Rubric Check)
-        lines.extend([
-            "",
-            "## 🚩 Technical Debt & Risks",
-            "| Area | Debt Type | Severity | Description |",
-            "| :--- | :--- | :--- | :--- |"
-        ])
-        
-        for m in modules:
-            rel_id = os.path.relpath(m.identity, self.repo_path) if os.path.isabs(m.identity) else m.identity
-            if m.is_high_complexity:
-                lines.append(f"| `{rel_id}` | Complexity | Medium | High cyclomatic complexity. |")
-            if m.is_dead_code_candidate:
-                lines.append(f"| `{rel_id}` | Logic | Low | Produced but never consumed. |")
-            if m.is_architectural_hub:
-                lines.append(f"| `{rel_id}` | Coupling | High | Major architectural hub; critical for blast radius. |")
-
-        # 7. Module Purpose Index (Rubric Check)
-        lines.append("\n## 🏷️ Module Purpose Index (by Domain)")
+        # 5. Domain Decomposition
+        lines.append("\n## 🏷️ Business Domain Map")
         domains = {}
         for m in modules:
             domains.setdefault(m.domain_cluster or "General", []).append(m)
         
         for domain, d_modules in sorted(domains.items()):
             lines.append(f"### {domain}")
+            item_lines = []
             for m in d_modules:
-                rel_path = os.path.relpath(m.path, self.repo_path) if os.path.isabs(m.path) else m.path
-                lines.append(f"- **`{rel_path}`**: {m.purpose_statement}")
+                item_lines.append(f"- **`{m.path}`**: {m.purpose_statement}")
+            lines.extend(item_lines)
             lines.append("")
 
         with open(output_path, "w") as f:

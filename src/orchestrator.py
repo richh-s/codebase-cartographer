@@ -223,16 +223,16 @@ class Orchestrator:
             re_analyze_targets = [m for m in modules if m.identity in blast_radius]
             if re_analyze_targets:
                 print(f"[Info] Incremental: Re-analyzing {len(re_analyze_targets)} modules (LLM/Drift/Missing)")
-                self.semanticist.analyze_modules(re_analyze_targets, store_embeddings=store_embeddings)
+                self.semanticist.analyze_modules(re_analyze_targets, store_embeddings=store_embeddings, all_modules=modules)
                 
                 # RE-UPDATE: Ensure the internal GraphBuilder nodes reflect Pydantic updates
-                # This ensures any changes to purpose_statement/domain_cluster are persisted
                 for m in re_analyze_targets:
                     if m.identity in module_graph_builder.nodes:
-                        # Update the graph node attributes as well
                         module_graph_builder.graph.nodes[m.identity].update(m.model_dump())
             else:
-                print("[Info] Incremental: No modules required re-analysis.")
+                print("[Info] Incremental: No modules required re-analysis, but refreshing global clusters...")
+                # Still perform clustering on the full set to ensure persistence
+                self.semanticist.analyze_modules([], store_embeddings=store_embeddings, all_modules=modules)
         
         # 4. Archivist Enrichment
         print("[4/4] Archivist: Consolidating and Exporting Artifacts...")

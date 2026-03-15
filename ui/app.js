@@ -273,15 +273,21 @@ document.getElementById('analyzeBtn').addEventListener('click', async () => {
         status.textContent = '✅ Analysis running in background…';
         
         let attempts = 0;
-        const maxAttempts = 20;
+        const maxAttempts = 100; // Increased to ~7 minutes for slow local LLMs
         const initialTimestamp = state.status?.timestamp;
 
         const poll = async () => {
             attempts++;
             const currentStatus = await apiFetch('/api/status');
             
-            if (currentStatus && currentStatus.timestamp !== initialTimestamp) {
-                status.textContent = '✨ Analysis complete! Refreshing…';
+            // Fix: Only consider finished if a REAL timestamp is returned AND it is different from initial
+            // This prevents "N/A" !== undefined causing a false completion.
+            const hasNewAnalysis = currentStatus && 
+                                 currentStatus.timestamp !== 'N/A' && 
+                                 currentStatus.timestamp !== initialTimestamp;
+
+            if (hasNewAnalysis) {
+                status.textContent = '✨ Analysis complete! Refreshing dashboard…';
                 state.moduleGraph = null;
                 state.lineageGraph = null;
                 await initDashboard();
@@ -296,7 +302,7 @@ document.getElementById('analyzeBtn').addEventListener('click', async () => {
                 status.textContent = `⚡ Analysis running… (Attempt ${attempts}/${maxAttempts})`;
                 setTimeout(poll, 4000);
             } else {
-                status.textContent = '⚠️ Analysis taking longer than expected. Please check back later.';
+                status.textContent = 'ℹ️ Analysis is heavily processing or using a local LLM. It is still running in the background. Please refresh the dashboard in a few minutes.';
                 btn.disabled = false;
                 initDashboard();
             }
@@ -531,7 +537,8 @@ function renderModuleGraph(graph) {
         <strong>${d.identity}</strong><br/>
         <span style="color:#94afd4">${d.path}</span><br/>
         Language: <b>${d.language || '?'}</b> | Layer: ${d.architecture_layer || '—'}<br/>
-        Complexity: ${(d.complexity_score || 0).toFixed(1)} &nbsp;|&nbsp; PageRank: ${(d.pagerank_score || 0).toFixed(3)}
+        Importance: <b>${d.importance_score || 1}</b> &nbsp;|&nbsp; Complexity: ${(d.complexity_score || 0).toFixed(1)}<br/>
+        PageRank: ${(d.pagerank_score || 0).toFixed(3)}
         ${d.purpose_statement ? `<br/><em style="color:#94afd4;font-size:11px">${d.purpose_statement.substring(0, 90)}…</em>` : ''}
     `;
     const clickFn = d => showModuleDetail(d);
@@ -553,6 +560,7 @@ function showModuleDetail(d) {
     <div class="detail-row"><span class="detail-key">Domain</span><span class="detail-val">${d.domain_cluster || '—'}</span></div>
     <div class="detail-row"><span class="detail-key">Complexity</span><span class="detail-val">${(d.complexity_score || 0).toFixed(1)}</span></div>
     <div class="detail-row"><span class="detail-key">Velocity</span><span class="detail-val">${(d.change_velocity_30d || 0).toFixed(1)}/mo</span></div>
+    <div class="detail-row"><span class="detail-key">Importance</span><span class="detail-val" style="color:var(--purple);font-weight:600">${d.importance_score || 1}</span></div>
     <div class="detail-row"><span class="detail-key">PageRank</span><span class="detail-val">${(d.pagerank_score || 0).toFixed(4)}</span></div>
     <div class="detail-row"><span class="detail-key">Arch Hub</span><span class="detail-val">${d.is_architectural_hub ? '✅ Yes' : 'No'}</span></div>
     <div class="detail-row"><span class="detail-key">Dead Code</span><span class="detail-val">${d.is_dead_code_candidate ? '☠️ Yes' : 'No'}</span></div>
@@ -672,6 +680,7 @@ function showLineageDetail(d) {
     <div class="detail-row"><span class="detail-key">Format</span><span class="detail-val">${d.format || '—'}</span></div>
     <div class="detail-row"><span class="detail-key">Environment</span><span class="detail-val">${d.environment || '—'}</span></div>
     <div class="detail-row"><span class="detail-key">Confidence</span><span class="detail-val">${(d.dataset_type_confidence || 1).toFixed(2)}</span></div>
+    <div class="detail-row"><span class="detail-key">Importance</span><span class="detail-val" style="color:var(--purple);font-weight:600">${d.importance_score || '—'}</span></div>
     ${d.purpose_statement ? `<div class="detail-purpose">${d.purpose_statement}</div>` : ''}
   `;
 }

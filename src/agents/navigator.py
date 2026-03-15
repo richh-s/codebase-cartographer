@@ -401,7 +401,7 @@ Provide:
 Format as JSON:
 {{"purpose": "...", "responsibilities": ["...", "..."], "critical_deps": ["..."], "elevator_pitch": "..."}}"""
 
-                response = self.llm._call_with_retry("gemini-1.5-flash", prompt, is_json=True)
+                response = self.llm._call_with_retry("synthesis", prompt, is_json=True)
                 if response:
                     if "```json" in response:
                         response = response.split("```json")[1].split("```")[0].strip()
@@ -487,7 +487,7 @@ Question: "{question}"
 Return JSON only:
 {{"tool": "<tool_name>", "parameter": "<extracted value>", "direction": "upstream|downstream (only for trace_lineage)"}}"""
 
-        response = self.llm._call_with_retry("gemini-1.5-flash", prompt, is_json=True)
+        response = self.llm._call_with_retry("bulk", prompt, is_json=True)
         try:
             if response and "```json" in response:
                 response = response.split("```json")[1].split("```")[0].strip()

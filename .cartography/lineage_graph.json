@@ -160,9 +160,9 @@
         "schema_": null,
         "system": "warehouse",
         "table": "__dbt_source_internal_raw_orders__",
-        "timestamp": "2026-03-15 04:10:18.381003",
+        "timestamp": "2026-03-15 05:33:15.628523",
         "type": "database_table",
-        "version": "git:589927b"
+        "version": "git:f445ffe"
       },
       {
         "canonical_identity": "process_orders",
@@ -187,9 +187,9 @@
         "schema_": null,
         "system": "unknown",
         "table": "process_orders",
-        "timestamp": "2026-03-15 04:10:18.381492",
+        "timestamp": "2026-03-15 05:33:15.628742",
         "type": "database_table",
-        "version": "git:589927b"
+        "version": "git:f445ffe"
       },
       {
         "canonical_identity": "processed_orders",
@@ -214,9 +214,9 @@
         "schema_": null,
         "system": "s3",
         "table": "processed_orders",
-        "timestamp": "2026-03-15 04:10:18.381459",
+        "timestamp": "2026-03-15 05:33:15.628714",
         "type": "object_storage",
-        "version": "git:589927b"
+        "version": "git:f445ffe"
       },
       {
         "canonical_identity": "stg_orders",
@@ -250,9 +250,9 @@
         "schema_": null,
         "system": "dbt",
         "table": "stg_orders",
-        "timestamp": "2026-03-15 04:10:18.381335",
+        "timestamp": "2026-03-15 05:33:15.628624",
         "type": "database_table",
-        "version": "git:589927b"
+        "version": "git:f445ffe"
       },
       {
         "canonical_identity": "task_a",
@@ -277,9 +277,9 @@
         "schema_": null,
         "system": "unknown",
         "table": "task_a",
-        "timestamp": "2026-03-15 04:10:18.381561",
+        "timestamp": "2026-03-15 05:33:15.628816",
         "type": "database_table",
-        "version": "git:589927b"
+        "version": "git:f445ffe"
       },
       {
         "canonical_identity": "task_b",
@@ -304,9 +304,9 @@
         "schema_": null,
         "system": "unknown",
         "table": "task_b",
-        "timestamp": "2026-03-15 04:10:18.381575",
+        "timestamp": "2026-03-15 05:33:15.628829",
         "type": "database_table",
-        "version": "git:589927b"
+        "version": "git:f445ffe"
       },
       {
         "canonical_identity": "utf-8",
@@ -331,9 +331,9 @@
         "schema_": null,
         "system": "unknown",
         "table": "utf-8",
-        "timestamp": "2026-03-15 04:10:18.381533",
+        "timestamp": "2026-03-15 05:33:15.628784",
         "type": "database_table",
-        "version": "git:589927b"
+        "version": "git:f445ffe"
       }
     ],
     "transformations": [
@@ -410,7 +410,7 @@
       }
     ]
   },
-  "timestamp": "2026-03-15T04:10:18.382335",
-  "version": "git:589927b",
+  "timestamp": "2026-03-15T05:33:15.629936",
+  "version": "git:f445ffe",
   "warnings": []
 }

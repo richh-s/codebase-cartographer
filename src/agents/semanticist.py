@@ -182,18 +182,22 @@ class SemanticistAgent:
         Answer the following FDE (Five Data Engineer) Questions based ONLY on the provided evidence.
         
         Questions:
-        1. What business capability does this system provide?
-        2. Where is the 'Source of Truth' and which systems are the sinks?
-        3. What are the key data transformation layers?
-        4. What is the overall architectural health (debt, complexity)?
-        5. What is the 'Blast Radius' of a change to core schemas?
+        ### 1. What is the primary data ingestion path? (Identify entry points)
+        ### 2. What are the 3-5 most critical output datasets/endpoints? (Identify sink nodes)
+        ### 3. What is the blast radius if the most critical module fails? (Quantify downstream impact)
+        ### 4. Where is the business logic concentrated vs. distributed? (Map architectural hubs)
+        ### 5. What has changed most frequently in the last 90 days? (Identify high-velocity pain points)
         
-        CRITICAL: Provide concrete business-level evidence for every claim. Every observation MUST have a citation in [file_path:line_number] format. Focus on 'Master Thinker' level insights: identifying the actual business value, identifying the true structural source of truth vs. derivative sinks, and quantifying the actual blast radius of changes. Responses failing to cite multiple lines for major logic centers will be rejected.
+        INSTRUCTIONS:
+        - You MUST use the exact headers provided above.
+        - Under each header, provide a technical answer based on the evidence.
+        - You MUST cite specific modules and line numbers (e.g., [src/main.py:10]).
+        - If evidence is missing for a question, state "Insufficient direct evidence; inferring from structural hubs...".
         
-        Evidence:
-        {json.dumps(evidence_packets, indent=2)}
+        Evidence (Modules & Purposes):
+        {json.dumps(evidence_packets[:20], indent=2)}
         
-        Graph Context (Summary of counts and nodes):
+        Graph Metrics:
         {json.dumps(graph_context, indent=2)}
         """
         

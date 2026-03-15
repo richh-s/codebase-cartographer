@@ -30,7 +30,6 @@ ENV/
 env/
 
 # IDEs
-.vscode/
 .idea/
 
 # Project Specific
@@ -40,3 +39,7 @@ env/
 .env
 .env.*
 !.env.example
+temp_auto_push.bat
+temp_interactive_push.bat
+.gitignore
+branch_structure.json

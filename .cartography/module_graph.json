@@ -1,5 +1,4 @@
 {
-  "analysis_version": "cartographer_phase4",
   "edges": [
     {
       "source": "src/agents/archivist.py",
@@ -272,7 +271,6 @@
       "type": "python_import"
     }
   ],
-  "git_commit": "a94f183c107926dd1c4accba6f8c8d2eef11c37e",
   "metadata": {
     "total_files": 71
   },
@@ -281,10 +279,10 @@
       "architecture_layer": "unknown",
       "change_velocity_30d": 1.0,
       "classes": [],
-      "commit_count_30d": 2,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "ProjectConfigurationTools",
+      "domain_cluster": null,
       "functions": [],
       "identity": ".env",
       "importance_score": 1,
@@ -304,20 +302,20 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": ".env",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "Stores environment variables for the project.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 1.0
     },
     {
       "architecture_layer": "unknown",
       "change_velocity_30d": 1.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "ProjectConfigurationTools",
+      "domain_cluster": null,
       "functions": [],
       "identity": ".env.example",
       "importance_score": 1,
@@ -337,20 +335,20 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": ".env.example",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "Serves as an example configuration file for .env.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 1.0
     },
     {
       "architecture_layer": "meta",
       "change_velocity_30d": 3.0,
       "classes": [],
-      "commit_count_30d": 3,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "ProjectConfigurationTools",
+      "domain_cluster": null,
       "functions": [],
       "identity": ".gitignore",
       "importance_score": 1,
@@ -370,10 +368,10 @@
       },
       "pagerank_score": 0.0,
       "path": ".gitignore",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "Defines files and directories to ignore during version control operations.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 3.0
     },
     {
@@ -383,7 +381,7 @@
       "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "TestAutomationTools",
+      "domain_cluster": null,
       "functions": [],
       "identity": ".pytest_cache/.gitignore",
       "importance_score": 1,
@@ -403,8 +401,8 @@
       },
       "pagerank_score": 0.0,
       "path": ".pytest_cache/.gitignore",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "Defines files and directories to ignore within the pytest cache directory structure.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 0,
       "velocity_score": 0.0
@@ -416,7 +414,7 @@
       "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "TestAutomationTools",
+      "domain_cluster": null,
       "functions": [],
       "identity": ".pytest_cache/CACHEDIR.TAG",
       "importance_score": 1,
@@ -436,8 +434,8 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": ".pytest_cache/CACHEDIR.TAG",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "Specifies the naming convention for cache directories in the pytest cache.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 0,
       "velocity_score": 0.0
@@ -449,7 +447,7 @@
       "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeBaseOrchestrator",
+      "domain_cluster": null,
       "functions": [],
       "identity": ".pytest_cache/README.md",
       "importance_score": 1,
@@ -469,8 +467,8 @@
       },
       "pagerank_score": 0.0,
       "path": ".pytest_cache/README.md",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "Provides documentation and guidelines for using the pytest cache directory structure.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 0,
       "velocity_score": 0.0
@@ -482,7 +480,7 @@
       "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "ProjectConfigurationTools",
+      "domain_cluster": null,
       "functions": [],
       "identity": ".pytest_cache/v/cache/lastfailed",
       "importance_score": 1,
@@ -502,8 +500,8 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": ".pytest_cache/v/cache/lastfailed",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "Stores information about failed tests in the pytest cache.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 0,
       "velocity_score": 0.0
@@ -515,7 +513,7 @@
       "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "ProjectConfigurationTools",
+      "domain_cluster": null,
       "functions": [],
       "identity": ".pytest_cache/v/cache/nodeids",
       "importance_score": 1,
@@ -535,8 +533,8 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": ".pytest_cache/v/cache/nodeids",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "Keeps track of test node IDs for pytest caching and reporting.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 0,
       "velocity_score": 0.0
@@ -545,10 +543,10 @@
       "architecture_layer": "meta",
       "change_velocity_30d": 2.0,
       "classes": [],
-      "commit_count_30d": 2,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "ProjectInsight",
+      "domain_cluster": null,
       "functions": [],
       "identity": "FINAL_REPORT.md",
       "importance_score": 1,
@@ -568,20 +566,20 @@
       },
       "pagerank_score": 0.0,
       "path": "FINAL_REPORT.md",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "Contains the final report generated by a testing or deployment process.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 2.0
     },
     {
       "architecture_layer": "meta",
       "change_velocity_30d": 4.0,
       "classes": [],
-      "commit_count_30d": 4,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "ProjectInsight",
+      "domain_cluster": null,
       "functions": [],
       "identity": "README.md",
       "importance_score": 1,
@@ -601,20 +599,20 @@
       },
       "pagerank_score": 0.0,
       "path": "README.md",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "Provides an overview and instructions for using the project's files and directories.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 4.0
     },
     {
       "architecture_layer": "meta",
       "change_velocity_30d": 3.0,
       "classes": [],
-      "commit_count_30d": 3,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "ProjectInsight",
+      "domain_cluster": null,
       "functions": [],
       "identity": "RECONNAISSANCE.md",
       "importance_score": 1,
@@ -634,20 +632,20 @@
       },
       "pagerank_score": 0.0,
       "path": "RECONNAISSANCE.md",
-      "purpose_confidence": 0.1,
-      "purpose_statement": "Documentation: Provides high-level project information, instructions, or architectural context.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 3.0
     },
     {
       "architecture_layer": "core",
       "change_velocity_30d": 1.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeBaseOrchestrator",
+      "domain_cluster": null,
       "functions": [],
       "identity": "fix_pagerank.py",
       "importance_score": 1,
@@ -672,20 +670,20 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "fix_pagerank.py",
-      "purpose_confidence": 0.8,
-      "purpose_statement": "The module 'fix_pagerank.py' is likely used to fix or improve the PageRank algorithm, possibly by handling data preprocessing or fixing issues in existing pagerank calculations.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 1.0
     },
     {
       "architecture_layer": "core",
       "change_velocity_30d": 1.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeBaseOrchestrator",
+      "domain_cluster": null,
       "functions": [],
       "identity": "mock_project/dag.py",
       "importance_score": 1,
@@ -710,20 +708,20 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "mock_project/dag.py",
-      "purpose_confidence": 0.7,
-      "purpose_statement": "The module 'dag.py' is part of a DAG (Directed Acyclic Graph) structure, which suggests it might be used for orchestrating tasks or workflows within an Airflow environment.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 1.0
     },
     {
       "architecture_layer": "tooling",
       "change_velocity_30d": 1.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeBaseOrchestrator",
+      "domain_cluster": null,
       "functions": [],
       "identity": "mock_project/models/schema.yml",
       "importance_score": 1,
@@ -743,20 +741,20 @@
       },
       "pagerank_score": 0.0,
       "path": "mock_project/models/schema.yml",
-      "purpose_confidence": 0.6,
-      "purpose_statement": "The 'schema.yml' file likely defines the schema for data models, specifying how data should be structured and stored in the database or other storage systems.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 1.0
     },
     {
       "architecture_layer": "model",
       "change_velocity_30d": 1.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 1.0,
       "documentation_drift": null,
-      "domain_cluster": "DataIntegrationAndAnalysis",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -793,20 +791,20 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "mock_project/models/stg_orders.sql",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 1 functions and imports 1 dependencies. Key features likely include stg_orders.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 1.0
     },
     {
       "architecture_layer": "core",
       "change_velocity_30d": 1.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeInsight",
+      "domain_cluster": null,
       "functions": [],
       "identity": "mock_project/process_orders.py",
       "importance_score": 1,
@@ -826,20 +824,20 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "mock_project/process_orders.py",
-      "purpose_confidence": 0.1,
-      "purpose_statement": "Unknown purpose (Fallback enabled)",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 1.0
     },
     {
       "architecture_layer": "tooling",
       "change_velocity_30d": 3.0,
       "classes": [],
-      "commit_count_30d": 5,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeInsight",
+      "domain_cluster": null,
       "functions": [],
       "identity": "pyproject.toml",
       "importance_score": 1,
@@ -859,20 +857,20 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "pyproject.toml",
-      "purpose_confidence": 0.1,
-      "purpose_statement": "Configuration file: Defines project settings, dependencies, or environment-specific parameters.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 3.0
     },
     {
       "architecture_layer": "meta",
-      "change_velocity_30d": 6.0,
+      "change_velocity_30d": 7.0,
       "classes": [],
-      "commit_count_30d": 6,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "ResourceRepository",
+      "domain_cluster": null,
       "functions": [],
       "identity": "semantic_index/index.json",
       "importance_score": 1,
@@ -884,28 +882,28 @@
       "is_informational": true,
       "is_sink_node": false,
       "language": "json",
-      "last_modified": "2026-03-15T01:50:22+03:00",
+      "last_modified": "2026-03-15T02:30:16+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-15T01:50:22+03:00"
+        "last_modified": "2026-03-15T02:30:16+03:00"
       },
       "pagerank_score": 0.0,
       "path": "semantic_index/index.json",
-      "purpose_confidence": 0.1,
-      "purpose_statement": "Data/Static resource: Stores structured data or plain text used by the system.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
-      "velocity_score": 6.0
+      "unique_authors_30d": 0,
+      "velocity_score": 7.0
     },
     {
       "architecture_layer": "agent",
       "change_velocity_30d": 0.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeInsight",
+      "domain_cluster": null,
       "functions": [],
       "identity": "src/agents/__init__.py",
       "importance_score": 1,
@@ -925,10 +923,10 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "src/agents/__init__.py",
-      "purpose_confidence": 0.1,
-      "purpose_statement": "Package initialization: Defines the module structure and exposes public interfaces for this directory.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 0.0
     },
     {
@@ -943,10 +941,10 @@
           "parent_module": "src/agents/archivist.py"
         }
       ],
-      "commit_count_30d": 7,
+      "commit_count_30d": 0,
       "complexity_score": 32.0,
       "documentation_drift": null,
-      "domain_cluster": "DataScienceTools",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -1036,15 +1034,15 @@
       },
       "pagerank_score": 0.011499085578523813,
       "path": "src/agents/archivist.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 4 functions and imports 6 dependencies. Key features likely include __init__, apply_overrides.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 6.0
     },
     {
       "architecture_layer": "agent",
-      "change_velocity_30d": 3.0,
+      "change_velocity_30d": 4.0,
       "classes": [
         {
           "bases": [],
@@ -1054,10 +1052,10 @@
           "parent_module": "src/agents/hydrologist.py"
         }
       ],
-      "commit_count_30d": 4,
+      "commit_count_30d": 0,
       "complexity_score": 72.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeInsight",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -1193,19 +1191,19 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "py",
-      "last_modified": "2026-03-15T01:05:50+03:00",
+      "last_modified": "2026-03-15T02:27:08+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-15T01:05:50+03:00"
+        "last_modified": "2026-03-15T02:27:08+03:00"
       },
       "pagerank_score": 0.06580417171176843,
       "path": "src/agents/hydrologist.py",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "Analyzes and provides dynamic confidence for hydrological data processing pipelines.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
-      "velocity_score": 3.0
+      "unique_authors_30d": 0,
+      "velocity_score": 4.0
     },
     {
       "architecture_layer": "agent",
@@ -1235,10 +1233,10 @@
           "parent_module": "src/agents/navigator.py"
         }
       ],
-      "commit_count_30d": 4,
+      "commit_count_30d": 0,
       "complexity_score": 75.0,
-      "documentation_drift": true,
-      "domain_cluster": "CodeInsight",
+      "documentation_drift": null,
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -1441,17 +1439,15 @@
       "last_modified": "2026-03-15T01:05:50+03:00",
       "metadata": {
         "author_breadth": 1,
-        "drift_contradiction": "The docstring describes a tool-loop agent that provides four query tools for interrogating the codebase knowledge graph with natural language and structured queries, while the actual purpose states that it provides tools to query the codebase knowledge graph using natural language or structured queries. The difference in scope (tool-loop vs. just querying) indicates a significant drift.",
-        "drift_severity": "high",
         "last_author": "richh-s",
         "last_modified": "2026-03-15T01:05:50+03:00"
       },
       "pagerank_score": 0.01628506795894707,
       "path": "src/agents/navigator.py",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "Provides tools to query the codebase knowledge graph using natural language or structured queries, tracing lineage and dependencies.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 4.0
     },
     {
@@ -1466,10 +1462,10 @@
           "parent_module": "src/agents/semanticist.py"
         }
       ],
-      "commit_count_30d": 6,
+      "commit_count_30d": 0,
       "complexity_score": 28.0,
       "documentation_drift": null,
-      "domain_cluster": "DataScienceTools",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -1574,10 +1570,10 @@
       },
       "pagerank_score": 0.03599954928016811,
       "path": "src/agents/semanticist.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 5 functions and imports 7 dependencies. Key features likely include __init__, analyze_modules.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 4.0
     },
     {
@@ -1592,10 +1588,10 @@
           "parent_module": "src/agents/surveyor.py"
         }
       ],
-      "commit_count_30d": 7,
+      "commit_count_30d": 0,
       "complexity_score": 32.0,
       "documentation_drift": null,
-      "domain_cluster": "ProjectInsight",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -1678,20 +1674,20 @@
       },
       "pagerank_score": 0.03499629146212586,
       "path": "src/agents/surveyor.py",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "Analyzes and summarizes module structures within a project for better understanding and management.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 4.0
     },
     {
       "architecture_layer": "analyzer",
       "change_velocity_30d": 0.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeInsight",
+      "domain_cluster": null,
       "functions": [],
       "identity": "src/analyzers/__init__.py",
       "importance_score": 1,
@@ -1711,10 +1707,10 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "src/analyzers/__init__.py",
-      "purpose_confidence": 0.1,
-      "purpose_statement": "Package initialization: Defines the module structure and exposes public interfaces for this directory.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 0.0
     },
     {
@@ -1738,10 +1734,10 @@
           "parent_module": "src/analyzers/dag_config_parser.py"
         }
       ],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 7.0,
       "documentation_drift": null,
-      "domain_cluster": "DataIntegrationAndAnalysis",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -1826,20 +1822,20 @@
       },
       "pagerank_score": 0.011376368081589884,
       "path": "src/analyzers/dag_config_parser.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 5 functions and imports 2 dependencies. Key features likely include can_handle, parse.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 0.0
     },
     {
       "architecture_layer": "analyzer",
       "change_velocity_30d": 0.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeInsight",
+      "domain_cluster": null,
       "functions": [],
       "identity": "src/analyzers/dag_parsers/__init__.py",
       "importance_score": 1,
@@ -1859,10 +1855,10 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "src/analyzers/dag_parsers/__init__.py",
-      "purpose_confidence": 0.1,
-      "purpose_statement": "Package initialization: Defines the module structure and exposes public interfaces for this directory.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 0.0
     },
     {
@@ -1884,10 +1880,10 @@
           "parent_module": "src/analyzers/dag_parsers/plugins.py"
         }
       ],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 14.0,
       "documentation_drift": null,
-      "domain_cluster": "DataIntegrationAndAnalysis",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -1969,10 +1965,10 @@
       },
       "pagerank_score": 0.011376368081589884,
       "path": "src/analyzers/dag_parsers/plugins.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 4 functions and imports 4 dependencies. Key features likely include can_handle, parse.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 0.0
     },
     {
@@ -1987,10 +1983,10 @@
           "parent_module": "src/analyzers/python_dataflow_analyzer.py"
         }
       ],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 72.0,
       "documentation_drift": null,
-      "domain_cluster": "DataScienceTools",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -2128,10 +2124,10 @@
       },
       "pagerank_score": 0.016263550116376254,
       "path": "src/analyzers/python_dataflow_analyzer.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 8 functions and imports 7 dependencies. Key features likely include __init__, _generate_logic_hash.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 0.0
     },
     {
@@ -2146,10 +2142,10 @@
           "parent_module": "src/analyzers/sql_lineage.py"
         }
       ],
-      "commit_count_30d": 4,
+      "commit_count_30d": 0,
       "complexity_score": 145.0,
       "documentation_drift": null,
-      "domain_cluster": "DataScienceTools",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -2299,10 +2295,10 @@
       },
       "pagerank_score": 0.011376368081589884,
       "path": "src/analyzers/sql_lineage.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 8 functions and imports 10 dependencies. Key features likely include __init__, _generate_logic_hash.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 2.0
     },
     {
@@ -2324,10 +2320,10 @@
           "parent_module": "src/analyzers/tree_sitter_analyzer.py"
         }
       ],
-      "commit_count_30d": 3,
+      "commit_count_30d": 0,
       "complexity_score": 82.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeInsight",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -2541,20 +2537,20 @@
       },
       "pagerank_score": 0.011499085578523813,
       "path": "src/analyzers/tree_sitter_analyzer.py",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "This module analyzes code written in different languages (Python, JavaScript, YAML, SQL) using the Tree-Sitter parser.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 2.0
     },
     {
       "architecture_layer": "core",
       "change_velocity_30d": 4.0,
       "classes": [],
-      "commit_count_30d": 5,
+      "commit_count_30d": 0,
       "complexity_score": 27.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeBaseOrchestrator",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -2731,10 +2727,10 @@
       },
       "pagerank_score": 0.06641432613798243,
       "path": "src/cli.py",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "This module provides command-line interface functionalities for orchestrating and managing various codebase operations such as analysis, lineage tracking, impact assessment, and serving API endpoints.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 4.0
     },
     {
@@ -2744,7 +2740,7 @@
       "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeInsight",
+      "domain_cluster": null,
       "functions": [],
       "identity": "src/codebase_cartographer.egg-info/PKG-INFO",
       "importance_score": 1,
@@ -2764,8 +2760,8 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "src/codebase_cartographer.egg-info/PKG-INFO",
-      "purpose_confidence": 0.1,
-      "purpose_statement": "Unknown purpose (Fallback enabled)",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 0,
       "velocity_score": 0.0
@@ -2777,7 +2773,7 @@
       "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "ResourceRepository",
+      "domain_cluster": null,
       "functions": [],
       "identity": "src/codebase_cartographer.egg-info/SOURCES.txt",
       "importance_score": 1,
@@ -2797,8 +2793,8 @@
       },
       "pagerank_score": 0.0,
       "path": "src/codebase_cartographer.egg-info/SOURCES.txt",
-      "purpose_confidence": 0.1,
-      "purpose_statement": "Data/Static resource: Stores structured data or plain text used by the system.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 0,
       "velocity_score": 0.0
@@ -2810,7 +2806,7 @@
       "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "ResourceRepository",
+      "domain_cluster": null,
       "functions": [],
       "identity": "src/codebase_cartographer.egg-info/dependency_links.txt",
       "importance_score": 1,
@@ -2830,8 +2826,8 @@
       },
       "pagerank_score": 0.0,
       "path": "src/codebase_cartographer.egg-info/dependency_links.txt",
-      "purpose_confidence": 0.1,
-      "purpose_statement": "Data/Static resource: Stores structured data or plain text used by the system.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 0,
       "velocity_score": 0.0
@@ -2843,7 +2839,7 @@
       "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "ResourceRepository",
+      "domain_cluster": null,
       "functions": [],
       "identity": "src/codebase_cartographer.egg-info/entry_points.txt",
       "importance_score": 1,
@@ -2863,8 +2859,8 @@
       },
       "pagerank_score": 0.0,
       "path": "src/codebase_cartographer.egg-info/entry_points.txt",
-      "purpose_confidence": 0.1,
-      "purpose_statement": "Data/Static resource: Stores structured data or plain text used by the system.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 0,
       "velocity_score": 0.0
@@ -2876,7 +2872,7 @@
       "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "ResourceRepository",
+      "domain_cluster": null,
       "functions": [],
       "identity": "src/codebase_cartographer.egg-info/requires.txt",
       "importance_score": 1,
@@ -2896,8 +2892,8 @@
       },
       "pagerank_score": 0.0,
       "path": "src/codebase_cartographer.egg-info/requires.txt",
-      "purpose_confidence": 0.1,
-      "purpose_statement": "Data/Static resource: Stores structured data or plain text used by the system.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 0,
       "velocity_score": 0.0
@@ -2909,7 +2905,7 @@
       "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "ResourceRepository",
+      "domain_cluster": null,
       "functions": [],
       "identity": "src/codebase_cartographer.egg-info/top_level.txt",
       "importance_score": 1,
@@ -2929,8 +2925,8 @@
       },
       "pagerank_score": 0.0,
       "path": "src/codebase_cartographer.egg-info/top_level.txt",
-      "purpose_confidence": 0.1,
-      "purpose_statement": "Data/Static resource: Stores structured data or plain text used by the system.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
       "unique_authors_30d": 0,
       "velocity_score": 0.0
@@ -2939,10 +2935,10 @@
       "architecture_layer": "graph",
       "change_velocity_30d": 0.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeInsight",
+      "domain_cluster": null,
       "functions": [],
       "identity": "src/graph/__init__.py",
       "importance_score": 1,
@@ -2962,10 +2958,10 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "src/graph/__init__.py",
-      "purpose_confidence": 0.1,
-      "purpose_statement": "Package initialization: Defines the module structure and exposes public interfaces for this directory.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 0.0
     },
     {
@@ -2980,10 +2976,10 @@
           "parent_module": "src/graph/graph_builder.py"
         }
       ],
-      "commit_count_30d": 3,
+      "commit_count_30d": 0,
       "complexity_score": 26.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeBaseOrchestrator",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -3098,15 +3094,15 @@
       },
       "pagerank_score": 0.011499085578523813,
       "path": "src/graph/graph_builder.py",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "This module builds a graph representation of the codebase structure by adding modules and computing intelligence based on their relationships and dependencies.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 2.0
     },
     {
       "architecture_layer": "graph",
-      "change_velocity_30d": 3.0,
+      "change_velocity_30d": 4.0,
       "classes": [
         {
           "bases": [],
@@ -3116,10 +3112,10 @@
           "parent_module": "src/graph/knowledge_graph.py"
         }
       ],
-      "commit_count_30d": 4,
+      "commit_count_30d": 0,
       "complexity_score": 70.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeBaseOrchestrator",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -3343,28 +3339,28 @@
       "is_informational": false,
       "is_sink_node": false,
       "language": "py",
-      "last_modified": "2026-03-14T09:10:20+03:00",
+      "last_modified": "2026-03-15T02:27:08+03:00",
       "metadata": {
         "author_breadth": 1,
         "last_author": "richh-s",
-        "last_modified": "2026-03-14T09:10:20+03:00"
+        "last_modified": "2026-03-15T02:27:08+03:00"
       },
       "pagerank_score": 0.011376368081589884,
       "path": "src/graph/knowledge_graph.py",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "This module manages the creation and manipulation of a knowledge graph representing data lineage, including adding nodes for different types of entities (data nodes, transformation nodes, module nodes) and edges between them.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
-      "velocity_score": 3.0
+      "unique_authors_30d": 0,
+      "velocity_score": 4.0
     },
     {
       "architecture_layer": "model",
       "change_velocity_30d": 0.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeInsight",
+      "domain_cluster": null,
       "functions": [],
       "identity": "src/models/__init__.py",
       "importance_score": 1,
@@ -3384,10 +3380,10 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "src/models/__init__.py",
-      "purpose_confidence": 0.1,
-      "purpose_statement": "Package initialization: Defines the module structure and exposes public interfaces for this directory.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 0.0
     },
     {
@@ -3441,10 +3437,10 @@
           "parent_module": "src/models/lineage.py"
         }
       ],
-      "commit_count_30d": 2,
+      "commit_count_30d": 0,
       "complexity_score": 1.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeBaseOrchestrator",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -3496,10 +3492,10 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "src/models/lineage.py",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "This module defines classes representing various components in the data lineage graph such as dataset roles, column references, data nodes, transformation nodes, and lineage edges, which are essential for tracking how data flows through different stages of processing.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 0.0
     },
     {
@@ -3543,10 +3539,10 @@
           "parent_module": "src/models/nodes.py"
         }
       ],
-      "commit_count_30d": 4,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "DataIntegrationAndAnalysis",
+      "domain_cluster": null,
       "functions": [],
       "identity": "src/models/nodes.py",
       "importance_score": 1,
@@ -3575,10 +3571,10 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "src/models/nodes.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 0 functions and imports 2 dependencies. Key features likely include system coordination.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 3.0
     },
     {
@@ -3593,10 +3589,10 @@
           "parent_module": "src/orchestrator.py"
         }
       ],
-      "commit_count_30d": 11,
+      "commit_count_30d": 0,
       "complexity_score": 61.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeBaseOrchestrator",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -3799,10 +3795,10 @@
       },
       "pagerank_score": 0.09946147887859945,
       "path": "src/orchestrator.py",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "This module orchestrates the analysis process by managing tasks such as loading and saving cache, computing hashes, propagating domains, running analyses, and generating reports, ensuring that data lineage information is accurately tracked throughout a repository.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 10.0
     },
     {
@@ -3837,10 +3833,10 @@
           "parent_module": "src/server.py"
         }
       ],
-      "commit_count_30d": 6,
+      "commit_count_30d": 0,
       "complexity_score": 39.0,
-      "documentation_drift": true,
-      "domain_cluster": "CodeBaseOrchestrator",
+      "documentation_drift": null,
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -4146,27 +4142,25 @@
       "last_modified": "2026-03-15T01:05:50+03:00",
       "metadata": {
         "author_breadth": 1,
-        "drift_contradiction": "The docstring describes a FastAPI backend that serves the UI and exposes REST APIs for the frontend, while the actual purpose of the module is to provide the backend for a web UI server that interacts with codebase analysis and management functionalities. This discrepancy indicates that the documentation does not accurately reflect the current implementation.",
-        "drift_severity": "high",
         "last_author": "richh-s",
         "last_modified": "2026-03-15T01:05:50+03:00"
       },
       "pagerank_score": 0.03844960865811741,
       "path": "src/server.py",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "This module provides the backend for a web UI server that serves REST APIs to interact with the codebase analysis and management functionalities, including cloning repositories, analyzing them, and providing metadata.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 5.0
     },
     {
       "architecture_layer": "utility",
       "change_velocity_30d": 0.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeInsight",
+      "domain_cluster": null,
       "functions": [],
       "identity": "src/utils/__init__.py",
       "importance_score": 1,
@@ -4186,10 +4180,10 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "src/utils/__init__.py",
-      "purpose_confidence": 0.1,
-      "purpose_statement": "Package initialization: Defines the module structure and exposes public interfaces for this directory.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 0.0
     },
     {
@@ -4204,10 +4198,10 @@
           "parent_module": "src/utils/canonicalization_service.py"
         }
       ],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 12.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeBaseOrchestrator",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -4294,20 +4288,20 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "src/utils/canonicalization_service.py",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "This module handles the normalization and canonicalization of paths to ensure consistency in how files are referenced within a codebase, which is crucial for accurate data lineage tracking.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 0.0
     },
     {
       "architecture_layer": "utility",
       "change_velocity_30d": 2.0,
       "classes": [],
-      "commit_count_30d": 2,
+      "commit_count_30d": 0,
       "complexity_score": 4.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeBaseOrchestrator",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -4348,10 +4342,10 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "src/utils/clustering.py",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "This module clusters different parts of the codebase into domains based on their similarity and dependencies, aiding in understanding how various components interact within a repository.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 2.0
     },
     {
@@ -4366,10 +4360,10 @@
           "parent_module": "src/utils/git_provider.py"
         }
       ],
-      "commit_count_30d": 2,
+      "commit_count_30d": 0,
       "complexity_score": 17.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeBaseOrchestrator",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -4469,10 +4463,10 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "src/utils/git_provider.py",
-      "purpose_confidence": 1.0,
-      "purpose_statement": "This module provides utilities for interacting with Git repositories to fetch metadata such as file metrics, current SHA, and changed files, which is essential for tracking changes in the codebase over time.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 2.0
     },
     {
@@ -4487,10 +4481,10 @@
           "parent_module": "src/utils/git_utils.py"
         }
       ],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 13.0,
       "documentation_drift": null,
-      "domain_cluster": "DataScienceTools",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -4557,10 +4551,10 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "src/utils/git_utils.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 3 functions and imports 3 dependencies. Key features likely include __init__, _run_git_cmd.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 0.0
     },
     {
@@ -4584,10 +4578,10 @@
           "parent_module": "src/utils/identity_resolver.py"
         }
       ],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 24.0,
       "documentation_drift": null,
-      "domain_cluster": "DataScienceTools",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -4691,10 +4685,10 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "src/utils/identity_resolver.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 6 functions and imports 4 dependencies. Key features likely include __init__, resolve.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 0.0
     },
     {
@@ -4716,10 +4710,10 @@
           "parent_module": "src/utils/llm_client.py"
         }
       ],
-      "commit_count_30d": 4,
+      "commit_count_30d": 0,
       "complexity_score": 57.0,
       "documentation_drift": null,
-      "domain_cluster": "DataScienceTools",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -4857,20 +4851,20 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "src/utils/llm_client.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 8 functions and imports 7 dependencies. Key features likely include __init__, can_afford_batch.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 4.0
     },
     {
       "architecture_layer": "utility",
       "change_velocity_30d": 1.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 8.0,
       "documentation_drift": null,
-      "domain_cluster": "DataIntegrationAndAnalysis",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -4919,10 +4913,10 @@
       },
       "pagerank_score": 0.011499085578523813,
       "path": "src/utils/module_summary.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 1 functions and imports 4 dependencies. Key features likely include build_module_summary.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 1.0
     },
     {
@@ -4937,10 +4931,10 @@
           "parent_module": "src/utils/semantic_index.py"
         }
       ],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 21.0,
-      "documentation_drift": false,
-      "domain_cluster": "CodeInsight",
+      "documentation_drift": null,
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -5067,27 +5061,25 @@
       "last_modified": "2026-03-12T16:14:14+03:00",
       "metadata": {
         "author_breadth": 1,
-        "drift_contradiction": null,
-        "drift_severity": null,
         "last_author": "richh-s",
         "last_modified": "2026-03-12T16:14:14+03:00"
       },
       "pagerank_score": 0.013339848032532759,
       "path": "src/utils/semantic_index.py",
-      "purpose_confidence": 0.4,
-      "purpose_statement": "Estimated purpose: Semantic Index \u2014 Persistent vector store for module purpose statements.\n\nStores embeddings as a flat JSON file in semantic_index/ directory.\nProvides fast cosine-similarity search without requiring an external vector DB.\n\nUsed by:\n  - NavigatorTools.find_implementation() (runtime lookup)\n  - Orchestrator (build/update on each analysis run)",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 1.0
     },
     {
       "architecture_layer": "utility",
       "change_velocity_30d": 1.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 3.0,
       "documentation_drift": null,
-      "domain_cluster": "DataIntegrationAndAnalysis",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -5128,10 +5120,10 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "src/utils/similarity.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 1 functions and imports 2 dependencies. Key features likely include cosine_similarity.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 1.0
     },
     {
@@ -5160,10 +5152,10 @@
           "parent_module": "src/utils/trace_logger.py"
         }
       ],
-      "commit_count_30d": 2,
+      "commit_count_30d": 0,
       "complexity_score": 9.0,
       "documentation_drift": null,
-      "domain_cluster": "DataScienceTools",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -5238,20 +5230,20 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "src/utils/trace_logger.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 3 functions and imports 5 dependencies. Key features likely include __init__, log_event.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 2.0
     },
     {
       "architecture_layer": "core",
       "change_velocity_30d": 1.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "DataIntegrationAndAnalysis",
+      "domain_cluster": null,
       "functions": [],
       "identity": "test_parse.py",
       "importance_score": 1,
@@ -5292,20 +5284,20 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "test_parse.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 0 functions and imports 5 dependencies. Key features likely include system coordination.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 1.0
     },
     {
       "architecture_layer": "core",
       "change_velocity_30d": 1.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "DataIntegrationAndAnalysis",
+      "domain_cluster": null,
       "functions": [],
       "identity": "test_pr.py",
       "importance_score": 1,
@@ -5330,20 +5322,20 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "test_pr.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 0 functions and imports 1 dependencies. Key features likely include system coordination.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 1.0
     },
     {
       "architecture_layer": "core",
       "change_velocity_30d": 1.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 5.0,
       "documentation_drift": null,
-      "domain_cluster": "DataIntegrationAndAnalysis",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -5388,20 +5380,20 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "test_scope.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 1 functions and imports 3 dependencies. Key features likely include resolve_table.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 1.0
     },
     {
       "architecture_layer": "test",
       "change_velocity_30d": 3.0,
       "classes": [],
-      "commit_count_30d": 3,
+      "commit_count_30d": 0,
       "complexity_score": 10.0,
       "documentation_drift": null,
-      "domain_cluster": "DataIntegrationAndAnalysis",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -5541,20 +5533,20 @@
       },
       "pagerank_score": 0.040364227106859406,
       "path": "tests/test_archivist_excellence.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 8 functions and imports 7 dependencies. Key features likely include repo_path, test_artifact_metadata_header.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 3.0
     },
     {
       "architecture_layer": "test",
       "change_velocity_30d": 1.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 3.0,
       "documentation_drift": null,
-      "domain_cluster": "DataIntegrationAndAnalysis",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -5621,20 +5613,20 @@
       },
       "pagerank_score": 0.011376368081589884,
       "path": "tests/test_lineage_graph.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 3 functions and imports 3 dependencies. Key features likely include test_lineage_graph_impact_analysis, test_lineage_graph_integrity.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 1.0
     },
     {
       "architecture_layer": "test",
       "change_velocity_30d": 1.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 3.0,
       "documentation_drift": null,
-      "domain_cluster": "DataIntegrationAndAnalysis",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -5701,20 +5693,20 @@
       },
       "pagerank_score": 0.017306517585576327,
       "path": "tests/test_python_dataflow.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 3 functions and imports 3 dependencies. Key features likely include test_python_dataflow_pandas, test_python_dataflow_sqlalchemy.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 1.0
     },
     {
       "architecture_layer": "test",
       "change_velocity_30d": 1.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 4.0,
       "documentation_drift": null,
-      "domain_cluster": "DataIntegrationAndAnalysis",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -5802,20 +5794,20 @@
       },
       "pagerank_score": 0.02974323150796951,
       "path": "tests/test_semanticist.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 4 functions and imports 5 dependencies. Key features likely include mock_llm, test_semantic_analysis_flow.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 1.0
     },
     {
       "architecture_layer": "test",
       "change_velocity_30d": 1.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 4.0,
       "documentation_drift": null,
-      "domain_cluster": "DataIntegrationAndAnalysis",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -5889,20 +5881,20 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "tests/test_sql_lineage.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 4 functions and imports 2 dependencies. Key features likely include test_sql_lineage_dbt_ref, test_sql_lineage_dbt_source.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 1.0
     },
     {
       "architecture_layer": "test",
       "change_velocity_30d": 1.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 2.0,
       "documentation_drift": null,
-      "domain_cluster": "DataIntegrationAndAnalysis",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -5962,20 +5954,20 @@
       },
       "pagerank_score": 0.025267200351293522,
       "path": "tests/test_surveyor.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 2 functions and imports 4 dependencies. Key features likely include test_surveyor_negative_dead_code, test_surveyor_phase1_5_features.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 1.0
     },
     {
       "architecture_layer": "test",
       "change_velocity_30d": 1.0,
       "classes": [],
-      "commit_count_30d": 1,
+      "commit_count_30d": 0,
       "complexity_score": 1.0,
       "documentation_drift": null,
-      "domain_cluster": "DataIntegrationAndAnalysis",
+      "domain_cluster": null,
       "functions": [
         {
           "call_count_within_repo": 0,
@@ -6036,20 +6028,20 @@
       },
       "pagerank_score": 0.03361476477549327,
       "path": "tests/verify_recon.py",
-      "purpose_confidence": 0.2,
-      "purpose_statement": "Inferred purpose: This module manages 1 functions and imports 7 dependencies. Key features likely include verify_recon_generation.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 1.0
     },
     {
       "architecture_layer": "unknown",
       "change_velocity_30d": 6.0,
       "classes": [],
-      "commit_count_30d": 6,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeInsight",
+      "domain_cluster": null,
       "functions": [],
       "identity": "ui/app.js",
       "importance_score": 1,
@@ -6069,20 +6061,20 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "ui/app.js",
-      "purpose_confidence": 0.1,
-      "purpose_statement": "Unknown purpose (Fallback enabled)",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 6.0
     },
     {
       "architecture_layer": "unknown",
       "change_velocity_30d": 4.0,
       "classes": [],
-      "commit_count_30d": 4,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeInsight",
+      "domain_cluster": null,
       "functions": [],
       "identity": "ui/index.html",
       "importance_score": 1,
@@ -6102,20 +6094,20 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "ui/index.html",
-      "purpose_confidence": 0.1,
-      "purpose_statement": "Unknown purpose (Fallback enabled)",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 4.0
     },
     {
       "architecture_layer": "unknown",
       "change_velocity_30d": 3.0,
       "classes": [],
-      "commit_count_30d": 3,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeInsight",
+      "domain_cluster": null,
       "functions": [],
       "identity": "ui/style.css",
       "importance_score": 1,
@@ -6135,20 +6127,20 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "ui/style.css",
-      "purpose_confidence": 0.1,
-      "purpose_statement": "Unknown purpose (Fallback enabled)",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 3.0
     },
     {
       "architecture_layer": "unknown",
       "change_velocity_30d": 2.0,
       "classes": [],
-      "commit_count_30d": 2,
+      "commit_count_30d": 0,
       "complexity_score": 0.0,
       "documentation_drift": null,
-      "domain_cluster": "CodeBaseOrchestrator",
+      "domain_cluster": null,
       "functions": [],
       "identity": "uv.lock",
       "importance_score": 1,
@@ -6168,16 +6160,14 @@
       },
       "pagerank_score": 0.010394628106118447,
       "path": "uv.lock",
-      "purpose_confidence": 0.0,
-      "purpose_statement": "The module 'uv.lock' does not contain any functions, classes, constants or imports that provide a clear business purpose based on the provided code implementation.",
+      "purpose_confidence": null,
+      "purpose_statement": null,
       "semantic_embedding": null,
-      "unique_authors_30d": 1,
+      "unique_authors_30d": 0,
       "velocity_score": 2.0
     }
   ],
   "scc_groups": [],
-  "schema_version": "1.0",
-  "timestamp": "2026-03-14T23:26:03.482660+00:00",
   "top_hubs": [
     "src/orchestrator.py",
     "src/cli.py",

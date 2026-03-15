@@ -339,8 +339,11 @@ class Orchestrator:
         Compiles evidence and generates a business-level reconnaissance report.
         Standardizes on 'onboarding_brief.md' for Phase 4.
         """
+        # Sort modules by PageRank to prioritize architectural hubs for evidence
+        sorted_modules = sorted(modules, key=lambda x: getattr(x, "pagerank_score", 0.0), reverse=True)
+        
         evidence_packets = []
-        for m in modules:
+        for m in sorted_modules:
             if m.purpose_statement:
                 evidence_lines = []
                 for f in m.functions[:3]: # Increase sample for better citations

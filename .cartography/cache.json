@@ -50,7 +50,7 @@
     "src/agents/__init__.py": "ad2e13b69c4fc1fda46413f740f426fc1793cfc6d6da8d226ba619f1aef48be7",
     "src/agents/navigator.py": "04a0dfe758870411b9e827d1a2e52cb9ca755b4a777c77605f1930aaf2a2724a",
     "src/agents/archivist.py": "fbdf63014a9e314df1bc2da791120ab57b601e39da6cb58ff58a210e632f3ae3",
-    "src/agents/semanticist.py": "25450461ba5dfbfd2a355d39f6b2e0b3e1a02612b7be4fb52126295474421b42",
+    "src/agents/semanticist.py": "a1a906fbabed26cf3360cd6c677262ecfe9f60785fb009493f7d43c9b193fb32",
     "src/utils/clustering.py": "048888f8b85aa26ad0d8ce7fb2961980416fe9989b75151f54d5549716f04dc4",
     "src/utils/similarity.py": "fc8ba18141e7cfd0bebb96336c1ead4d2da14cc7dcdc8544bd5ea8492591d4a5",
     "src/utils/__init__.py": "ad2e13b69c4fc1fda46413f740f426fc1793cfc6d6da8d226ba619f1aef48be7",
@@ -71,11 +71,11 @@
     "src/codebase_cartographer.egg-info/requires.txt": "c190aa6e928a32dcd37064be1286d2385b135ceff5f646c15ad725ec440a4471",
     "src/codebase_cartographer.egg-info/top_level.txt": "21e423b53270d185f5959aad158676953a52c1aa76c350029a8a230f07ad01ba",
     "src/codebase_cartographer.egg-info/dependency_links.txt": "ad2e13b69c4fc1fda46413f740f426fc1793cfc6d6da8d226ba619f1aef48be7",
-    "semantic_index/index.json": "515f36cd5e6cc9dea271748e20e38d6190562eeb149bb3ff588d06f8ffa43abe",
+    "semantic_index/index.json": "117da359b7ff7805a41b488a73b8b468375ed7a21bff042511e4ba0a2eae25f3",
     "test_llm.py": "41d21b2d4b665d7c2a85cc52e6b92b9c2a3635defbb6f9ef373bb349067acba2",
     "test_llm_google.py": "0720c9bdb16481f757554cdf177b78889d025658a335640e2d6cba9267ba2b87",
     "test_llm_priority.py": "0db218c6298e42f86f4fd1183fdcc9707e5d7d8a088e78bc57608f0344cfe365",
-    "FINAL_REPORT.md": "dc08cae75e012e0e84e1ab6556498940ffe111d875cb434196712f06c5c5e28c"
+    "FINAL_REPORT.md": "670575cc03e40927e50ffe7a0daf0831f5f2235b91e05942322e8cbe873d6fbf"
   },
   "signatures": {
     "test_parse.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",

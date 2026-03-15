@@ -1,6 +1,6 @@
 # 🗺️ Codebase Technical Overview
-**Commit SHA:** `a94f183c107926dd1c4accba6f8c8d2eef11c37e`
-**Generated:** 2026-03-15T02:24:30.531870
+**Commit SHA:** `589927b72c7b78b3e4124459caef8516f5648a58`
+**Generated:** 2026-03-15T04:07:07.648422
 **Total Modules:** 71
 
 ## 🏗️ Architecture Overview
@@ -27,13 +27,13 @@ The following sequence represents the longest dependency chain in the system, ma
 ## 🚀 High-Velocity Files
 | File | 30d Commits | Authors | Risk |
 | :--- | :--- | :--- | :--- |
-| `src/orchestrator.py` | 11 | 1 | High churn |
+| `src/orchestrator.py` | 12 | 1 | High churn |
 | `src/agents/archivist.py` | 7 | 1 | High churn |
 | `src/agents/surveyor.py` | 7 | 1 | High churn |
+| `semantic_index/index.json` | 7 | 1 | High churn |
 | `src/server.py` | 6 | 1 | High churn |
 | `ui/app.js` | 6 | 1 | High churn |
 | `src/agents/semanticist.py` | 6 | 1 | High churn |
-| `semantic_index/index.json` | 6 | 1 | High churn |
 
 ## 📂 Module Inventory
 | Module | Domain | Rank | Sync | Purpose |

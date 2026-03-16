@@ -194,14 +194,44 @@ class SemanticistAgent:
         response = self.llm._call_with_retry("synthesis", prompt, is_json=False)
         if not response or "Failed to synthesize answers" in response:
             # Fallback to a structured non-LLM synthesis if API fails
-            fallback = "## Phase 0: System Analysis (Fallback Synthesis)\n\n"
-            fallback += "### Observation Summary\n"
-            fallback += f"The system analyzed {graph_context.get('module_count', 0)} modules and "
-            fallback += f"identified {graph_context.get('data_node_count', 0)} primary data entities.\n\n"
-            fallback += "### Data Entities\n"
-            for packet in evidence_packets[:5]:
-                fallback += f"- **{packet['module']}**: {packet['purpose']}\n"
-            fallback += "\n### Recommendation\nManual review of `module_graph.json` is recommended as LLM synthesis was unavailable."
+            fallback = "## Phase 0: System Analysis (Heuristic Synthesis)\n\n"
+            fallback += "> [!NOTE]\n"
+            fallback += "> LLM synthesis was unavailable. The follows answers are derived from structural graph metrics.\n\n"
+            
+            fallback += "### 1. What is the primary data ingestion path? (Identify entry points)\n"
+            sources = graph_context.get("primary_sources", [])
+            if sources:
+                fallback += f"Primary entry points identified via lineage analysis: {', '.join([f'`{s}`' for s in sources])}.\n\n"
+            else:
+                fallback += "Insufficient direct evidence to identify data ingestion paths without LLM synthesis.\n\n"
+                
+            fallback += "### 2. What are the 3-5 most critical output datasets/endpoints? (Identify sink nodes)\n"
+            sinks = graph_context.get("primary_sinks", [])
+            if sinks:
+                fallback += f"Primary output datasets (sinks) identified: {', '.join([f'`{s}`' for s in sinks])}.\n\n"
+            else:
+                fallback += "Insufficient direct evidence of critical output datasets.\n\n"
+
+            fallback += "### 3. What is the blast radius if the most critical module fails? (Quantify downstream impact)\n"
+            hubs = graph_context.get("architectural_hubs", [])
+            if hubs:
+                fallback += f"The most critical architectural hub is `{hubs[0]}`. Failure here has a high probability of cascading impacts across {graph_context.get('module_count', 0)} modules.\n\n"
+            else:
+                fallback += "Insufficient evidence to quantify specific blast radius.\n\n"
+
+            fallback += "### 4. Where is the business logic concentrated vs. distributed? (Map architectural hubs)\n"
+            if hubs:
+                fallback += f"Business logic appears concentrated in the following core hubs: {', '.join([f'`{h}`' for h in hubs[:3]])}.\n\n"
+            else:
+                fallback += "Logic distribution analysis unavailable without LLM synthesis.\n\n"
+
+            fallback += "### 5. What has changed most frequently in the last 90 days? (Identify high-velocity pain points)\n"
+            hot = graph_context.get("high_velocity_files", [])
+            if hot:
+                fallback += f"High-velocity code areas (frequent changes) identified in: {', '.join([f'`{h}`' for h in hot[:3]])}.\n\n"
+            else:
+                fallback += "Change velocity analysis unavailable.\n\n"
+
             return fallback
 
         return response

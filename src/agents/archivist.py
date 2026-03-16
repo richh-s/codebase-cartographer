@@ -162,12 +162,25 @@ class ArchivistAgent:
 
         # 4. Detailed Module Inventory
         lines.append("## 📂 Module Inventory")
-        lines.append("| Module | Layer | Importance | Purpose |")
-        lines.append("| :--- | :--- | :--- | :--- |")
+        lines.append("| Module | Layer | Importance | Rank | Sync | Purpose |")
+        lines.append("| :--- | :--- | :--- | :--- | :--- | :--- |")
         
         for m in modules_sorted:
-            purpose = (m.purpose_statement or "No purpose statement generated.").split('.')[0] + "." # First sentence
-            lines.append(f"| `{m.path}` | {m.architecture_layer} | {m.importance_score} | {purpose} |")
+            # Purpose Statement logic
+            purpose_raw = m.purpose_statement or "No purpose statement generated."
+            purpose = purpose_raw.split('.')[0] + "." # First sentence
+            
+            # Rank logic (PageRank)
+            rank = f"{(m.pagerank_score or 0.0):.3f}"
+            
+            # Sync / Drift logic
+            drift_status = "✅"
+            if getattr(m, "documentation_drift", False):
+                drift_status = "⚠️ Drift"
+            elif getattr(m, "documentation_drift", None) is None:
+                drift_status = "—"
+                
+            lines.append(f"| `{m.path}` | {m.architecture_layer} | {m.importance_score} | {rank} | {drift_status} | {purpose} |")
             
         # 5. Domain Decomposition
         lines.append("\n## 🏷️ Business Domain Map")
@@ -179,7 +192,8 @@ class ArchivistAgent:
             lines.append(f"### {domain}")
             item_lines = []
             for m in d_modules:
-                item_lines.append(f"- **`{m.path}`**: {m.purpose_statement}")
+                purpose = m.purpose_statement or "_No architectural purpose statement defined for this module._"
+                item_lines.append(f"- **`{m.path}`**: {purpose}")
             lines.extend(item_lines)
             lines.append("")
 

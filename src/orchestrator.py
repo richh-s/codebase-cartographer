@@ -132,6 +132,19 @@ class Orchestrator:
         # Prefetch Git Metrics
         self.git.prefetch_metadata(days=velocity_days)
 
+        # Merge existing semantic data (Phase 6.5 Master Thinker Polish)
+        # We must do this BEFORE Surveyor runs and overwrites the file
+        old_nodes_map = {}
+        m_graph_path = os.path.join(self.output_dir, "module_graph.json")
+        if os.path.exists(m_graph_path):
+            try:
+                with open(m_graph_path, "r") as f:
+                    old_data = json.load(f)
+                    old_nodes_map = {n["identity"]: n for n in old_data.get("nodes", [])}
+                print(f"[Info] Orchestrator: Loaded {len(old_nodes_map)} nodes from existing module_graph.json for semantic merging.")
+            except Exception as e:
+                print(f"[Warning] Orchestrator: Failed to load existing semantic data: {e}")
+
         # 1. Run Surveyor for Structural Graph
         print(f"[1/3] Running Surveyor Agent...")
         start_time = datetime.now()
@@ -142,30 +155,23 @@ class Orchestrator:
         
         modules = list(module_graph_builder.nodes.values())
         
-        # Merge existing semantic data (Phase 6.5 Master Thinker Polish)
-        m_graph_path = os.path.join(self.output_dir, "module_graph.json")
-        if os.path.exists(m_graph_path):
-            try:
-                with open(m_graph_path, "r") as f:
-                    old_data = json.load(f)
-                    old_nodes = {n["identity"]: n for n in old_data.get("nodes", [])}
-                    for m in modules:
-                        if m.identity in old_nodes:
-                            old = old_nodes[m.identity]
-                            # Preserve semantic fields if they are missing in current node
-                            if not m.purpose_statement:
-                                m.purpose_statement = old.get("purpose_statement")
-                            if not m.domain_cluster:
-                                m.domain_cluster = old.get("domain_cluster")
-                            if m.purpose_confidence is None:
-                                m.purpose_confidence = old.get("purpose_confidence")
-                            if m.documentation_drift is None:
-                                m.documentation_drift = old.get("documentation_drift")
-                            if not m.semantic_embedding:
-                                m.semantic_embedding = old.get("semantic_embedding")
-                print("[Info] Orchestrator: Merged existing semantic data from module_graph.json")
-            except Exception as e:
-                print(f"[Warning] Orchestrator: Failed to merge existing semantic data: {e}")
+        # Apply merged semantic data (Phase 6.5 Master Thinker Polish)
+        if old_nodes_map:
+            for m in modules:
+                if m.identity in old_nodes_map:
+                    old = old_nodes_map[m.identity]
+                    # Preserve semantic fields if they are missing in current node
+                    if not m.purpose_statement:
+                        m.purpose_statement = old.get("purpose_statement")
+                    if not m.domain_cluster:
+                        m.domain_cluster = old.get("domain_cluster")
+                    if m.purpose_confidence is None:
+                        m.purpose_confidence = old.get("purpose_confidence")
+                    if m.documentation_drift is None:
+                        m.documentation_drift = old.get("documentation_drift")
+                    if not m.semantic_embedding:
+                        m.semantic_embedding = old.get("semantic_embedding")
+            print("[Info] Orchestrator: Merged existing semantic data into current modules")
         
         # 2. Run Hydrologist for Data Lineage Graph
         print(f"[2/3] Running Hydrologist Agent...")
@@ -214,10 +220,14 @@ class Orchestrator:
                     for u, v in module_graph_builder.graph.in_edges(sid):
                         blast_radius.add(u)
             
-            # Ensure ANY module without a purpose statement gets analyzed if we're in LLM mode
-            # This handles the case where a previous run was non-LLM
+            # Ensure ANY module without a real purpose statement gets analyzed if we're in LLM mode
+            # This handles cases where a previous run was non-LLM or returned a fallback
+            placeholders = {"No purpose statement generated.", "Unknown purpose (Fallback enabled)", "null", ""}
             for m in modules:
-                if not m.purpose_statement or not m.domain_cluster:
+                is_missing_purpose = not m.purpose_statement or m.purpose_statement in placeholders
+                is_missing_domain = not m.domain_cluster or m.domain_cluster in {"Unknown", "General", "Unclustered", "null"}
+                
+                if is_missing_purpose or is_missing_domain:
                     blast_radius.add(m.identity)
 
             re_analyze_targets = [m for m in modules if m.identity in blast_radius]
@@ -362,11 +372,21 @@ class Orchestrator:
                 }
                 evidence_packets.append(packet)
 
+        # Identify architectural hubs (highest PageRank)
+        hubs = sorted(modules, key=lambda x: getattr(x, "pagerank_score", 0.0), reverse=True)[:5]
+        
+        # Identify high-velocity pain points
+        hot_files = sorted(modules, key=lambda x: getattr(x, "change_velocity_30d", 0.0), reverse=True)[:5]
+
         graph_context = {
             "module_count": len(modules),
             "data_node_count": len(lineage_graph.data_nodes),
             "transformation_count": len(lineage_graph.transformation_nodes),
-            "edge_count": lineage_graph.graph.number_of_edges()
+            "edge_count": lineage_graph.graph.number_of_edges(),
+            "architectural_hubs": [m.identity for m in hubs],
+            "high_velocity_files": [m.identity for m in hot_files],
+            "primary_sources": [n.identity for n in lineage_graph.find_sources()][:5],
+            "primary_sinks": [n.identity for n in lineage_graph.find_sinks()][:5]
         }
 
         report_content = self.semanticist.answer_day_one_questions(graph_context, evidence_packets)
